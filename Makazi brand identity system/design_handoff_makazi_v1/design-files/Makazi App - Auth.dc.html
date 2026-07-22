@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hanken Grotesk',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  :root{
+    --ink:#0B140F;--paper:#F6F5F0;--white:#FFFFFF;
+    --green:#0E5C43;--green-deep:#093C2C;--green-soft:#E3EDE7;--green-line:#C9DBD1;
+    --clay:#DB6B3B;--clay-soft:#F5E4DA;
+    --success:#1E9E5A;--warning:#E0A008;--error:#CF4B3E;
+    --stone:#5C665F;--line:#E4E2DA;--line-2:#D8D6CD;
+  }
+  a{color:var(--green);text-decoration:none}
+  a:hover{color:var(--green-deep)}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea{font-family:inherit;font-size:15px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--green);outline-offset:1px}
+  ::selection{background:var(--clay);color:#fff}
+  @keyframes barSweep{0%{width:0%}50%{width:65%}100%{width:100%}}
+  @keyframes popIn{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+  @keyframes toastUp{from{transform:translate(-50%,16px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-wrap:wrap">
+
+  <!-- LEFT BRAND PANEL -->
+  <div style="flex:1 1 300px;min-width:280px;max-width:400px;background:var(--green-deep);color:#fff;padding:clamp(32px,4vw,56px);display:flex;flex-direction:column;justify-content:space-between;position:relative">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:clamp(40px,10vh,120px)">
+        <img src="assets/makazi-mark-light.png" alt="Makazi" style="height:26px">
+        <span style="font-family:'Schibsted Grotesk';font-weight:800;letter-spacing:.12em;font-size:15px">MAKAZI</span>
+      </div>
+      <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(24px,2.6vw,32px);letter-spacing:-.02em;line-height:1.25;margin:0 0 18px">{{ brandHeadline }}</h1>
+      <p style="font-size:15px;color:#C7CEC9;margin:0;line-height:1.6;max-width:340px">{{ brandSubcopy }}</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;gap:10px;align-items:flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M4 12l5 5L20 6"/></svg><span style="font-size:13px;color:#C7CEC9">Payments go straight to your account — Makazi never holds funds</span></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M4 12l5 5L20 6"/></svg><span style="font-size:13px;color:#C7CEC9">Works on smartphones and feature phones, via USSD</span></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M4 12l5 5L20 6"/></svg><span style="font-size:13px;color:#C7CEC9">Built for Kenyan rental housing, first</span></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div style="flex:2 1 400px;min-width:300px;display:flex;flex-direction:column">
+    <!-- top loading bar -->
+    <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;top:0;left:0;right:0;height:3px;z-index:100;background:var(--line)">
+        <div style="height:100%;background:var(--clay);animation:barSweep 0.7s ease-out forwards"></div>
+      </div>
+    </sc-if>
+
+    <!-- onboarding stepper -->
+    <sc-if value="{{ inOnboarding }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:22px clamp(24px,4vw,64px) 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <img src="assets/makazi-mark.png" alt="" style="height:20px">
+        <div style="flex:1"></div>
+        <sc-for list="{{ onboardingSteps }}" as="step" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="{{ step.dotStyle }}">{{ step.marker }}</div>
+            <span style="{{ step.labelStyle }}">{{ step.label }}</span>
+            <sc-if value="{{ step.hasLine }}" hint-placeholder-val="{{ true }}"><div style="width:18px;height:1.5px;background:var(--line-2)"></div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ inOnboarding }}" hint-placeholder-val="{{ false }}">
+    </sc-if>
+    <sc-if value="{{ showBackToSite }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:22px clamp(24px,4vw,64px) 0;text-align:right">
+        <a href="Makazi Website - Home.dc.html" style="font-size:13px;color:var(--stone)">← Back to website</a>
+      </div>
+    </sc-if>
+
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:32px 24px 60px">
+      <div style="{{ formAreaStyle }}">
+
+        <!-- LOGIN -->
+        <sc-if value="{{ is_login }}" hint-placeholder-val="{{ true }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:28px;letter-spacing:-.02em;margin:0 0 8px">Log in to Makazi</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 24px">Welcome back. Enter your details to continue.</p>
+          <div style="display:flex;gap:8px;margin-bottom:22px">
+            <button onClick="{{ pickLoginRoleLandlord }}" style="{{ loginRoleLandlordStyle }}">Landlord</button>
+            <button onClick="{{ pickLoginRoleCaretaker }}" style="{{ loginRoleCaretakerStyle }}">Caretaker</button>
+            <button onClick="{{ pickLoginRoleTenant }}" style="{{ loginRoleTenantStyle }}">Tenant</button>
+          </div>
+          <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
+            <div style="background:rgba(207,75,62,.08);border:1px solid rgba(207,75,62,.25);border-radius:10px;padding:12px 14px;margin-bottom:18px;display:flex;gap:9px;align-items:flex-start">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+              <span style="font-size:13px;color:var(--error)">Incorrect email or password. Try "wrong" as password to see this state, or anything else to continue.</span>
+            </div>
+          </sc-if>
+          <form onSubmit="{{ handleLogin }}">
+            <div style="margin-bottom:16px">
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Email</label>
+              <input type="email" required="" value="{{ loginEmail }}" onInput="{{ updateLoginEmail }}" placeholder="you@example.com" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            </div>
+            <div style="margin-bottom:10px">
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Password</label>
+              <input type="password" required="" value="{{ loginPassword }}" onInput="{{ updateLoginPassword }}" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            </div>
+            <div style="text-align:right;margin-bottom:22px"><a onClick="{{ gotoForgot }}" style="font-size:13px;cursor:pointer">Forgot password?</a></div>
+            <button type="submit" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px" style-hover="background:var(--green-deep)">Log in</button>
+          </form>
+          <p style="text-align:center;font-size:14px;color:var(--stone);margin:22px 0 0">New to Makazi? <a onClick="{{ gotoRegister }}" style="cursor:pointer;font-weight:600">Create an account</a></p>
+        </sc-if>
+
+        <!-- REGISTER -->
+        <sc-if value="{{ is_register }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:28px;letter-spacing:-.02em;margin:0 0 8px">Create your account</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 24px">Takes about two minutes.</p>
+          <form onSubmit="{{ handleRegister }}">
+            <div style="margin-bottom:16px">
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Full name</label>
+              <input type="text" required="" value="{{ regName }}" onInput="{{ updateRegName }}" placeholder="Wanjiru Mwangi" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            </div>
+            <div style="margin-bottom:16px">
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Email</label>
+              <input type="email" required="" value="{{ regEmail }}" onInput="{{ updateRegEmail }}" placeholder="you@example.com" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            </div>
+            <div style="margin-bottom:22px">
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Phone number</label>
+              <input type="tel" required="" value="{{ regPhone }}" onInput="{{ updateRegPhone }}" placeholder="+254 7XX XXX XXX" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            </div>
+            <button type="submit" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px" style-hover="background:var(--green-deep)">Continue</button>
+          </form>
+          <p style="text-align:center;font-size:14px;color:var(--stone);margin:22px 0 0">Already have an account? <a onClick="{{ gotoLogin }}" style="cursor:pointer;font-weight:600">Log in</a></p>
+        </sc-if>
+
+        <!-- CHOOSE ROLE -->
+        <sc-if value="{{ is_chooseRole }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">How will you use Makazi?</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 24px">Choose the account type that fits you. You can't change this later.</p>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+            <div onClick="{{ selectRoleLandlord }}" style="{{ roleCardLandlordStyle }}">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="flex-shrink:0"><rect x="3" y="9" width="7" height="12"/><rect x="14" y="4" width="7" height="17"/></svg>
+              <div><div style="font-weight:600;font-size:15px">Landlord</div><div style="font-size:13px;color:var(--stone)">I own or manage rental properties</div></div>
+            </div>
+            <div onClick="{{ selectRoleCaretaker }}" style="{{ roleCardCaretakerStyle }}">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="flex-shrink:0"><path d="M14.7 3.3a4 4 0 0 0-5.4 5.4L3 15l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg>
+              <div><div style="font-weight:600;font-size:15px">Caretaker</div><div style="font-size:13px;color:var(--stone)">I manage a property on a landlord's behalf</div></div>
+            </div>
+            <div onClick="{{ selectRoleTenant }}" style="{{ roleCardTenantStyle }}">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="flex-shrink:0"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+              <div><div style="font-weight:600;font-size:15px">Tenant</div><div style="font-size:13px;color:var(--stone)">I rent a unit and want to pay &amp; report issues</div></div>
+            </div>
+          </div>
+          <button onClick="{{ confirmRole }}" disabled="{{ roleNotChosen }}" style="{{ continueBtnStyle }}">Continue</button>
+        </sc-if>
+
+        <!-- VERIFY EMAIL -->
+        <sc-if value="{{ is_verifyEmail }}" hint-placeholder-val="{{ false }}">
+          <div style="width:52px;height:52px;border-radius:14px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin-bottom:20px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><path d="M4 4h16v16H4z"/><path d="M4 6l8 7 8-7"/></svg></div>
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Verify your email</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 26px">We sent a 6-digit code to <strong>{{ regEmailDisplay }}</strong></p>
+          <div style="display:flex;gap:8px;margin-bottom:20px">
+            <sc-for list="{{ otpEmailBoxes }}" as="box" hint-placeholder-count="6">
+              <input value="{{ box.value }}" onInput="{{ box.onInput }}" onKeyDown="{{ box.onKeyDown }}" maxlength="1" inputmode="numeric" style="width:44px;height:52px;border:1.5px solid var(--line-2);border-radius:10px;text-align:center;font-family:'JetBrains Mono';font-weight:600;font-size:20px">
+            </sc-for>
+          </div>
+          <button onClick="{{ verifyEmailNow }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px;margin-bottom:16px" style-hover="background:var(--green-deep)">Verify</button>
+          <p style="text-align:center;font-size:13px;color:var(--stone);margin:0">{{ resendLabel }} <a onClick="{{ resendOtp }}" style="{{ resendLinkStyle }}">Resend code</a></p>
+        </sc-if>
+
+        <!-- VERIFY PHONE -->
+        <sc-if value="{{ is_verifyPhone }}" hint-placeholder-val="{{ false }}">
+          <div style="width:52px;height:52px;border-radius:14px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin-bottom:20px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8 10.3a16 16 0 0 0 6 6l1.5-1.4a2 2 0 0 1 2.1-.4c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2z"/></svg></div>
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Verify your phone</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 26px">Enter the code sent via SMS to <strong>{{ regPhoneDisplay }}</strong></p>
+          <div style="display:flex;gap:8px;margin-bottom:20px">
+            <sc-for list="{{ otpPhoneBoxes }}" as="box" hint-placeholder-count="6">
+              <input value="{{ box.value }}" onInput="{{ box.onInput }}" onKeyDown="{{ box.onKeyDown }}" maxlength="1" inputmode="numeric" style="width:44px;height:52px;border:1.5px solid var(--line-2);border-radius:10px;text-align:center;font-family:'JetBrains Mono';font-weight:600;font-size:20px">
+            </sc-for>
+          </div>
+          <button onClick="{{ verifyPhoneNow }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px;margin-bottom:16px" style-hover="background:var(--green-deep)">Verify</button>
+          <p style="text-align:center;font-size:13px;color:var(--stone);margin:0">{{ resendLabel }} <a onClick="{{ resendOtp }}" style="{{ resendLinkStyle }}">Resend code</a></p>
+        </sc-if>
+
+        <!-- CREATE PASSWORD -->
+        <sc-if value="{{ is_createPassword }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Create a password</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 24px">Make it strong — you'll use it every time you log in.</p>
+          <sc-if value="{{ passwordError }}" hint-placeholder-val="{{ false }}">
+            <div style="background:rgba(207,75,62,.08);border:1px solid rgba(207,75,62,.25);border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:var(--error)">Passwords don't match. Please try again.</div>
+          </sc-if>
+          <div style="margin-bottom:10px">
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">New password</label>
+            <input type="password" value="{{ newPassword }}" onInput="{{ updateNewPassword }}" placeholder="At least 8 characters" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+          </div>
+          <div style="display:flex;gap:4px;margin-bottom:16px">
+            <div style="{{ strengthBar1 }}"></div><div style="{{ strengthBar2 }}"></div><div style="{{ strengthBar3 }}"></div>
+          </div>
+          <div style="margin-bottom:22px">
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Confirm password</label>
+            <input type="password" value="{{ confirmPassword }}" onInput="{{ updateConfirmPassword }}" placeholder="Re-enter password" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+          </div>
+          <button onClick="{{ createPasswordNow }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px" style-hover="background:var(--green-deep)">Create account</button>
+        </sc-if>
+
+        <!-- FORGOT EMAIL -->
+        <sc-if value="{{ is_forgotEmail }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Reset your password</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 24px">Enter your email and we'll send you a reset code.</p>
+          <div style="margin-bottom:22px">
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Email</label>
+            <input type="email" value="{{ forgotEmail }}" onInput="{{ updateForgotEmail }}" placeholder="you@example.com" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+          </div>
+          <button onClick="{{ sendResetCode }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px;margin-bottom:16px" style-hover="background:var(--green-deep)">Send reset code</button>
+          <p style="text-align:center;font-size:14px"><a onClick="{{ gotoLogin }}" style="cursor:pointer">← Back to log in</a></p>
+        </sc-if>
+
+        <!-- FORGOT OTP -->
+        <sc-if value="{{ is_forgotOtp }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Enter reset code</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 26px">Sent to <strong>{{ forgotEmailDisplay }}</strong></p>
+          <div style="display:flex;gap:8px;margin-bottom:20px">
+            <sc-for list="{{ otpForgotBoxes }}" as="box" hint-placeholder-count="6">
+              <input value="{{ box.value }}" onInput="{{ box.onInput }}" onKeyDown="{{ box.onKeyDown }}" maxlength="1" inputmode="numeric" style="width:44px;height:52px;border:1.5px solid var(--line-2);border-radius:10px;text-align:center;font-family:'JetBrains Mono';font-weight:600;font-size:20px">
+            </sc-for>
+          </div>
+          <button onClick="{{ verifyForgotOtp }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px;margin-bottom:16px" style-hover="background:var(--green-deep)">Verify</button>
+          <p style="text-align:center;font-size:13px;color:var(--stone);margin:0">{{ resendLabel }} <a onClick="{{ resendOtp }}" style="{{ resendLinkStyle }}">Resend code</a></p>
+        </sc-if>
+
+        <!-- RESET PASSWORD -->
+        <sc-if value="{{ is_resetPassword }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Set a new password</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 24px">Choose something you haven't used before.</p>
+          <sc-if value="{{ passwordError }}" hint-placeholder-val="{{ false }}">
+            <div style="background:rgba(207,75,62,.08);border:1px solid rgba(207,75,62,.25);border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:var(--error)">Passwords don't match. Please try again.</div>
+          </sc-if>
+          <div style="margin-bottom:16px">
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">New password</label>
+            <input type="password" value="{{ newPassword }}" onInput="{{ updateNewPassword }}" placeholder="At least 8 characters" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+          </div>
+          <div style="margin-bottom:22px">
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Confirm password</label>
+            <input type="password" value="{{ confirmPassword }}" onInput="{{ updateConfirmPassword }}" placeholder="Re-enter password" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+          </div>
+          <button onClick="{{ resetPasswordNow }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px" style-hover="background:var(--green-deep)">Reset password</button>
+        </sc-if>
+
+        <!-- RESET SUCCESS -->
+        <sc-if value="{{ is_resetSuccess }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:20px 0">
+            <div style="width:64px;height:64px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;animation:popIn .5s ease-out"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></div>
+            <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;margin:0 0 10px">Password updated</h2>
+            <p style="font-size:14px;color:var(--stone);margin:0 0 26px">You can now log in with your new password.</p>
+            <button onClick="{{ gotoLogin }}" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:13px 28px;font-weight:600;font-size:14px" style-hover="background:var(--green-deep)">Back to log in</button>
+          </div>
+        </sc-if>
+
+        <!-- LOGIN SUCCESS -->
+        <sc-if value="{{ is_loginSuccess }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:20px 0">
+            <div style="width:64px;height:64px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;animation:popIn .5s ease-out"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></div>
+            <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;margin:0 0 10px">Welcome back</h2>
+            <p style="font-size:14px;color:var(--stone);margin:0 0 26px">Redirecting to your {{ loginRoleLabel }} dashboard…</p>
+            <button onClick="{{ gotoRoleDashboard }}" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:13px 28px;font-weight:600;font-size:14px" style-hover="background:var(--green-deep)">Continue to dashboard</button>
+          </div>
+        </sc-if>
+
+        <!-- WELCOME -->
+        <sc-if value="{{ is_welcome }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:20px 0">
+            <div style="width:64px;height:64px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;animation:popIn .5s ease-out"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></div>
+            <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;margin:0 0 10px">Welcome to Makazi, {{ firstName }}!</h2>
+            <p style="font-size:15px;color:var(--stone);margin:0 0 30px">{{ welcomeSubcopy }}</p>
+            <button onClick="{{ startOnboarding }}" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px 30px;font-weight:600;font-size:15px" style-hover="background:var(--green-deep)">Get started</button>
+          </div>
+        </sc-if>
+
+        <!-- ===== LANDLORD ONBOARDING ===== -->
+        <sc-if value="{{ is_landlordCompany }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Tell us about your business</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 24px">This appears on receipts your tenants see.</p>
+          <div style="margin-bottom:16px">
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Business name</label>
+            <input type="text" value="{{ companyName }}" onInput="{{ updateCompanyName }}" placeholder="Wanjiru Properties" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+          </div>
+          <div style="margin-bottom:24px">
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Business type</label>
+            <div style="display:flex;gap:10px">
+              <button onClick="{{ pickBusinessIndividual }}" style="{{ businessIndividualStyle }}">Individual landlord</button>
+              <button onClick="{{ pickBusinessCompany }}" style="{{ businessCompanyStyle }}">Management company</button>
+            </div>
+          </div>
+          <button onClick="{{ goLandlordPortfolio }}" style="{{ continueBtnStyle }}">Continue</button>
+        </sc-if>
+
+        <sc-if value="{{ is_landlordPortfolio }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Your portfolio</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 24px">A rough estimate is fine — you can adjust it any time.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+            <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Number of properties</label><input type="text" value="{{ numProperties }}" onInput="{{ updateNumProperties }}" placeholder="e.g. 3" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px"></div>
+            <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Total units</label><input type="text" value="{{ numUnits }}" onInput="{{ updateNumUnits }}" placeholder="e.g. 42" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px"></div>
+          </div>
+          <a onClick="{{ goLandlordCompany }}" style="display:block;font-size:13px;margin-bottom:14px;cursor:pointer">← Back</a>
+          <button onClick="{{ goLandlordPayment }}" style="{{ continueBtnStyle }}">Continue</button>
+        </sc-if>
+
+        <sc-if value="{{ is_landlordPayment }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Where should rent land?</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 20px">Tenants pay directly here — Makazi never touches the money.</p>
+          <div style="display:flex;gap:8px;margin-bottom:18px">
+            <button onClick="{{ pickPaymentPaybill }}" style="{{ paymentPaybillStyle }}">PayBill</button>
+            <button onClick="{{ pickPaymentTill }}" style="{{ paymentTillStyle }}">Till</button>
+            <button onClick="{{ pickPaymentBank }}" style="{{ paymentBankStyle }}">Bank</button>
+          </div>
+          <sc-if value="{{ showPaybillField }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-bottom:24px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">PayBill number</label><input type="text" value="{{ paybillNumber }}" onInput="{{ updatePaybillNumber }}" placeholder="e.g. 542100" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px"></div>
+          </sc-if>
+          <sc-if value="{{ showTillField }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-bottom:24px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Till number</label><input type="text" value="{{ tillNumber }}" onInput="{{ updateTillNumber }}" placeholder="e.g. 897213" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px"></div>
+          </sc-if>
+          <sc-if value="{{ showBankFields }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+              <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Bank name</label><input type="text" value="{{ bankName }}" onInput="{{ updateBankName }}" placeholder="e.g. Equity Bank" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px"></div>
+              <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Account number</label><input type="text" value="{{ bankAccount }}" onInput="{{ updateBankAccount }}" placeholder="e.g. 0110xxxxxx" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px"></div>
+            </div>
+          </sc-if>
+          <a onClick="{{ goLandlordPortfolio }}" style="display:block;font-size:13px;margin-bottom:14px;cursor:pointer">← Back</a>
+          <button onClick="{{ goLandlordLogo }}" style="{{ continueBtnStyle }}">Continue</button>
+        </sc-if>
+
+        <sc-if value="{{ is_landlordLogo }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Add your logo</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 22px">Shown on receipts and reminders. Optional — you can skip this.</p>
+          <div style="margin-bottom:24px"><image-slot id="landlord-logo" shape="rounded" radius="16" style="width:140px;height:140px" placeholder="drop logo"></image-slot></div>
+          <a onClick="{{ goLandlordPayment }}" style="display:block;font-size:13px;margin-bottom:14px;cursor:pointer">← Back</a>
+          <div style="display:flex;gap:10px">
+            <button onClick="{{ goLandlordInvite }}" style="flex:1;background:none;border:1.5px solid var(--line-2);border-radius:10px;padding:14px;font-weight:600;font-size:15px;color:var(--ink)">Skip</button>
+            <button onClick="{{ goLandlordInvite }}" style="flex:1;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px" style-hover="background:var(--green-deep)">Continue</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ is_landlordInvite }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Invite a caretaker</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 20px">They'll manage day-to-day tasks on your behalf. Optional.</p>
+          <div style="display:flex;gap:8px;margin-bottom:18px">
+            <input type="text" value="{{ inviteEmail }}" onInput="{{ updateInviteEmail }}" placeholder="caretaker@example.com or phone" style="flex:1;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            <button onClick="{{ sendInvite }}" style="background:var(--ink);color:#fff;border:none;border-radius:10px;padding:0 18px;font-weight:600;font-size:14px">Send</button>
+          </div>
+          <sc-if value="{{ noInvites }}" hint-placeholder-val="{{ true }}">
+            <div style="border:1.5px dashed var(--line-2);border-radius:14px;padding:24px;text-align:center;margin-bottom:22px">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--line-2)" stroke-width="1.6" style="margin:0 auto 8px;display:block"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/></svg>
+              <p style="font-size:13px;color:var(--stone);margin:0">No caretakers invited yet</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{ hasInvites }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:22px">
+              <sc-for list="{{ invitedList }}" as="inv" hint-placeholder-count="1">
+                <div style="background:var(--white);padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:13px">{{ inv.value }}</span>
+                  <span style="font-family:'JetBrains Mono';font-size:10px;color:var(--warning)">Invite sent</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <a onClick="{{ goLandlordLogo }}" style="display:block;font-size:13px;margin-bottom:14px;cursor:pointer">← Back</a>
+          <div style="display:flex;gap:10px">
+            <button onClick="{{ goLandlordProperty }}" style="flex:1;background:none;border:1.5px solid var(--line-2);border-radius:10px;padding:14px;font-weight:600;font-size:15px;color:var(--ink)">Skip</button>
+            <button onClick="{{ goLandlordProperty }}" style="flex:1;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px" style-hover="background:var(--green-deep)">Continue</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ is_landlordProperty }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Add your first property</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 22px">You can add more properties later from the dashboard.</p>
+          <div style="margin-bottom:16px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Property name</label><input type="text" value="{{ propName }}" onInput="{{ updatePropName }}" placeholder="Riverside Estates" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px"></div>
+          <div style="margin-bottom:16px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Location</label><input type="text" value="{{ propAddress }}" onInput="{{ updatePropAddress }}" placeholder="Kilimani, Nairobi" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px"></div>
+          <div style="margin-bottom:24px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Units in this property</label><input type="text" value="{{ propUnits }}" onInput="{{ updatePropUnits }}" placeholder="e.g. 12" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px"></div>
+          <a onClick="{{ goLandlordInvite }}" style="display:block;font-size:13px;margin-bottom:14px;cursor:pointer">← Back</a>
+          <button onClick="{{ goLandlordFinish }}" style="{{ continueBtnStyle }}">Continue</button>
+        </sc-if>
+
+        <sc-if value="{{ is_landlordFinish }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:10px 0 20px">
+            <div style="width:64px;height:64px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:popIn .5s ease-out"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></div>
+            <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;margin:0 0 10px">You're all set, {{ firstName }}</h2>
+            <p style="font-size:14px;color:var(--stone);margin:0 0 22px">{{ propName }} is ready with {{ propUnits }} units.</p>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:24px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Business</span><span style="font-weight:600">{{ companyNameDisplay }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Portfolio</span><span style="font-weight:600">{{ numProperties }} properties · {{ numUnits }} units</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Caretakers invited</span><span style="font-weight:600">{{ inviteCountDisplay }}</span></div>
+          </div>
+          <button onClick="{{ gotoPlaceholderDashboard }}" style="{{ continueBtnStyle }}">Go to dashboard</button>
+        </sc-if>
+
+        <!-- ===== CARETAKER ONBOARDING ===== -->
+        <sc-if value="{{ is_caretakerAccept }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">You've been invited</h2>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:24px;display:flex;gap:12px;align-items:center">
+            <div style="width:40px;height:40px;border-radius:99px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Schibsted Grotesk';font-weight:700;font-size:14px">WM</div>
+            <div><div style="font-weight:600;font-size:14px">Wanjiru Mwangi</div><div style="font-size:13px;color:var(--stone)">invited you to manage <strong>Green Gardens Apartments</strong> as caretaker</div></div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button onClick="{{ goLogin }}" style="flex:1;background:none;border:1.5px solid var(--line-2);border-radius:10px;padding:14px;font-weight:600;font-size:15px;color:var(--ink)">Decline</button>
+            <button onClick="{{ acceptCaretakerInvite }}" style="flex:1;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px" style-hover="background:var(--green-deep)">Accept</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ is_caretakerProfile }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Complete your profile</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 22px">Keep it short — tenants will see this when you're assigned to their unit.</p>
+          <div style="display:flex;gap:16px;align-items:center;margin-bottom:18px">
+            <image-slot id="caretaker-photo" shape="circle" style="width:64px;height:64px;flex-shrink:0" placeholder="photo"></image-slot>
+            <div style="flex:1">
+              <div style="margin-bottom:12px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Full name</label><input type="text" value="{{ regName }}" onInput="{{ updateRegName }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+              <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Phone number</label><input type="tel" value="{{ regPhone }}" onInput="{{ updateRegPhone }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+            <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">National ID <span style="color:var(--stone);font-weight:400">(optional)</span></label><input type="text" value="{{ caretakerId }}" onInput="{{ updateCaretakerId }}" placeholder="e.g. 32xxxxxx" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+            <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Emergency contact <span style="color:var(--stone);font-weight:400">(optional)</span></label><input type="text" value="{{ nextOfKin }}" onInput="{{ updateNextOfKin }}" placeholder="Name and phone number" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          </div>
+          <div style="margin-bottom:24px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Language preference</label>
+            <select value="{{ caretakerLanguage }}" onChange="{{ updateCaretakerLanguage }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px">
+              <option>English</option><option>Kiswahili</option>
+            </select>
+          </div>
+          <button onClick="{{ goCaretakerWelcome }}" style="{{ continueBtnStyle }}">Save &amp; go to dashboard</button>
+        </sc-if>
+
+        <sc-if value="{{ is_caretakerWelcome }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:10px 0 20px">
+            <div style="width:64px;height:64px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:popIn .5s ease-out"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></div>
+            <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;margin:0 0 8px">Welcome, {{ firstName }}.</h2>
+            <p style="font-size:14px;color:var(--stone);margin:0 0 22px">Green Gardens Apartments has invited you to join Makazi. Let's finish setting up your workspace.</p>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Assigned properties</div>
+          <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:24px">
+            <div style="background:var(--white);padding:13px 14px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>Green Gardens Apartments</div>
+            <div style="background:var(--white);padding:13px 14px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>Sunset Court</div>
+          </div>
+          <button onClick="{{ goCaretakerPermissions }}" style="{{ continueBtnStyle }}">Continue</button>
+        </sc-if>
+
+        <sc-if value="{{ is_caretakerPermissions }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 8px">What you can do</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 22px">A quick rundown before you get started.</p>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Register tenants</div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Allocate units</div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Perform inspections</div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Manage maintenance</div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>View assigned properties &amp; tenants</div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Track vacancies</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:26px;padding-top:16px;border-top:1px solid var(--line)">
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--stone)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" style="flex-shrink:0"><path d="M6 6l12 12M18 6L6 18"/></svg>Configure payment methods</div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--stone)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" style="flex-shrink:0"><path d="M6 6l12 12M18 6L6 18"/></svg>Delete properties</div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--stone)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" style="flex-shrink:0"><path d="M6 6l12 12M18 6L6 18"/></svg>Change company settings</div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--stone)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" style="flex-shrink:0"><path d="M6 6l12 12M18 6L6 18"/></svg>Access financial reports</div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--stone)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" style="flex-shrink:0"><path d="M6 6l12 12M18 6L6 18"/></svg>Manage subscriptions</div>
+          </div>
+          <button onClick="{{ enterCaretakerDashboard }}" style="{{ continueBtnStyle }}">Enter dashboard</button>
+        </sc-if>
+
+        <!-- ===== TENANT ONBOARDING ===== -->
+        <sc-if value="{{ is_tenantInvite }}" hint-placeholder-val="{{ false }}">
+          <div style="width:52px;height:52px;border-radius:14px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin-bottom:20px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><path d="M4 4h16v16H4z"/><path d="M4 6l8 7 8-7"/></svg></div>
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Welcome to Makazi</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 22px">Your caretaker has registered you as a tenant.</p>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:24px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Property</span><span style="font-weight:600">Green Gardens Apartments</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Unit</span><span style="font-weight:600">B203</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Monthly rent</span><span style="font-weight:600;font-family:'JetBrains Mono'">KES 15,000</span></div>
+          </div>
+          <button onClick="{{ acceptTenantInvite }}" style="{{ continueBtnStyle }}">Open invitation</button>
+        </sc-if>
+
+        <sc-if value="{{ is_tenantTerms }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 8px">Accept terms</h2>
+          <p style="font-size:14px;color:var(--stone);margin:0 0 22px">One last thing before you get started.</p>
+          <div style="border:1px solid var(--line);border-radius:12px;padding:16px;max-height:160px;overflow-y:auto;font-size:12.5px;color:var(--stone);line-height:1.6;margin-bottom:18px">Makazi connects you with your landlord's rent collection and maintenance systems. Payments you make go directly to your landlord's PayBill, Till or bank account — Makazi never holds your money. Your rental data is used to build your Rental Passport and may be shared with your landlord and caretaker.</div>
+          <div onClick="{{ toggleTermsAccepted }}" style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;margin-bottom:24px">
+            <div style="{{ termsCheckStyle }}">{{ termsCheckMark }}</div>
+            <span style="font-size:13px">I agree to Makazi's Terms of Service and Privacy Policy</span>
+          </div>
+          <button onClick="{{ acceptTerms }}" disabled="{{ termsNotAccepted }}" style="{{ continueBtnStyle }}">Continue</button>
+        </sc-if>
+
+        <sc-if value="{{ is_tenantWelcome }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:10px 0 20px">
+            <div style="width:64px;height:64px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:popIn .5s ease-out"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></div>
+            <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;margin:0 0 8px">Welcome {{ firstName }} 👋</h2>
+            <p style="font-size:14px;color:var(--stone);margin:0 0 22px">You've successfully joined Makazi. Your rental information has already been prepared.</p>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:24px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Property</span><span style="font-weight:600">Green Gardens Apartments</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Unit</span><span style="font-weight:600">B203</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Monthly rent</span><span style="font-weight:600;font-family:'JetBrains Mono'">KES 15,000</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Move-in date</span><span style="font-weight:600">1 July 2026</span></div>
+          </div>
+          <button onClick="{{ enterTenantDashboard }}" style="{{ continueBtnStyle }}">Go to dashboard</button>
+        </sc-if>
+
+        <!-- PLACEHOLDER DASHBOARD -->
+        <sc-if value="{{ is_dashboardPlaceholder }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:10px 0">
+            <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--green-deep);background:var(--green-soft);display:inline-block;padding:8px 16px;border-radius:99px;margin-bottom:22px">Phase 2</div>
+            <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;margin:0 0 10px">Your {{ loginRoleLabel }} dashboard is next</h2>
+            <p style="font-size:14px;color:var(--stone);margin:0 0 26px;max-width:340px;margin-left:auto;margin-right:auto">Account setup is complete. The full interactive {{ loginRoleLabel }} dashboard is being designed next — you saw a preview of it on the marketing site.</p>
+            <div style="display:flex;gap:10px;justify-content:center">
+              <a href="Makazi Website - Home.dc.html#dashboard-preview" style="border:1.5px solid var(--line-2);border-radius:10px;padding:13px 22px;font-weight:600;font-size:14px;color:var(--ink)">See dashboard preview</a>
+              <button onClick="{{ gotoLogout }}" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:13px 22px;font-weight:600;font-size:14px" style-hover="background:var(--green-deep)">Log out</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- SESSION EXPIRED -->
+        <sc-if value="{{ is_sessionExpired }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:10px 0">
+            <div style="width:56px;height:56px;border-radius:14px;background:rgba(224,160,8,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+            <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;margin:0 0 10px">Your session has expired</h2>
+            <p style="font-size:14px;color:var(--stone);margin:0 0 26px">For your security, please log in again to continue.</p>
+            <button onClick="{{ gotoLogin }}" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:13px 28px;font-weight:600;font-size:14px" style-hover="background:var(--green-deep)">Log in again</button>
+          </div>
+        </sc-if>
+
+        <!-- LOGOUT CONFIRM -->
+        <sc-if value="{{ is_logoutConfirm }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:10px 0">
+            <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;margin:0 0 10px">Log out of Makazi?</h2>
+            <p style="font-size:14px;color:var(--stone);margin:0 0 26px">You'll need to log in again to access your account.</p>
+            <div style="display:flex;gap:10px">
+              <button onClick="{{ cancelLogout }}" style="flex:1;background:none;border:1.5px solid var(--line-2);border-radius:10px;padding:13px;font-weight:600;font-size:14px;color:var(--ink)">Cancel</button>
+              <button onClick="{{ confirmLogout }}" style="flex:1;background:var(--error);color:#fff;border:none;border-radius:10px;padding:13px;font-weight:600;font-size:14px">Log out</button>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 22px;border-radius:99px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;animation:toastUp .3s ease-out;z-index:200">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>{{ toast }}
+  </div>
+</sc-if>
+
+<!-- PROTOTYPE NAV -->
+<div style="position:fixed;bottom:16px;right:16px;z-index:150;font-family:'JetBrains Mono'">
+  <sc-if value="{{ !navOpen }}" hint-placeholder-val="{{ true }}">
+    <button onClick="{{ toggleNav }}" style="background:var(--ink);color:#fff;border:none;border-radius:99px;padding:10px 16px;font-size:11px;letter-spacing:.05em;font-family:'JetBrains Mono'">⚙ Prototype nav</button>
+  </sc-if>
+  <sc-if value="{{ navOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px -30px rgba(11,20,15,.35);width:260px;max-height:70vh;overflow-y:auto;padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:11px;letter-spacing:.05em;color:var(--stone)">PROTOTYPE NAV</span>
+        <button onClick="{{ toggleNav }}" style="background:none;border:none;font-size:14px;color:var(--stone)">✕</button>
+      </div>
+      <div style="font-size:10px;color:var(--stone);margin:10px 0 4px">AUTH</div>
+      <a onClick="{{ jump_login }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Login</a>
+      <a onClick="{{ jump_register }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Register</a>
+      <a onClick="{{ jump_chooseRole }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Choose role</a>
+      <a onClick="{{ jump_verifyEmail }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Verify email (OTP)</a>
+      <a onClick="{{ jump_verifyPhone }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Verify phone (OTP)</a>
+      <a onClick="{{ jump_createPassword }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Create password</a>
+      <a onClick="{{ jump_forgotEmail }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Forgot password</a>
+      <a onClick="{{ jump_welcome }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Welcome</a>
+      <a onClick="{{ jump_sessionExpired }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Session expired</a>
+      <a onClick="{{ jump_logoutConfirm }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Logout confirm</a>
+      <div style="font-size:10px;color:var(--stone);margin:10px 0 4px">LANDLORD</div>
+      <a onClick="{{ jump_dashboardPlaceholder }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">→ Straight to Dashboard (no wizard)</a>
+      <div style="font-size:10px;color:var(--stone);margin:10px 0 4px">CARETAKER ONBOARDING</div>
+      <a onClick="{{ jump_caretakerAccept }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">1. Accept invite</a>
+      <a onClick="{{ jump_verifyPhoneCaretaker }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">2. Verify phone</a>
+      <a onClick="{{ jump_createPasswordCaretaker }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">3. Create password</a>
+      <a onClick="{{ jump_caretakerProfile }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">4. Complete profile</a>
+      <a onClick="{{ jump_caretakerWelcome }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">5. Welcome + properties</a>
+      <a onClick="{{ jump_caretakerPermissions }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">6. Permissions</a>
+      <div style="font-size:10px;color:var(--stone);margin:10px 0 4px">TENANT ONBOARDING</div>
+      <a onClick="{{ jump_tenantInvite }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">1. Open invitation</a>
+      <a onClick="{{ jump_verifyPhoneTenant }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">2. Verify phone</a>
+      <a onClick="{{ jump_createPasswordTenant }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">3. Create password</a>
+      <a onClick="{{ jump_tenantTerms }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">4. Accept terms</a>
+      <a onClick="{{ jump_tenantWelcome }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">5. Welcome</a>
+      <div style="font-size:10px;color:var(--stone);margin:10px 0 4px">DASHBOARD</div>
+      <a onClick="{{ jump_dashboardPlaceholder }}" style="display:block;font-size:11px;padding:4px 0;cursor:pointer">Placeholder dashboard</a>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    screen: 'login', role: null, loading: false, toast: '', navOpen: false,
+    loginEmail: '', loginPassword: '', loginError: false, loginRole: 'landlord',
+    regName: '', regEmail: '', regPhone: '',
+    otpEmail: ['','','','','',''], otpPhone: ['','','','','',''], otpForgot: ['','','','','',''],
+    newPassword: '', confirmPassword: '', passwordError: false,
+    forgotEmail: '', resendCountdown: 30,
+    companyName: '', businessType: 'individual',
+    numProperties: '', numUnits: '',
+    paymentMethod: 'paybill', paybillNumber: '', tillNumber: '', bankName: '', bankAccount: '',
+    inviteEmail: '', invitedList: [],
+    propName: '', propAddress: '', propUnits: '',
+    caretakerId: '', nextOfKin: '', caretakerLanguage: 'English',
+    termsAccepted: false
+  };
+
+  componentWillUnmount() { clearTimeout(this._navTimer); clearInterval(this._countdownTimer); }
+
+  go(screen, delay) {
+    this.setState({ loading: true });
+    clearTimeout(this._navTimer);
+    this._navTimer = setTimeout(() => {
+      this.setState({ loading: false, screen });
+      if (['verifyEmail','verifyPhone','forgotOtp'].includes(screen)) this.startCountdown();
+    }, delay ?? 650);
+  }
+  jump(screen, role) {
+    this.setState({ loading: false, screen, navOpen: false, ...(role ? { role } : {}) });
+  }
+  startCountdown() {
+    clearInterval(this._countdownTimer);
+    this.setState({ resendCountdown: 30 });
+    this._countdownTimer = setInterval(() => {
+      this.setState(s => s.resendCountdown <= 1 ? (clearInterval(this._countdownTimer), { resendCountdown: 0 }) : { resendCountdown: s.resendCountdown - 1 });
+    }, 1000);
+  }
+
+  otpBoxes(field) {
+    return this.state[field].map((v, i) => ({
+      value: v,
+      onInput: (e) => {
+        const val = e.target.value.replace(/\D/g, '').slice(-1);
+        const copy = [...this.state[field]]; copy[i] = val;
+        this.setState({ [field]: copy });
+        if (val && e.target.nextElementSibling) e.target.nextElementSibling.focus();
+      },
+      onKeyDown: (e) => { if (e.key === 'Backspace' && !this.state[field][i] && e.target.previousElementSibling) e.target.previousElementSibling.focus(); }
+    }));
+  }
+
+  roleCardStyle(active) {
+    return active
+      ? 'display:flex;gap:14px;align-items:center;padding:16px;border:2px solid var(--green);border-radius:14px;background:var(--green-soft);cursor:pointer'
+      : 'display:flex;gap:14px;align-items:center;padding:16px;border:1.5px solid var(--line-2);border-radius:14px;background:var(--white);cursor:pointer';
+  }
+  chipStyle(active) {
+    return active
+      ? 'flex:1;background:var(--ink);color:#fff;border:none;border-radius:9px;padding:10px;font-size:13px;font-weight:600'
+      : 'flex:1;background:none;border:1.5px solid var(--line-2);border-radius:9px;padding:10px;font-size:13px;font-weight:600;color:var(--ink)';
+  }
+  strengthBar(active, color) { return `flex:1;height:4px;border-radius:99px;background:${active ? color : 'var(--line)'}`; }
+
+  renderVals() {
+    const s = this.state;
+    const on = (n) => s.screen === n;
+    const inOnboarding = /^(landlord|caretaker|tenant)[A-Z]/.test(s.screen);
+    const strength = Math.min(3, Math.floor(s.newPassword.length / 4));
+
+    const landlordSteps = ['Company','Portfolio','Payment','Logo','Invite','Property','Done'];
+    const landlordKeys = ['landlordCompany','landlordPortfolio','landlordPayment','landlordLogo','landlordInvite','landlordProperty','landlordFinish'];
+    const caretakerSteps = ['Invite','Profile','Welcome','Permissions'];
+    const caretakerKeys = ['caretakerAccept','caretakerProfile','caretakerWelcome','caretakerPermissions'];
+    const tenantSteps = ['Invite','Phone','Password','Terms','Welcome'];
+    const tenantKeys = ['tenantInvite','verifyPhone','createPassword','tenantTerms','tenantWelcome'];
+    let steps = [], keys = [];
+    if (s.role === 'landlord') { steps = landlordSteps; keys = landlordKeys; }
+    else if (s.role === 'caretaker') { steps = caretakerSteps; keys = caretakerKeys; }
+    else if (s.role === 'tenant') { steps = tenantSteps; keys = tenantKeys; }
+    const curIdx = keys.indexOf(s.screen);
+    const onboardingSteps = steps.map((label, i) => {
+      const st = i < curIdx ? 'done' : i === curIdx ? 'active' : 'upcoming';
+      return {
+        label,
+        marker: st === 'done' ? '✓' : String(i + 1),
+        hasLine: i < steps.length - 1,
+        dotStyle: `width:20px;height:20px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;font-family:'JetBrains Mono';${st === 'upcoming' ? 'background:none;border:1.5px solid var(--line-2);color:var(--stone)' : st === 'active' ? 'background:var(--green);color:#fff' : 'background:var(--green-deep);color:#fff'}`,
+        labelStyle: `font-size:11px;color:${st === 'upcoming' ? 'var(--stone)' : 'var(--ink)'};font-weight:${st === 'active' ? 600 : 500}`
+      };
+    });
+
+    const roleBrand = {
+      landlord: ['Run your whole portfolio from one place.', 'Collections, tenants, caretakers and reports — together at last.'],
+      caretaker: ['Everything on-site, in your pocket.', 'Inspections, tenant registration and repairs, tracked as you work.'],
+      tenant: ['Pay rent your way, in seconds.', 'App, USSD or WhatsApp — whichever works for you.']
+    };
+    const [bh, bs] = inOnboarding && roleBrand[s.role] ? roleBrand[s.role] : ['Rental housing, finally organised.', 'One platform for landlords, caretakers and tenants across Kenya.'];
+
+    const firstName = (s.regName || 'there').split(' ')[0];
+    const welcomeCopy = { landlord: "Let's get your properties set up.", caretaker: "Let's get you ready to manage your assigned properties.", tenant: "Let's link you to your apartment." };
+
+    return {
+      loading: s.loading,
+      formAreaStyle: `width:100%;max-width:420px;${s.loading ? 'opacity:.45;pointer-events:none;transition:opacity .15s' : 'transition:opacity .15s'}`,
+      inOnboarding, onboardingSteps,
+      showBackToSite: !inOnboarding,
+      brandHeadline: bh, brandSubcopy: bs,
+      toast: s.toast, navOpen: s.navOpen, toggleNav: () => this.setState({ navOpen: !s.navOpen }),
+
+      is_login: on('login'), is_register: on('register'), is_chooseRole: on('chooseRole'),
+      is_verifyEmail: on('verifyEmail'), is_verifyPhone: on('verifyPhone'), is_createPassword: on('createPassword'),
+      is_forgotEmail: on('forgotEmail'), is_forgotOtp: on('forgotOtp'), is_resetPassword: on('resetPassword'), is_resetSuccess: on('resetSuccess'),
+      is_loginSuccess: on('loginSuccess'), is_welcome: on('welcome'),
+      is_landlordCompany: on('landlordCompany'), is_landlordPortfolio: on('landlordPortfolio'), is_landlordPayment: on('landlordPayment'),
+      is_landlordLogo: on('landlordLogo'), is_landlordInvite: on('landlordInvite'), is_landlordProperty: on('landlordProperty'), is_landlordFinish: on('landlordFinish'),
+      is_caretakerAccept: on('caretakerAccept'), is_caretakerProfile: on('caretakerProfile'),
+      is_caretakerWelcome: on('caretakerWelcome'), is_caretakerPermissions: on('caretakerPermissions'),
+      is_tenantInvite: on('tenantInvite'), is_tenantTerms: on('tenantTerms'), is_tenantWelcome: on('tenantWelcome'),
+      is_dashboardPlaceholder: on('dashboardPlaceholder'), is_sessionExpired: on('sessionExpired'), is_logoutConfirm: on('logoutConfirm'),
+
+      // LOGIN
+      loginEmail: s.loginEmail, updateLoginEmail: (e) => this.setState({ loginEmail: e.target.value }),
+      loginPassword: s.loginPassword, updateLoginPassword: (e) => this.setState({ loginPassword: e.target.value }),
+      loginError: s.loginError,
+      loginRoleLandlordStyle: this.chipStyle(s.loginRole === 'landlord'), loginRoleCaretakerStyle: this.chipStyle(s.loginRole === 'caretaker'), loginRoleTenantStyle: this.chipStyle(s.loginRole === 'tenant'),
+      pickLoginRoleLandlord: () => this.setState({ loginRole: 'landlord' }), pickLoginRoleCaretaker: () => this.setState({ loginRole: 'caretaker' }), pickLoginRoleTenant: () => this.setState({ loginRole: 'tenant' }),
+      loginRoleLabel: s.loginRole,
+      handleLogin: (e) => { e.preventDefault(); if (s.loginPassword === 'wrong') { this.setState({ loginError: true }); return; } this.setState({ loginError: false }); this.go('loginSuccess'); },
+      gotoForgot: () => this.jump('forgotEmail'), gotoRegister: () => this.jump('register'), gotoLogin: () => this.jump('login'), goLogin: () => this.jump('login'),
+
+      // REGISTER
+      regName: s.regName, updateRegName: (e) => this.setState({ regName: e.target.value }),
+      regEmail: s.regEmail, updateRegEmail: (e) => this.setState({ regEmail: e.target.value }),
+      regPhone: s.regPhone, updateRegPhone: (e) => this.setState({ regPhone: e.target.value }),
+      regEmailDisplay: s.regEmail || 'you@example.com', regPhoneDisplay: s.regPhone || '+254 7XX XXX XXX',
+      handleRegister: (e) => { e.preventDefault(); this.go('chooseRole'); },
+
+      // CHOOSE ROLE
+      roleCardLandlordStyle: this.roleCardStyle(s.role === 'landlord'), roleCardCaretakerStyle: this.roleCardStyle(s.role === 'caretaker'), roleCardTenantStyle: this.roleCardStyle(s.role === 'tenant'),
+      selectRoleLandlord: () => this.setState({ role: 'landlord' }), selectRoleCaretaker: () => this.setState({ role: 'caretaker' }), selectRoleTenant: () => this.setState({ role: 'tenant' }),
+      roleNotChosen: !s.role,
+      continueBtnStyle: `width:100%;background:${s.role || !on('chooseRole') ? 'var(--green)' : 'var(--line-2)'};color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:15px;cursor:pointer`,
+      confirmRole: () => { if (s.role) this.go('verifyEmail'); },
+
+      // OTP screens
+      otpEmailBoxes: this.otpBoxes('otpEmail'), otpPhoneBoxes: this.otpBoxes('otpPhone'), otpForgotBoxes: this.otpBoxes('otpForgot'),
+      verifyEmailNow: () => this.go('verifyPhone'),
+      verifyPhoneNow: () => this.go('createPassword'),
+      resendLabel: s.resendCountdown > 0 ? `Resend in ${s.resendCountdown}s` : "Didn't get it?",
+      resendLinkStyle: s.resendCountdown > 0 ? 'color:var(--line-2);pointer-events:none;cursor:default' : 'color:var(--green);cursor:pointer;font-weight:600',
+      resendOtp: () => { if (s.resendCountdown <= 0) this.startCountdown(); },
+
+      // PASSWORD
+      newPassword: s.newPassword, updateNewPassword: (e) => this.setState({ newPassword: e.target.value, passwordError: false }),
+      confirmPassword: s.confirmPassword, updateConfirmPassword: (e) => this.setState({ confirmPassword: e.target.value, passwordError: false }),
+      passwordError: s.passwordError,
+      strengthBar1: this.strengthBar(strength >= 1, 'var(--error)'), strengthBar2: this.strengthBar(strength >= 2, 'var(--warning)'), strengthBar3: this.strengthBar(strength >= 3, 'var(--success)'),
+      createPasswordNow: () => { if (!s.newPassword || s.newPassword !== s.confirmPassword) { this.setState({ passwordError: true }); return; } localStorage.setItem('makazi_demo_name', s.regName); this.go(s.role === 'caretaker' ? 'caretakerProfile' : s.role === 'tenant' ? 'tenantTerms' : 'welcome'); },
+      resetPasswordNow: () => { if (!s.newPassword || s.newPassword !== s.confirmPassword) { this.setState({ passwordError: true }); return; } this.go('resetSuccess'); },
+
+      // FORGOT PASSWORD
+      forgotEmail: s.forgotEmail, updateForgotEmail: (e) => this.setState({ forgotEmail: e.target.value }),
+      forgotEmailDisplay: s.forgotEmail || 'you@example.com',
+      sendResetCode: () => this.go('forgotOtp'),
+      verifyForgotOtp: () => this.go('resetPassword'),
+
+      // WELCOME
+      firstName, welcomeSubcopy: welcomeCopy[s.role] || "Let's get you set up.",
+      startOnboarding: () => { window.location.href = 'Makazi App - Landlord Dashboard.dc.html'; },
+      gotoPlaceholderDashboard: () => this.go('dashboardPlaceholder'),
+      gotoRoleDashboard: () => {
+        const files = { landlord: 'Makazi App - Landlord Dashboard.dc.html', caretaker: 'Makazi App - Caretaker Dashboard.dc.html', tenant: 'Makazi App - Tenant Dashboard.dc.html' };
+        window.location.href = files[s.loginRole] || files.landlord;
+      },
+
+      // LANDLORD ONBOARDING
+      companyName: s.companyName, updateCompanyName: (e) => this.setState({ companyName: e.target.value }),
+      companyNameDisplay: s.companyName || '—',
+      businessIndividualStyle: `flex:1;padding:11px;border-radius:9px;font-size:13px;font-weight:600;${s.businessType === 'individual' ? 'background:var(--ink);color:#fff;border:none' : 'background:none;border:1.5px solid var(--line-2);color:var(--ink)'}`,
+      businessCompanyStyle: `flex:1;padding:11px;border-radius:9px;font-size:13px;font-weight:600;${s.businessType === 'company' ? 'background:var(--ink);color:#fff;border:none' : 'background:none;border:1.5px solid var(--line-2);color:var(--ink)'}`,
+      pickBusinessIndividual: () => this.setState({ businessType: 'individual' }), pickBusinessCompany: () => this.setState({ businessType: 'company' }),
+      goLandlordCompany: () => this.jump('landlordCompany'), goLandlordPortfolio: () => this.go('landlordPortfolio'),
+      numProperties: s.numProperties, updateNumProperties: (e) => this.setState({ numProperties: e.target.value }),
+      numUnits: s.numUnits, updateNumUnits: (e) => this.setState({ numUnits: e.target.value }),
+      goLandlordPayment: () => this.go('landlordPayment'),
+      paymentPaybillStyle: this.chipStyle(s.paymentMethod === 'paybill'), paymentTillStyle: this.chipStyle(s.paymentMethod === 'till'), paymentBankStyle: this.chipStyle(s.paymentMethod === 'bank'),
+      pickPaymentPaybill: () => this.setState({ paymentMethod: 'paybill' }), pickPaymentTill: () => this.setState({ paymentMethod: 'till' }), pickPaymentBank: () => this.setState({ paymentMethod: 'bank' }),
+      showPaybillField: s.paymentMethod === 'paybill', showTillField: s.paymentMethod === 'till', showBankFields: s.paymentMethod === 'bank',
+      paybillNumber: s.paybillNumber, updatePaybillNumber: (e) => this.setState({ paybillNumber: e.target.value }),
+      tillNumber: s.tillNumber, updateTillNumber: (e) => this.setState({ tillNumber: e.target.value }),
+      bankName: s.bankName, updateBankName: (e) => this.setState({ bankName: e.target.value }),
+      bankAccount: s.bankAccount, updateBankAccount: (e) => this.setState({ bankAccount: e.target.value }),
+      goLandlordLogo: () => this.go('landlordLogo'),
+      goLandlordInvite: () => this.go('landlordInvite'),
+      inviteEmail: s.inviteEmail, updateInviteEmail: (e) => this.setState({ inviteEmail: e.target.value }),
+      invitedList: s.invitedList.map(v => ({ value: v })), noInvites: s.invitedList.length === 0, hasInvites: s.invitedList.length > 0,
+      inviteCountDisplay: s.invitedList.length,
+      sendInvite: () => { if (!s.inviteEmail.trim()) return; this.setState({ invitedList: [...s.invitedList, s.inviteEmail], inviteEmail: '' }); },
+      goLandlordProperty: () => this.go('landlordProperty'),
+      propName: s.propName, updatePropName: (e) => this.setState({ propName: e.target.value }),
+      propAddress: s.propAddress, updatePropAddress: (e) => this.setState({ propAddress: e.target.value }),
+      propUnits: s.propUnits, updatePropUnits: (e) => this.setState({ propUnits: e.target.value }),
+      goLandlordFinish: () => this.go('landlordFinish'),
+
+      // CARETAKER ONBOARDING
+      acceptCaretakerInvite: () => this.go('verifyPhone'),
+      caretakerId: s.caretakerId, updateCaretakerId: (e) => this.setState({ caretakerId: e.target.value }),
+      nextOfKin: s.nextOfKin, updateNextOfKin: (e) => this.setState({ nextOfKin: e.target.value }),
+      caretakerLanguage: s.caretakerLanguage, updateCaretakerLanguage: (e) => this.setState({ caretakerLanguage: e.target.value }),
+      goCaretakerWelcome: () => this.go('caretakerWelcome'),
+      goCaretakerPermissions: () => this.go('caretakerPermissions'),
+      enterCaretakerDashboard: () => { window.location.href = 'Makazi App - Caretaker Dashboard.dc.html'; },
+
+      // TENANT ONBOARDING
+      acceptTenantInvite: () => this.go('verifyPhone'),
+      termsAccepted: s.termsAccepted, termsNotAccepted: !s.termsAccepted,
+      termsCheckStyle: `width:20px;height:20px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;${s.termsAccepted ? 'background:var(--green)' : 'border:1.5px solid var(--line-2)'}`,
+      termsCheckMark: s.termsAccepted ? '✓' : '',
+      toggleTermsAccepted: () => this.setState({ termsAccepted: !s.termsAccepted }),
+      acceptTerms: () => { if (s.termsAccepted) this.go('tenantWelcome'); },
+      enterTenantDashboard: () => { window.location.href = 'Makazi App - Tenant Dashboard.dc.html'; },
+
+      // SESSION / LOGOUT
+      gotoLogout: () => this.jump('logoutConfirm'),
+      cancelLogout: () => this.jump('dashboardPlaceholder'),
+      confirmLogout: () => { this.setState({ toast: "You've been logged out.", role: null }); this.go('login'); setTimeout(() => this.setState({ toast: '' }), 3000); },
+
+      // PROTOTYPE NAV JUMPS
+      jump_login: () => this.jump('login'), jump_register: () => this.jump('register'), jump_chooseRole: () => this.jump('chooseRole'),
+      jump_verifyEmail: () => this.jump('verifyEmail'), jump_verifyPhone: () => this.jump('verifyPhone'), jump_createPassword: () => this.jump('createPassword'),
+      jump_forgotEmail: () => this.jump('forgotEmail'), jump_welcome: () => this.jump('welcome'),
+      jump_sessionExpired: () => this.jump('sessionExpired'), jump_logoutConfirm: () => this.jump('logoutConfirm'),
+      jump_landlordCompany: () => this.jump('landlordCompany', 'landlord'), jump_landlordPortfolio: () => this.jump('landlordPortfolio', 'landlord'),
+      jump_landlordPayment: () => this.jump('landlordPayment', 'landlord'), jump_landlordLogo: () => this.jump('landlordLogo', 'landlord'),
+      jump_landlordInvite: () => this.jump('landlordInvite', 'landlord'), jump_landlordProperty: () => this.jump('landlordProperty', 'landlord'),
+      jump_landlordFinish: () => this.jump('landlordFinish', 'landlord'),
+      jump_caretakerAccept: () => this.jump('caretakerAccept', 'caretaker'),
+      jump_verifyPhoneCaretaker: () => this.jump('verifyPhone', 'caretaker'), jump_createPasswordCaretaker: () => this.jump('createPassword', 'caretaker'),
+      jump_caretakerProfile: () => this.jump('caretakerProfile', 'caretaker'), jump_caretakerWelcome: () => this.jump('caretakerWelcome', 'caretaker'),
+      jump_caretakerPermissions: () => this.jump('caretakerPermissions', 'caretaker'),
+      jump_tenantInvite: () => this.jump('tenantInvite', 'tenant'), jump_verifyPhoneTenant: () => this.jump('verifyPhone', 'tenant'),
+      jump_createPasswordTenant: () => this.jump('createPassword', 'tenant'), jump_tenantTerms: () => this.jump('tenantTerms', 'tenant'),
+      jump_tenantWelcome: () => this.jump('tenantWelcome', 'tenant'),
+      jump_dashboardPlaceholder: () => this.jump('dashboardPlaceholder')
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hanken Grotesk',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  :root{
+    --ink:#0B140F;--paper:#F6F5F0;--white:#FFFFFF;
+    --green:#0E5C43;--green-deep:#093C2C;--green-soft:#E3EDE7;--green-line:#C9DBD1;
+    --clay:#DB6B3B;--clay-soft:#F5E4DA;
+    --success:#1E9E5A;--warning:#E0A008;--error:#CF4B3E;
+    --stone:#5C665F;--line:#E4E2DA;--line-2:#D8D6CD;
+  }
+  a{color:var(--green);text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea{font-family:inherit;font-size:14px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--green);outline-offset:1px}
+  ::selection{background:var(--clay);color:#fff}
+  @keyframes popIn{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+  @keyframes toastUp{from{transform:translate(-50%,16px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+  @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(420px) rotate(340deg);opacity:0}}
+  @keyframes modalIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(14,92,67,.35)}100%{box-shadow:0 0 0 16px rgba(14,92,67,0)}}
+</style>
+</helmet>
+
+<div style="display:flex;min-height:100vh">
+
+  <!-- SIDEBAR -->
+  <div style="{{ sidebarStyle }}">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;padding:8px 4px 24px">
+      <div style="display:flex;align-items:center;gap:9px;overflow:hidden">
+        <img src="assets/makazi-mark-light.png" alt="Makazi" style="height:22px;flex-shrink:0">
+        <span style="{{ navLabelStyle }}">MAKAZI</span>
+      </div>
+      <button onClick="{{ toggleSidebarCollapsed }}" style="background:none;border:none;color:#9AA39D;padding:4px;display:flex;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="{{ collapseIconStyle }}"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"></path></svg></button>
+    </div>
+    <button onClick="{{ navToOverview }}" style="{{ navOverviewStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg><span style="{{ navLabelStyle }}">Overview</span></button>
+    <button onClick="{{ navToPay }}" style="{{ navPayStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"></rect></svg><span style="{{ navLabelStyle }}">Pay Rent</span></button>
+    <button onClick="{{ navToReceipts }}" style="{{ navReceiptsStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"></path></svg><span style="{{ navLabelStyle }}">Receipts</span></button>
+    <button onClick="{{ navToLease }}" style="{{ navLeaseStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path><path d="M9 13h6M9 17h6"></path></svg><span style="{{ navLabelStyle }}">Lease</span></button>
+    <button onClick="{{ navToMaintenance }}" style="{{ navMaintenanceStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path></svg><span style="{{ navLabelStyle }}">Maintenance</span></button>
+    <button onClick="{{ navToPassport }}" style="{{ navPassportStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4 1 6L12 16l-5.5 3 1-6L3 9l6-1z"></path></svg><span style="{{ navLabelStyle }}">Rental Passport</span></button>
+    <button onClick="{{ navToContact }}" style="{{ navContactStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 3.3a4 4 0 0 0-5.4 5.4L3 15l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"></path></svg><span style="{{ navLabelStyle }}">Contact Caretaker</span></button>
+    <div style="flex:1"></div>
+    <button onClick="{{ navToSettings }}" style="{{ navSettingsStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg><span style="{{ navLabelStyle }}">Settings</span></button>
+    <div onClick="{{ toggleProfileMenu }}" style="display:flex;align-items:center;gap:9px;padding:10px 8px;margin-top:8px;border-top:1px solid rgba(255,255,255,.1);cursor:pointer;position:relative">
+      <div style="width:28px;height:28px;border-radius:99px;background:var(--clay);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0">SW</div>
+      <div style="{{ profileNameWrapStyle }}"><div style="font-size:12px;font-weight:500">{{ firstName }}</div><div style="font-size:10px;color:#9AA39D">Tenant</div></div>
+      <sc-if value="{{ profileMenuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;bottom:48px;left:8px;right:8px;background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 24px 60px -30px rgba(0,0,0,.4);width:200px">
+          <div onClick="{{ navToSettings }}" style="padding:11px 14px;font-size:13px;color:var(--ink)">Profile &amp; settings</div>
+          <div onClick="{{ openLogoutConfirm }}" style="padding:11px 14px;font-size:13px;color:var(--error);border-top:1px solid var(--line)">Log out</div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+    <!-- TOP BAR -->
+    <div style="height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 28px;background:var(--white);position:sticky;top:0;z-index:20">
+      <button onClick="{{ toggleSidebarCollapsed }}" style="background:none;border:1px solid var(--line);border-radius:8px;padding:8px;display:flex;color:var(--stone)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></svg></button>
+      <div style="font-size:13px;font-weight:600;color:var(--stone)">{{ propertyUnit }}</div>
+      <div style="flex:1"></div>
+      <div style="position:relative">
+        <button onClick="{{ toggleNotif }}" style="position:relative;background:none;border:none;padding:8px;display:flex">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"></path><path d="M9.5 20a2.5 2.5 0 0 0 5 0"></path></svg>
+          <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:99px;background:var(--clay)"></span>
+        </button>
+        <sc-if value="{{ notifOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:44px;right:0;background:var(--white);border:1px solid var(--line);border-radius:10px;width:290px;max-height:340px;overflow-y:auto;box-shadow:0 24px 60px -30px rgba(0,0,0,.3);z-index:30">
+            <div style="padding:12px 14px;font-size:12px;font-weight:600;color:var(--stone);border-bottom:1px solid var(--line)">NOTIFICATIONS</div>
+            <sc-for list="{{ notifList }}" as="n" hint-placeholder-count="6">
+              <div style="padding:11px 14px;border-bottom:1px solid var(--line);font-size:12.5px">{{ n.text }}<div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);margin-top:2px">{{ n.time }}</div></div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div style="flex:1;padding:28px 32px 56px;max-width:1200px;width:100%;margin:0 auto">
+
+      <!-- OVERVIEW -->
+      <sc-if value="{{ is_overview }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 4px">Habari, {{ firstName }} 👋</h1>
+        <p style="font-size:14px;color:var(--stone);margin:0 0 24px">{{ todayLabel }}</p>
+
+        <sc-if value="{{ isLate }}" hint-placeholder-val="{{ false }}">
+          <div style="background:rgba(207,75,62,.08);border:1px solid rgba(207,75,62,.25);border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;gap:9px;align-items:flex-start">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+            <span style="font-size:13px;color:var(--error)">Your rent is overdue. Pay now to avoid a late note on your Rental Passport.</span>
+          </div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:20px;align-items:stretch">
+          <div style="background:var(--green-deep);color:#fff;border-radius:20px;padding:26px;display:flex;flex-direction:column;justify-content:space-between">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+              <div><div style="font-size:13px;opacity:.75;margin-bottom:6px">Rent due</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:36px">KES {{ rentAmount }}</div></div>
+              <span style="{{ rentStatusStyle }}">{{ rentStatusLabel }}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;opacity:.85;margin-bottom:20px">
+              <span>Due {{ dueDateDisplay }}</span><span>{{ propertyUnit }}</span>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button onClick="{{ startPay }}" style="flex:1;background:var(--clay);color:#fff;border:none;border-radius:11px;padding:14px;font-weight:700;font-size:14px">Pay Rent</button>
+              <button onClick="{{ navToPay }}" style="flex:1;background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:11px;padding:14px;font-weight:600;font-size:13.5px">Payment details</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button onClick="{{ goReportIssue }}" style="{{ actionBtnStyle }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path></svg>Report Issue</button>
+            <button onClick="{{ navToReceipts }}" style="{{ actionBtnStyle }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"></path></svg>Receipts</button>
+            <button onClick="{{ navToLease }}" style="{{ actionBtnStyle }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path><path d="M9 13h6M9 17h6"></path></svg>Lease</button>
+            <button onClick="{{ navToContact }}" style="{{ actionBtnStyle }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7"><path d="M14.7 3.3a4 4 0 0 0-5.4 5.4L3 15l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"></path></svg>Caretaker</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--white)">
+            <div style="font-weight:600;font-size:15px;margin-bottom:14px">Recent activity</div>
+            <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border-radius:12px;overflow:hidden">
+              <sc-for list="{{ activityList }}" as="a" hint-placeholder-count="4">
+                <div style="background:var(--white);padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:13px">{{ a.text }}</span><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">{{ a.time }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--green-deep);color:#fff;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"></path></svg><span style="font-weight:600;font-size:13px">Ask Makazi</span></div>
+            <p style="font-size:13px;color:#DCEAE2;margin:0;line-height:1.55;flex:1">Ask about rent, receipts or repairs — I'm here to help.</p>
+            <button onClick="{{ toggleAi }}" style="align-self:flex-start;background:#fff;color:var(--green-deep);border:none;border-radius:9px;padding:9px 16px;font-size:12.5px;font-weight:700">Chat now</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PAY -->
+      <sc-if value="{{ is_pay }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">Pay Rent</h1>
+        <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:16px;margin-bottom:16px;align-items:start">
+          <div style="border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--white)">
+            <div style="display:flex;justify-content:space-between;margin-bottom:14px"><span style="font-size:13px;color:var(--stone)">Amount due</span><span style="font-family:'JetBrains Mono';font-weight:700;font-size:18px">KES {{ rentAmount }}</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:14px"><span style="font-size:13px;color:var(--stone)">Due date</span><span style="font-size:13px;font-weight:600">{{ dueDateDisplay }}</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:16px"><span style="font-size:13px;color:var(--stone)">Status</span><span style="{{ rentStatusStyle2 }}">{{ rentStatusLabel }}</span></div>
+            <button onClick="{{ goStk }}" style="width:100%;background:var(--clay);color:#fff;border:none;border-radius:11px;padding:14px;font-weight:700;font-size:14px;margin-bottom:10px">Pay with M-Pesa</button>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ goUssd }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:9px;padding:10px;font-weight:600;font-size:12px;color:var(--ink)">Via USSD</button>
+              <button onClick="{{ goWhatsapp }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:9px;padding:10px;font-weight:600;font-size:12px;color:var(--ink)">Via WhatsApp</button>
+            </div>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--white)">
+            <div style="padding:14px 16px;font-weight:600;font-size:14px;border-bottom:1px solid var(--line)">Payment history</div>
+            <sc-for list="{{ paymentHistory }}" as="p" hint-placeholder-count="4">
+              <div onClick="{{ p.openReceipt }}" style="padding:13px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+                <div><div style="font-size:13px;font-weight:600">{{ p.month }}</div><div style="font-size:11px;color:var(--stone)">{{ p.date }}</div></div>
+                <div style="text-align:right"><div style="font-family:'JetBrains Mono';font-size:13px;font-weight:600">KES {{ p.amount }}</div><div style="{{ p.statusStyle }}">{{ p.statusLabel }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- RECEIPTS -->
+      <sc-if value="{{ is_receipts }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">Receipts</h1>
+        <div style="position:relative;max-width:320px;margin-bottom:16px">
+          <input value="{{ receiptSearch }}" onInput="{{ updateReceiptSearch }}" placeholder="Search by month" style="width:100%;padding:10px 14px 10px 34px;border:1px solid var(--line);border-radius:10px;background:var(--white);font-size:13px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--stone)" stroke-width="2" style="position:absolute;left:11px;top:12px"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Month</span><span>Date</span><span>Amount</span><span>Status</span></div>
+          <sc-for list="{{ filteredReceipts }}" as="p" hint-placeholder-count="4">
+            <div onClick="{{ p.openReceipt }}" style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:13px;cursor:pointer">
+              <span style="font-weight:600">{{ p.month }}</span><span style="color:var(--stone)">{{ p.date }}</span><span style="font-family:'JetBrains Mono'">KES {{ p.amount }}</span><span style="{{ p.statusStyle }}">{{ p.statusLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- LEASE -->
+      <sc-if value="{{ is_lease }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">Your Lease</h1>
+        <div style="border:1px solid var(--line);border-radius:16px;padding:22px;background:var(--white);max-width:520px;margin-bottom:18px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Property</span><span style="font-weight:600">{{ propertyName }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Unit</span><span style="font-weight:600">{{ unitCode }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Monthly rent</span><span style="font-family:'JetBrains Mono';font-weight:600">KES {{ rentAmount }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Deposit paid</span><span style="font-family:'JetBrains Mono';font-weight:600">KES {{ depositAmount }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Lease start</span><span style="font-weight:600">{{ leaseStartDisplay }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Lease end</span><span style="font-weight:600">{{ leaseEndDisplay }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--stone)">Renewal date</span><span style="font-weight:600">{{ renewalDisplay }}</span></div>
+        </div>
+        <div style="display:flex;gap:10px;max-width:520px">
+          <button onClick="{{ downloadStub }}" style="flex:1;background:var(--ink);color:#fff;border:none;border-radius:11px;padding:13px;font-weight:600;font-size:13px">Download lease</button>
+          <button onClick="{{ viewTermsStub }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:11px;padding:13px;font-weight:600;font-size:13px;color:var(--ink)">View terms</button>
+        </div>
+      </sc-if>
+
+      <!-- MAINTENANCE -->
+      <sc-if value="{{ is_maintenance }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
+          <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0">Maintenance</h1>
+          <button onClick="{{ goNewRequest }}" style="background:var(--green);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600">Report Issue</button>
+        </div>
+        <sc-if value="{{ noTickets }}" hint-placeholder-val="{{ false }}"><p style="font-size:14px;color:var(--stone)">No requests yet.</p></sc-if>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+          <sc-for list="{{ ticketsList }}" as="t" hint-placeholder-count="2">
+            <div onClick="{{ t.openDetail }}" style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:14px;font-weight:600">{{ t.issue }}</span><span style="{{ t.statusStyle }}">{{ t.statusLabel }}</span></div>
+              <div style="font-size:12px;color:var(--stone)">{{ t.category }} · Ticket {{ t.ticketNumber }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- RENTAL PASSPORT + CREDIT -->
+      <sc-if value="{{ is_passport }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">Rental Passport</h1>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start">
+          <div style="background:var(--green-deep);color:#fff;border-radius:18px;padding:26px;text-align:center">
+            <div style="font-size:13px;opacity:.75;margin-bottom:6px">Rental Passport Score</div>
+            <div style="font-family:'JetBrains Mono';font-weight:800;font-size:42px;margin-bottom:10px">{{ passportScore }}</div>
+            <div style="display:inline-block;background:var(--clay);padding:6px 16px;border-radius:99px;font-size:12px;font-weight:700">EXCELLENT TENANT</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Paid on time</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ monthsOnTime }} months</div></div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Late payments</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ latePayments }}</div></div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">At this property</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ yearsAtProperty }}</div></div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Verified</div><div style="font-weight:700;font-size:15px;color:var(--success);margin-top:4px">✓ Tenant</div></div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--stone);line-height:1.6;margin:0 0 28px;max-width:700px">Your Rental Passport travels with you. Landlords can see your verified payment history when you apply for your next home — no more starting from zero.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:16px;align-items:start">
+          <div style="background:var(--white);border:1px solid var(--line);border-radius:18px;padding:22px;text-align:center">
+            <div style="font-size:12px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Makazi Rent Score</div>
+            <div style="font-family:'JetBrains Mono';font-weight:800;font-size:36px;margin-bottom:4px">{{ creditScore }}</div>
+            <div style="color:var(--success);font-weight:700;font-size:13px;margin-bottom:14px">Excellent</div>
+            <p style="font-size:12px;color:var(--stone);margin:0;line-height:1.5">Calculated from on-time payments, consistency, tenancy length and rental behaviour.</p>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+            <div style="padding:14px 16px;font-weight:600;font-size:14px;border-bottom:1px solid var(--line)">Eligible products</div>
+            <sc-for list="{{ eligibleProducts }}" as="pr" hint-placeholder-count="6">
+              <div style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px">{{ pr.label }}</span><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">Coming soon</span></div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- CONTACT -->
+      <sc-if value="{{ is_contact }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">Contact your caretaker</h1>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:760px">
+          <div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px;display:flex;gap:12px;align-items:center">
+              <div style="width:44px;height:44px;border-radius:99px;background:var(--clay);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Schibsted Grotesk';font-weight:700;font-size:15px">DK</div>
+              <div><div style="font-weight:700;font-size:15px">David Kamau</div><div style="font-size:12px;color:var(--stone)">Caretaker · Green Gardens Apartments</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <button onClick="{{ contactStub }}" style="{{ contactBtnStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8 10.3a16 16 0 0 0 6 6l1.5-1.4a2 2 0 0 1 2.1-.4c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2z"></path></svg>Call</button>
+              <button onClick="{{ contactStub }}" style="{{ contactBtnStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8"><path d="M4 4h16v13H8l-4 4z"></path></svg>WhatsApp</button>
+              <button onClick="{{ contactStub }}" style="{{ contactBtnStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8"><path d="M4 4h16v16H4z"></path><path d="M4 6l8 7 8-7"></path></svg>Email</button>
+              <button onClick="{{ toggleAi }}" style="{{ contactBtnStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"></path></svg>Chat</button>
+            </div>
+          </div>
+          <div>
+            <div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px"><div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Office hours</div><p style="margin:0;font-size:13px">Mon–Sat, 8:00am – 6:00pm</p></div>
+            <div style="background:rgba(207,75,62,.06);border:1px solid rgba(207,75,62,.2);border-radius:14px;padding:16px"><div style="font-size:12px;font-weight:600;color:var(--error);text-transform:uppercase;margin-bottom:6px">Emergency contact</div><p style="margin:0;font-size:13px;color:var(--error)">+254 743 695 612 (24/7 for urgent issues)</p></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SETTINGS -->
+      <sc-if value="{{ is_settings }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">Settings</h1>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:800px">
+          <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white)">
+            <div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:14px">Profile</div>
+            <div style="display:flex;gap:14px;align-items:center;margin-bottom:16px">
+              <image-slot id="td-avatar" shape="circle" style="width:52px;height:52px;flex-shrink:0" placeholder="photo"></image-slot>
+              <div><div style="font-weight:700;font-size:15px">{{ firstName }} {{ lastName }}</div><div style="font-size:12px;color:var(--stone)">{{ propertyUnit }}</div></div>
+            </div>
+            <div style="margin-bottom:12px"><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Email (optional)</label><input type="email" value="{{ settingsEmail }}" onInput="{{ updateSettingsEmail }}" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:8px"></div>
+            <div style="margin-bottom:12px"><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Emergency contact (optional)</label><input type="text" value="{{ settingsEmergency }}" onInput="{{ updateSettingsEmergency }}" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:8px"></div>
+            <div style="margin-bottom:16px"><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Language</label>
+              <select value="{{ settingsLanguage }}" onChange="{{ updateSettingsLanguage }}" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:8px"><option>English</option><option>Kiswahili</option></select>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--line);margin-bottom:14px"><span style="font-size:13px">Push notifications</span><button onClick="{{ toggleNotifPref }}" style="{{ notifToggleStyle }}"><span style="{{ notifToggleDotStyle }}"></span></button></div>
+            <button onClick="{{ saveSettings }}" style="background:var(--green);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:600">Save changes</button>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white)">
+            <div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:14px">Account</div>
+            <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border-radius:10px;overflow:hidden;margin-bottom:16px">
+              <div onClick="{{ stubToast }}" style="background:var(--white);padding:13px 14px;font-size:13.5px;font-weight:500">Change password</div>
+              <div onClick="{{ stubToast }}" style="background:var(--white);padding:13px 14px;font-size:13.5px;font-weight:500">Privacy</div>
+              <div style="background:var(--white);padding:13px 14px;font-size:13.5px;display:flex;justify-content:space-between"><span style="font-weight:500">Linked phone</span><span style="color:var(--stone)">{{ tenantPhone }}</span></div>
+              <div onClick="{{ stubToast }}" style="background:var(--white);padding:13px 14px;font-size:13.5px;font-weight:500">Support</div>
+            </div>
+            <button onClick="{{ openLogoutConfirm }}" style="width:100%;border:1.5px solid rgba(207,75,62,.3);background:none;border-radius:9px;padding:11px;font-weight:600;font-size:13px;color:var(--error)">Log out</button>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+
+<!-- AI ASSISTANT -->
+<sc-if value="{{ !aiOpen }}" hint-placeholder-val="{{ true }}">
+  <button onClick="{{ toggleAi }}" style="position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;border:none;border-radius:99px;padding:13px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;z-index:150;box-shadow:0 20px 40px -20px rgba(0,0,0,.4)">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"></path></svg>Ask Makazi
+  </button>
+</sc-if>
+<sc-if value="{{ aiOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:20px;right:20px;width:320px;max-height:460px;background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px -30px rgba(0,0,0,.4);z-index:150;display:flex;flex-direction:column;overflow:hidden">
+    <div style="background:var(--green-deep);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:600;font-size:13px">Ask Makazi</span>
+      <button onClick="{{ toggleAi }}" style="background:none;border:none;color:#fff;font-size:15px">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;max-height:280px">
+      <sc-for list="{{ aiMessages }}" as="m" hint-placeholder-count="1"><div style="{{ m.style }}">{{ m.text }}</div></sc-for>
+    </div>
+    <div style="padding:10px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px">
+      <sc-for list="{{ aiPrompts }}" as="pr" hint-placeholder-count="4"><button onClick="{{ pr.ask }}" style="background:var(--green-soft);color:var(--green-deep);border:none;border-radius:99px;padding:6px 11px;font-size:11px;font-weight:600">{{ pr.label }}</button></sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<!-- CONFETTI -->
+<sc-if value="{{ confettiActive }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden">
+    <sc-for list="{{ confettiPieces }}" as="p" hint-placeholder-count="14"><div style="{{ p.style }}"></div></sc-for>
+  </div>
+</sc-if>
+
+<!-- MODALS -->
+<sc-if value="{{ anyModalOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(11,20,15,.5);z-index:250;display:flex;align-items:center;justify-content:center;padding:20px" onClick="{{ closeModal }}">
+    <div style="background:var(--white);border-radius:20px;width:100%;max-width:{{ modalMaxWidth }};max-height:88vh;overflow-y:auto;padding:28px;animation:modalIn .25s ease-out" onClick="{{ stopProp }}">
+
+      <!-- STK -->
+      <sc-if value="{{ is_modal_stk }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:10px 0">
+          <div style="width:72px;height:72px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:pulseRing 1.6s infinite"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><rect x="7" y="2" width="10" height="20" rx="2"></rect></svg></div>
+          <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 10px">Check your phone</h3>
+          <p style="font-size:13.5px;color:var(--stone);margin:0 0 22px;line-height:1.55">We've sent an M-Pesa payment request of <strong>KES {{ rentAmount }}</strong> to {{ tenantPhone }}. Enter your M-Pesa PIN to complete payment.</p>
+          <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:left;font-family:'JetBrains Mono';font-size:12px;color:var(--stone);line-height:1.7">
+            <span style="color:var(--green-deep);font-weight:600">M-PESA</span><br>Pay {{ propertyName }}<br>KES {{ rentAmount }}<br>Enter PIN to confirm
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SUCCESS -->
+      <sc-if value="{{ is_modal_success }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:10px 0">
+          <div style="width:72px;height:72px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:popIn .5s ease-out"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"></path></svg></div>
+          <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 8px">Payment successful</h3>
+          <p style="font-size:13.5px;color:var(--stone);margin:0 0 20px">KES {{ rentAmount }} paid to {{ propertyName }}.</p>
+          <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:left;margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0"><span style="color:var(--stone)">Reference</span><span style="font-family:'JetBrains Mono';font-weight:600">{{ lastPaymentRef }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0"><span style="color:var(--stone)">Date</span><span style="font-weight:600">{{ todayLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0"><span style="color:var(--stone)">Method</span><span style="font-weight:600">M-Pesa STK Push</span></div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button onClick="{{ viewLastReceipt }}" style="flex:1;background:var(--ink);color:#fff;border:none;border-radius:11px;padding:13px;font-weight:600;font-size:13.5px">View receipt</button>
+            <button onClick="{{ closeModal }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:11px;padding:13px;font-weight:600;font-size:13.5px;color:var(--ink)">Close</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- FAILURE -->
+      <sc-if value="{{ is_modal_failure }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:10px 0">
+          <div style="width:72px;height:72px;border-radius:99px;background:rgba(207,75,62,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"></path></svg></div>
+          <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 8px">Payment failed</h3>
+          <p style="font-size:13.5px;color:var(--stone);margin:0 0 22px">The request timed out or was cancelled. No money was deducted.</p>
+          <div style="display:flex;gap:10px">
+            <button onClick="{{ goStk }}" style="flex:1;background:var(--clay);color:#fff;border:none;border-radius:11px;padding:13px;font-weight:700;font-size:14px">Try again</button>
+            <button onClick="{{ closeModal }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:11px;padding:13px;font-weight:600;font-size:13.5px;color:var(--ink)">Close</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PENDING -->
+      <sc-if value="{{ is_modal_pending }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:10px 0">
+          <div style="width:72px;height:72px;border-radius:99px;background:rgba(224,160,8,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg></div>
+          <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 8px">Payment pending</h3>
+          <p style="font-size:13.5px;color:var(--stone);margin:0 0 22px">We're confirming your payment with M-Pesa. This can take a minute.</p>
+          <button onClick="{{ closeModal }}" style="width:100%;border:1.5px solid var(--line-2);background:none;border-radius:11px;padding:13px;font-weight:600;font-size:13.5px;color:var(--ink)">Close</button>
+        </div>
+      </sc-if>
+
+      <!-- USSD -->
+      <sc-if value="{{ is_modal_ussd }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 6px">Pay via USSD</h3>
+        <p style="font-size:13px;color:var(--stone);margin:0 0 16px">Works on any phone, even without internet.</p>
+        <div style="background:#111a15;border-radius:14px;padding:16px;color:var(--paper);font-family:'JetBrains Mono';font-size:13px;line-height:1.9;margin-bottom:16px">
+          <span style="color:var(--green-line);font-weight:600">MAKAZI</span><br>1 Pay Rent<br>2 Check Rent Balance<br>3 Report Issue<br>4 View Receipt Reference<br>5 Help
+        </div>
+        <div style="text-align:center;font-family:'JetBrains Mono';font-size:13px;color:var(--stone);margin-bottom:20px">Dial <span style="color:var(--clay);font-weight:600">*151*7#</span> and select option 1</div>
+        <button onClick="{{ closeModal }}" style="width:100%;border:1.5px solid var(--line-2);background:none;border-radius:11px;padding:13px;font-weight:600;font-size:13.5px;color:var(--ink)">Close</button>
+      </sc-if>
+
+      <!-- WHATSAPP -->
+      <sc-if value="{{ is_modal_whatsapp }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 16px">Pay via WhatsApp</h3>
+        <div style="background:#E9E4DA;border-radius:14px;padding:14px;margin-bottom:18px">
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="align-self:flex-start;max-width:88%;background:#fff;border-radius:4px 13px 13px 13px;padding:10px 13px;font-size:12.5px;line-height:1.4">Hi {{ firstName }} 👋<br>How can I help today?<br><br>1️⃣ Pay Rent<br>2️⃣ Check Balance<br>3️⃣ View Receipts<br>4️⃣ Report Issue<br>5️⃣ Track Repair<br>6️⃣ Talk to AI</div>
+            <div style="align-self:flex-end;max-width:60%;background:#D6EAD9;border-radius:13px 4px 13px 13px;padding:10px 13px;font-size:12.5px">1</div>
+            <div style="align-self:flex-start;max-width:88%;background:#fff;border-radius:4px 13px 13px 13px;padding:10px 13px;font-size:12.5px;line-height:1.4">Your rent of <strong>KES {{ rentAmount }}</strong> is due {{ dueDateDisplay }}. Reply <strong>PAY</strong> to get an M-Pesa prompt.</div>
+          </div>
+        </div>
+        <button onClick="{{ closeModal }}" style="width:100%;border:1.5px solid var(--line-2);background:none;border-radius:11px;padding:13px;font-weight:600;font-size:13.5px;color:var(--ink)">Close</button>
+      </sc-if>
+
+      <!-- RECEIPT DETAIL -->
+      <sc-if value="{{ is_modal_receiptDetail }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 16px">Receipt</h3>
+        <div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px">
+          <div style="text-align:center;margin-bottom:14px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" style="margin:0 auto 8px;display:block"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"></path></svg><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">KES {{ detailAmount }}</div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Month</span><span style="font-weight:600">{{ detailMonth }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Date paid</span><span style="font-weight:600">{{ detailDate }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Status</span><span style="{{ detailStatusStyle }}">{{ detailStatusLabel }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Property</span><span style="font-weight:600">{{ propertyUnit }}</span></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ downloadStub }}" style="flex:1;background:var(--ink);color:#fff;border:none;border-radius:11px;padding:13px;font-weight:600;font-size:13px">Download PDF</button>
+          <button onClick="{{ shareStub }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:11px;padding:13px;font-weight:600;font-size:13px;color:var(--ink)">Share</button>
+        </div>
+      </sc-if>
+
+      <!-- MAINT NEW -->
+      <sc-if value="{{ is_modal_maintNew }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 18px">Report an issue</h3>
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:8px">Category</label>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <sc-for list="{{ categoryOptions }}" as="c" hint-placeholder-count="7"><button onClick="{{ c.select }}" style="{{ c.style }}">{{ c.label }}</button></sc-for>
+          </div>
+        </div>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:6px">Description</label><textarea rows="3" value="{{ fMaintDesc }}" onInput="{{ updateFMaintDesc }}" placeholder="Describe what's wrong" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px;resize:vertical;font-family:inherit"></textarea></div>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:8px">Photos</label>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <image-slot id="td-maint-1" shape="rounded" radius="10" style="width:100%;aspect-ratio:1" placeholder="photo"></image-slot>
+            <image-slot id="td-maint-2" shape="rounded" radius="10" style="width:100%;aspect-ratio:1" placeholder="photo"></image-slot>
+            <image-slot id="td-maint-3" shape="rounded" radius="10" style="width:100%;aspect-ratio:1" placeholder="photo"></image-slot>
+          </div>
+        </div>
+        <div style="margin-bottom:22px"><label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:8px">Priority</label>
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ pickPriorityLow }}" style="{{ priorityLowStyle }}">Low</button>
+            <button onClick="{{ pickPriorityNormal }}" style="{{ priorityNormalStyle }}">Normal</button>
+            <button onClick="{{ pickPriorityUrgent }}" style="{{ priorityUrgentStyle }}">Urgent</button>
+          </div>
+        </div>
+        <button onClick="{{ submitMaintenance }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:11px;padding:14px;font-weight:700;font-size:14px">Submit</button>
+      </sc-if>
+
+      <!-- MAINT SUBMITTED -->
+      <sc-if value="{{ is_modal_maintSubmitted }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:10px 0">
+          <div style="width:64px;height:64px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;animation:popIn .5s ease-out"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"></path></svg></div>
+          <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:18px;margin:0 0 8px">Request submitted</h3>
+          <p style="font-size:13px;color:var(--stone);margin:0 0 20px">Ticket {{ lastTicketNumber }} — we'll keep you updated.</p>
+          <button onClick="{{ closeModal }}" style="width:100%;background:var(--ink);color:#fff;border:none;border-radius:11px;padding:13px;font-weight:600;font-size:13.5px">Done</button>
+        </div>
+      </sc-if>
+
+      <!-- MAINT DETAIL -->
+      <sc-if value="{{ is_modal_maintDetail }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 4px">{{ mdIssue }}</h3>
+        <p style="font-size:12.5px;color:var(--stone);margin:0 0 18px">Ticket {{ mdTicketNumber }} · {{ mdCategory }}</p>
+        <div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0"><span style="color:var(--stone)">Status</span><span style="{{ mdStatusStyle }}">{{ mdStatusLabel }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Technician</span><span style="font-weight:600">{{ mdTechnician }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Expected visit</span><span style="font-weight:600">{{ mdExpectedVisit }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Est. completion</span><span style="font-weight:600">{{ mdCompletion }}</span></div>
+        </div>
+        <div style="display:flex;gap:1px;background:var(--line);border-radius:12px;overflow:hidden">
+          <sc-for list="{{ mdTimeline }}" as="step" hint-placeholder-count="4">
+            <div style="flex:1;background:var(--white);padding:10px 6px;text-align:center">
+              <div style="{{ step.dotStyle }}"></div>
+              <div style="font-size:9.5px;color:var(--stone);margin-top:6px">{{ step.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- LOGOUT -->
+      <sc-if value="{{ is_modal_logout }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 8px">Log out of Makazi?</h3>
+        <p style="font-size:13px;color:var(--stone);margin:0 0 20px">You'll need to log in again next time.</p>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ closeModal }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:9px;padding:11px;font-size:13px;font-weight:600">Cancel</button>
+          <button onClick="{{ confirmLogout }}" style="flex:1;background:var(--error);color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:600">Log out</button>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</sc-if>
+
+<!-- TOAST -->
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 22px;border-radius:99px;font-size:13px;font-weight:500;animation:toastUp .3s ease-out;z-index:400;max-width:340px;text-align:center">{{ toast }}</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    navActive: 'overview', modalOpen: null, isLate: false,
+    ticketsList: [
+      { id: 1, issue: 'Leaking tap in bathroom', category: 'Water', priority: 'Normal', status: 'in_progress', ticketNumber: 'MKZ-T4821', technician: 'Otieno Plumbing', expectedVisit: '23 Jul 2026', completion: '24 Jul 2026' },
+      { id: 2, issue: 'Broken kitchen cabinet hinge', category: 'Other', priority: 'Low', status: 'completed', ticketNumber: 'MKZ-T4790', technician: 'James Mwenda — Handyman', expectedVisit: '—', completion: '15 Jul 2026' }
+    ],
+    activity: [
+      { text: 'Payment received — June rent', time: '3w ago' },
+      { text: 'Maintenance scheduled — Leaking tap', time: '2d ago' },
+      { text: 'Rental Passport improved to Excellent', time: '1w ago' }
+    ],
+    viewingTicketId: null, viewingReceiptId: null,
+    notifOpen: false, profileMenuOpen: false, aiOpen: false,
+    toast: '', confettiActive: false,
+    receiptSearch: '',
+    fMaintCategory: '', fMaintDesc: '', fMaintPriority: 'Normal', lastTicketNumber: '',
+    settingsEmail: '', settingsEmergency: '', settingsLanguage: 'English', notifPref: true,
+    aiMessages: [{ text: "Hi Sarah! Ask me about rent, receipts, or repairs.", who: 'ai' }],
+    sidebarCollapsed: false
+  };
+
+  componentWillUnmount() { clearTimeout(this._toastTimer); clearTimeout(this._confettiTimer); clearTimeout(this._stkTimer); }
+  showToast(msg) { this.setState({ toast: msg }); clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.setState({ toast: '' }), 2600); }
+  burstConfetti() { this.setState({ confettiActive: true }); clearTimeout(this._confettiTimer); this._confettiTimer = setTimeout(() => this.setState({ confettiActive: false }), 1500); }
+  logActivity(text) { this.setState(s => ({ activity: [{ text, time: 'Just now' }, ...s.activity] })); }
+  openModal(name) { this.setState({ modalOpen: name }); }
+  closeModal = () => this.setState({ modalOpen: null });
+  stopProp = (e) => e.stopPropagation();
+
+  renderVals() {
+    const s = this.state;
+    const firstName = 'Sarah', lastName = 'Wanjiku';
+    const rentAmount = '15,000', dueDateDisplay = '30 Jul 2026', propertyName = 'Green Gardens Apartments', unitCode = 'B203', tenantPhone = '+254 712 445 210';
+    const depositAmount = '15,000', leaseStartDisplay = '1 Jul 2026', leaseEndDisplay = '30 Jun 2027', renewalDisplay = '1 Jun 2027';
+    const on = (n) => s.navActive === n;
+
+    const paymentHistoryRaw = [
+      { id: 1, month: 'June 2026', date: '2 Jun 2026', amount: '15,000', status: 'paid' },
+      { id: 2, month: 'May 2026', date: '3 May 2026', amount: '15,000', status: 'paid' },
+      { id: 3, month: 'April 2026', date: '9 Apr 2026', amount: '15,000', status: 'late' },
+      { id: 4, month: 'March 2026', date: '1 Mar 2026', amount: '15,000', status: 'paid' }
+    ];
+    const statusStyle = (st) => `font-size:10.5px;font-weight:700;color:${st === 'paid' ? 'var(--success)' : st === 'late' ? 'var(--warning)' : 'var(--stone)'}`;
+    const statusLabel = (st) => st === 'paid' ? 'Paid' : st === 'late' ? 'Paid late' : 'Upcoming';
+    const paymentHistory = paymentHistoryRaw.map(p => ({
+      month: p.month, date: p.date, amount: p.amount, statusLabel: statusLabel(p.status), statusStyle: statusStyle(p.status),
+      openReceipt: () => { this.setState({ viewingReceiptId: p.id, modalOpen: 'receiptDetail' }); }
+    }));
+    const filteredReceipts = paymentHistoryRaw.filter(p => p.month.toLowerCase().includes(s.receiptSearch.toLowerCase())).map(p => ({
+      month: p.month, date: p.date, amount: p.amount, statusLabel: statusLabel(p.status), statusStyle: statusStyle(p.status),
+      openReceipt: () => { this.setState({ viewingReceiptId: p.id, modalOpen: 'receiptDetail' }); }
+    }));
+    const viewingReceipt = paymentHistoryRaw.find(p => p.id === s.viewingReceiptId) || paymentHistoryRaw[0];
+
+    const actionBtnStyle = 'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 6px;font-size:12px;font-weight:600;color:var(--ink)';
+    const chip = (active) => active
+      ? 'background:var(--ink);color:#fff;border:none;border-radius:9px;padding:9px 4px;font-size:11px;font-weight:600'
+      : 'background:none;border:1.5px solid var(--line-2);border-radius:9px;padding:9px 4px;font-size:11px;font-weight:600;color:var(--stone)';
+    const priorityChip = (active, color) => active
+      ? `flex:1;background:${color};color:#fff;border:none;border-radius:9px;padding:10px;font-size:12.5px;font-weight:600`
+      : 'flex:1;background:none;border:1.5px solid var(--line-2);border-radius:9px;padding:10px;font-size:12.5px;font-weight:600;color:var(--ink)';
+
+    const categories = ['Water', 'Electricity', 'Bathroom', 'Kitchen', 'Security', 'Cleaning', 'Other'];
+    const categoryOptions = categories.map(c => ({ label: c, style: chip(s.fMaintCategory === c), select: () => this.setState({ fMaintCategory: c }) }));
+
+    const viewingTicket = s.ticketsList.find(t => t.id === s.viewingTicketId) || s.ticketsList[0];
+    const mdStatusMap = { in_progress: 'In progress', completed: 'Completed', reported: 'Reported', assigned: 'Assigned' };
+    const timelineSteps = ['Reported', 'Assigned', 'In Progress', 'Completed'];
+    const statusIdx = { reported: 0, assigned: 1, in_progress: 2, completed: 3 };
+    const curIdx = statusIdx[viewingTicket?.status] ?? 0;
+    const mdTimeline = timelineSteps.map((label, i) => ({ label, dotStyle: `width:10px;height:10px;border-radius:99px;margin:0 auto;background:${i <= curIdx ? 'var(--green)' : 'var(--line-2)'}` }));
+
+    const notifList = [
+      { text: 'Rent due in 7 days', time: '2h ago' }, { text: 'Payment received', time: '3w ago' },
+      { text: 'Maintenance scheduled', time: '1d ago' }, { text: 'Technician arriving today', time: '5h ago' },
+      { text: 'Rental Passport improved', time: '1w ago' }, { text: 'New financial offer available', time: '2w ago' }
+    ];
+
+    const aiPromptDefs = [
+      { label: 'Next rent due?', ask: () => this.askAi('When is my next rent due?', `Your rent of KES ${rentAmount} is due ${dueDateDisplay}.`) },
+      { label: 'Already paid?', ask: () => this.askAi('Have I already paid?', "You're up to date — your last payment was received on 2 Jun 2026.") },
+      { label: 'Track repair', ask: () => this.askAi('Track my maintenance request', `Ticket ${s.ticketsList[0].ticketNumber} is ${mdStatusMap[s.ticketsList[0].status]} — ${s.ticketsList[0].technician} is assigned.`) },
+      { label: 'Rent Advance?', ask: () => this.askAi('Can I qualify for Rent Advance?', "Rent Advance is launching soon — your Excellent Passport score puts you on the early-access list.") }
+    ];
+
+    const nav = (n) => `display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:${on(n) ? 'rgba(227,237,231,.12)' : 'none'};border:none;color:${on(n) ? '#fff' : '#9AA39D'};border-radius:9px;padding:10px 10px;font-size:13px;font-weight:${on(n) ? 600 : 500}`;
+
+    const collapsed = s.sidebarCollapsed;
+    return {
+      sidebarStyle: `width:${collapsed ? '68px' : '230px'};flex-shrink:0;background:var(--ink);color:#fff;padding:${collapsed ? '20px 10px' : '20px 14px'};display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;transition:width .15s ease;overflow:hidden`,
+      navLabelStyle: collapsed ? 'display:none' : 'white-space:nowrap',
+      navCollapseStyle: `display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:#9AA39D;border-radius:9px;padding:10px 10px;font-size:13px;font-weight:500;margin-bottom:6px;justify-content:${collapsed ? 'center' : 'flex-start'}`,
+      collapseIconStyle: `transition:transform .15s;transform:rotate(${collapsed ? '180deg' : '0deg'})`,
+      profileNameWrapStyle: collapsed ? 'display:none' : 'line-height:1.2;flex:1',
+      toggleSidebarCollapsed: () => this.setState({ sidebarCollapsed: !collapsed }),
+      firstName, lastName, tenantPhone, rentAmount, dueDateDisplay, propertyName, unitCode, depositAmount, leaseStartDisplay, leaseEndDisplay, renewalDisplay,
+      propertyUnit: `${propertyName} · Unit ${unitCode}`,
+      todayLabel: 'Tuesday, 21 July 2026',
+      isLate: s.isLate,
+      rentStatusLabel: s.isLate ? 'Overdue' : 'Upcoming',
+      rentStatusStyle: `font-family:'JetBrains Mono';font-size:10px;font-weight:700;padding:4px 10px;border-radius:99px;background:${s.isLate ? 'rgba(207,75,62,.25)' : 'rgba(255,255,255,.15)'};color:#fff`,
+      rentStatusStyle2: `font-family:'JetBrains Mono';font-size:11px;font-weight:700;color:${s.isLate ? 'var(--error)' : 'var(--warning)'}`,
+
+      is_overview: on('overview'), is_pay: on('pay'), is_receipts: on('receipts'), is_lease: on('lease'),
+      is_maintenance: on('maintenance'), is_passport: on('passport'), is_contact: on('contact'), is_settings: on('settings'),
+      navOverviewStyle: nav('overview'), navPayStyle: nav('pay'), navReceiptsStyle: nav('receipts'), navLeaseStyle: nav('lease'),
+      navMaintenanceStyle: nav('maintenance'), navPassportStyle: nav('passport'), navContactStyle: nav('contact'), navSettingsStyle: nav('settings'),
+      navToOverview: () => this.setState({ navActive: 'overview' }), navToPay: () => this.setState({ navActive: 'pay' }),
+      navToReceipts: () => this.setState({ navActive: 'receipts' }), navToLease: () => this.setState({ navActive: 'lease' }),
+      navToMaintenance: () => this.setState({ navActive: 'maintenance' }), navToPassport: () => this.setState({ navActive: 'passport' }),
+      navToContact: () => this.setState({ navActive: 'contact' }), navToSettings: () => this.setState({ navActive: 'settings' }),
+
+      profileMenuOpen: s.profileMenuOpen, toggleProfileMenu: () => this.setState({ profileMenuOpen: !s.profileMenuOpen }),
+      notifOpen: s.notifOpen, toggleNotif: () => this.setState({ notifOpen: !s.notifOpen }), notifList,
+      openLogoutConfirm: () => this.setState({ profileMenuOpen: false, modalOpen: 'logout' }),
+
+      startPay: () => { this.openModal('stk'); this.simulateStk(); }, goReportIssue: () => this.openModal('maintNew'),
+      actionBtnStyle,
+
+      goStk: () => { this.openModal('stk'); this.simulateStk(); }, goUssd: () => this.openModal('ussd'), goWhatsapp: () => this.openModal('whatsapp'),
+      paymentHistory,
+      lastPaymentRef: 'QSR' + Math.random().toString(36).slice(2, 10).toUpperCase(),
+      viewLastReceipt: () => this.setState({ viewingReceiptId: paymentHistoryRaw[0].id, modalOpen: 'receiptDetail' }),
+
+      receiptSearch: s.receiptSearch, updateReceiptSearch: (e) => this.setState({ receiptSearch: e.target.value }),
+      filteredReceipts,
+      detailMonth: viewingReceipt.month, detailAmount: viewingReceipt.amount, detailDate: viewingReceipt.date,
+      detailStatusLabel: statusLabel(viewingReceipt.status), detailStatusStyle: statusStyle(viewingReceipt.status),
+      downloadStub: () => this.showToast('Receipt downloaded (demo).'), shareStub: () => this.showToast('Share sheet opened (demo).'), viewTermsStub: () => this.showToast('Opening lease terms…'),
+
+      noTickets: s.ticketsList.length === 0,
+      ticketsList: s.ticketsList.map(t => ({
+        issue: t.issue, category: t.category, ticketNumber: t.ticketNumber,
+        statusLabel: mdStatusMap[t.status], statusStyle: `font-size:10.5px;font-weight:700;color:${t.status === 'completed' ? 'var(--success)' : 'var(--warning)'}`,
+        openDetail: () => this.setState({ viewingTicketId: t.id, modalOpen: 'maintDetail' })
+      })),
+      goNewRequest: () => this.openModal('maintNew'),
+      categoryOptions,
+      fMaintDesc: s.fMaintDesc, updateFMaintDesc: (e) => this.setState({ fMaintDesc: e.target.value }),
+      priorityLowStyle: priorityChip(s.fMaintPriority === 'Low', 'var(--green)'), priorityNormalStyle: priorityChip(s.fMaintPriority === 'Normal', 'var(--warning)'), priorityUrgentStyle: priorityChip(s.fMaintPriority === 'Urgent', 'var(--error)'),
+      pickPriorityLow: () => this.setState({ fMaintPriority: 'Low' }), pickPriorityNormal: () => this.setState({ fMaintPriority: 'Normal' }), pickPriorityUrgent: () => this.setState({ fMaintPriority: 'Urgent' }),
+      submitMaintenance: () => {
+        if (!s.fMaintCategory || !s.fMaintDesc) return;
+        const ticketNumber = 'MKZ-T' + Math.floor(1000 + Math.random() * 9000);
+        this.setState(prev => ({ ticketsList: [{ id: Date.now(), issue: s.fMaintDesc, category: s.fMaintCategory, priority: s.fMaintPriority, status: 'reported', ticketNumber, technician: 'Unassigned', expectedVisit: 'Pending', completion: 'Pending' }, ...prev.ticketsList], lastTicketNumber: ticketNumber, fMaintCategory: '', fMaintDesc: '', fMaintPriority: 'Normal', modalOpen: 'maintSubmitted' }));
+        this.logActivity(`Maintenance reported: ${s.fMaintDesc}`);
+      },
+      lastTicketNumber: s.lastTicketNumber,
+      mdIssue: viewingTicket.issue, mdTicketNumber: viewingTicket.ticketNumber, mdCategory: viewingTicket.category,
+      mdStatusLabel: mdStatusMap[viewingTicket.status], mdStatusStyle: `font-weight:700;color:${viewingTicket.status === 'completed' ? 'var(--success)' : 'var(--warning)'}`,
+      mdTechnician: viewingTicket.technician, mdExpectedVisit: viewingTicket.expectedVisit, mdCompletion: viewingTicket.completion,
+      mdTimeline,
+
+      passportScore: '82/100', monthsOnTime: 11, latePayments: 1, yearsAtProperty: '1.1 yrs',
+      creditScore: '742',
+      eligibleProducts: ['Rent Advance', 'Deposit Financing', 'Personal Loan', 'Partner Bank Offers', 'Savings Products', 'Insurance'].map(label => ({ label })),
+
+      contactBtnStyle: 'display:flex;align-items:center;gap:8px;justify-content:center;background:var(--white);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:12.5px;font-weight:600;color:var(--ink)',
+      contactStub: () => this.showToast('Opening…'),
+
+      settingsEmail: s.settingsEmail, updateSettingsEmail: (e) => this.setState({ settingsEmail: e.target.value }),
+      settingsEmergency: s.settingsEmergency, updateSettingsEmergency: (e) => this.setState({ settingsEmergency: e.target.value }),
+      settingsLanguage: s.settingsLanguage, updateSettingsLanguage: (e) => this.setState({ settingsLanguage: e.target.value }),
+      notifToggleStyle: `width:38px;height:22px;border-radius:99px;border:none;position:relative;background:${s.notifPref ? 'var(--green)' : 'var(--line-2)'};padding:0`,
+      notifToggleDotStyle: `position:absolute;top:2px;left:${s.notifPref ? '18px' : '2px'};width:18px;height:18px;border-radius:99px;background:#fff;transition:left .15s;display:block`,
+      toggleNotifPref: () => this.setState({ notifPref: !s.notifPref }),
+      saveSettings: () => this.showToast('Settings saved.'), stubToast: () => this.showToast('Coming soon.'),
+
+      confirmLogout: () => { window.location.href = 'Makazi App - Auth.dc.html'; },
+
+      aiOpen: s.aiOpen, toggleAi: () => this.setState({ aiOpen: !s.aiOpen }),
+      aiMessages: s.aiMessages.map(m => ({ text: m.text, style: m.who === 'ai' ? 'align-self:flex-start;max-width:88%;background:var(--paper);border-radius:4px 12px 12px 12px;padding:9px 12px;font-size:12.5px;line-height:1.4' : 'align-self:flex-end;max-width:75%;background:var(--green-soft);color:var(--green-deep);border-radius:12px 4px 12px 12px;padding:9px 12px;font-size:12.5px' })),
+      aiPrompts: aiPromptDefs,
+
+      toast: s.toast, confettiActive: s.confettiActive,
+      confettiPieces: Array.from({ length: 14 }, (_, i) => ({
+        style: `position:absolute;top:-10px;left:${(i * 7) % 100}%;width:8px;height:8px;border-radius:2px;background:${['var(--green)', 'var(--clay)', 'var(--success)', 'var(--warning)'][i % 4]};animation:confettiFall ${1.1 + (i % 5) * 0.1}s ease-in ${(i % 6) * 0.05}s forwards`
+      })),
+
+      anyModalOpen: !!s.modalOpen, closeModal: this.closeModal, stopProp: this.stopProp,
+      modalMaxWidth: ['maintNew', 'maintDetail', 'receiptDetail'].includes(s.modalOpen) ? '480px' : '420px',
+      is_modal_stk: s.modalOpen === 'stk', is_modal_success: s.modalOpen === 'success', is_modal_failure: s.modalOpen === 'failure', is_modal_pending: s.modalOpen === 'pending',
+      is_modal_ussd: s.modalOpen === 'ussd', is_modal_whatsapp: s.modalOpen === 'whatsapp',
+      is_modal_receiptDetail: s.modalOpen === 'receiptDetail', is_modal_maintNew: s.modalOpen === 'maintNew',
+      is_modal_maintSubmitted: s.modalOpen === 'maintSubmitted', is_modal_maintDetail: s.modalOpen === 'maintDetail', is_modal_logout: s.modalOpen === 'logout'
+    };
+  }
+
+  simulateStk() {
+    clearTimeout(this._stkTimer);
+    this._stkTimer = setTimeout(() => {
+      this.setState({ modalOpen: 'success' });
+      this.logActivity('Payment received — July rent');
+      this.burstConfetti();
+    }, 2800);
+  }
+  askAi(question, answer) {
+    this.setState(prev => ({ aiMessages: [...prev.aiMessages, { text: question, who: 'user' }, { text: answer, who: 'ai' }], aiOpen: true }));
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hanken Grotesk',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  :root{
+    --ink:#0B140F;--paper:#F6F5F0;--white:#FFFFFF;
+    --green:#0E5C43;--green-deep:#093C2C;--green-soft:#E3EDE7;--green-line:#C9DBD1;
+    --clay:#DB6B3B;--clay-soft:#F5E4DA;
+    --success:#1E9E5A;--warning:#E0A008;--error:#CF4B3E;
+    --stone:#5C665F;--line:#E4E2DA;--line-2:#D8D6CD;
+  }
+  a{color:var(--green);text-decoration:none}
+  a:hover{color:var(--green-deep)}
+  button{font-family:inherit;cursor:pointer}
+  input,select{font-family:inherit;font-size:14px}
+  input:focus,select:focus{outline:2px solid var(--green);outline-offset:1px}
+  ::selection{background:var(--clay);color:#fff}
+  ::placeholder{color:var(--stone)}
+  @keyframes popIn{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+  @keyframes toastUp{from{transform:translate(-50%,16px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+  @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(420px) rotate(340deg);opacity:0}}
+  @keyframes modalIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes checkPulse{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
+</style>
+</helmet>
+
+<div style="display:flex;min-height:100vh">
+
+  <!-- SIDEBAR -->
+  <div style="{{ sidebarStyle }}">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;padding:8px 4px 24px">
+      <div style="display:flex;align-items:center;gap:9px;overflow:hidden">
+        <img src="assets/makazi-mark-light.png" alt="Makazi" style="height:22px;flex-shrink:0">
+        <span style="{{ navLabelStyle }}">MAKAZI</span>
+      </div>
+      <button onClick="{{ toggleSidebarCollapsed }}" style="background:none;border:none;color:#9AA39D;padding:4px;display:flex;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="{{ collapseIconStyle }}"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"></path></svg></button>
+    </div>
+    <button onClick="{{ navToOverview }}" style="{{ navOverviewStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg><span style="{{ navLabelStyle }}">Overview</span></button>
+    <button onClick="{{ navToProperties }}" style="{{ navPropertiesStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="7" height="12"></rect><rect x="14" y="4" width="7" height="17"></rect></svg><span style="{{ navLabelStyle }}">My Properties</span></button>
+    <button onClick="{{ navToTenants }}" style="{{ navTenantsStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 19a6.5 6.5 0 0 1 13 0"></path></svg><span style="{{ navLabelStyle }}">Tenants</span></button>
+    <button onClick="{{ navToUnits }}" style="{{ navUnitsStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M3 15h18M9 3v18"></path></svg><span style="{{ navLabelStyle }}">Units</span></button>
+    <button onClick="{{ navToMaintenance }}" style="{{ navMaintenanceStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path></svg><span style="{{ navLabelStyle }}">Maintenance</span></button>
+    <button onClick="{{ navToInspections }}" style="{{ navInspectionsStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg><span style="{{ navLabelStyle }}">Inspections</span></button>
+    <button onClick="{{ navToCalendar }}" style="{{ navCalendarStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18M8 2v4M16 2v4"></path></svg><span style="{{ navLabelStyle }}">Calendar</span></button>
+    <div style="flex:1"></div>
+    <button onClick="{{ navToSettings }}" style="{{ navSettingsStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg><span style="{{ navLabelStyle }}">Settings</span></button>
+    <div onClick="{{ toggleProfileMenu }}" style="display:flex;align-items:center;gap:9px;padding:10px 8px;margin-top:8px;border-top:1px solid rgba(255,255,255,.1);cursor:pointer;position:relative">
+      <div style="width:28px;height:28px;border-radius:99px;background:var(--clay);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0">{{ initials }}</div>
+      <div style="{{ profileNameWrapStyle }}"><div style="font-size:12px;font-weight:500">{{ firstName }}</div><div style="font-size:10px;color:#9AA39D">Caretaker</div></div>
+      <sc-if value="{{ profileMenuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;bottom:48px;left:8px;right:8px;background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 24px 60px -30px rgba(0,0,0,.4);width:200px">
+          <div onClick="{{ navToSettings }}" style="padding:11px 14px;font-size:13px;color:var(--ink)">Profile &amp; settings</div>
+          <div onClick="{{ openLogoutConfirm }}" style="padding:11px 14px;font-size:13px;color:var(--error);border-top:1px solid var(--line)">Log out</div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+    <!-- TOP BAR -->
+    <div style="height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 28px;background:var(--white);position:sticky;top:0;z-index:20">
+      <button onClick="{{ toggleSidebarCollapsed }}" style="background:none;border:1px solid var(--line);border-radius:8px;padding:8px;display:flex;color:var(--stone)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></svg></button>
+      <div style="position:relative">
+        <button onClick="{{ toggleSwitcher }}" style="display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--ink)">{{ switcherLabel }}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--stone)" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <sc-if value="{{ switcherOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:44px;left:0;background:var(--white);border:1px solid var(--line);border-radius:10px;width:220px;box-shadow:0 24px 60px -30px rgba(0,0,0,.3);overflow:hidden;z-index:30">
+            <div onClick="{{ selectAllProperties }}" style="padding:11px 14px;font-size:13px;font-weight:600">All Properties</div>
+            <sc-for list="{{ propertiesList }}" as="p" hint-placeholder-count="2">
+              <div onClick="{{ p.select }}" style="padding:11px 14px;font-size:13px;border-top:1px solid var(--line)">{{ p.name }}</div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <div style="flex:1;max-width:360px;position:relative">
+        <input value="{{ searchValue }}" onInput="{{ updateSearch }}" onFocus="{{ openSearch }}" placeholder="Search tenants, units…" style="width:100%;padding:9px 14px 9px 34px;border:1px solid var(--line);border-radius:9px;background:var(--paper);font-size:13px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--stone)" stroke-width="2" style="position:absolute;left:11px;top:10px"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+        <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:40px;left:0;right:0;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:6px;box-shadow:0 24px 60px -30px rgba(0,0,0,.3);z-index:30;max-height:280px;overflow-y:auto">
+            <sc-if value="{{ noSearchResults }}" hint-placeholder-val="{{ true }}"><p style="margin:0;padding:12px;font-size:12px;color:var(--stone)">{{ searchHint }}</p></sc-if>
+            <sc-for list="{{ searchResults }}" as="res" hint-placeholder-count="0">
+              <div onClick="{{ res.select }}" style="padding:10px 12px;border-radius:8px;font-size:13px" style-hover="background:var(--paper)">{{ res.label }}<span style="color:var(--stone);font-size:11px;margin-left:6px">{{ res.sub }}</span></div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <div style="flex:1"></div>
+      <div style="position:relative">
+        <button onClick="{{ toggleNotif }}" style="position:relative;background:none;border:none;padding:8px;display:flex">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"></path><path d="M9.5 20a2.5 2.5 0 0 0 5 0"></path></svg>
+          <sc-if value="{{ hasNotifs }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:99px;background:var(--clay)"></span></sc-if>
+        </button>
+        <sc-if value="{{ notifOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:44px;right:0;background:var(--white);border:1px solid var(--line);border-radius:10px;width:290px;max-height:340px;overflow-y:auto;box-shadow:0 24px 60px -30px rgba(0,0,0,.3);z-index:30">
+            <div style="padding:12px 14px;font-size:12px;font-weight:600;color:var(--stone);border-bottom:1px solid var(--line)">NOTIFICATIONS</div>
+            <sc-for list="{{ notifList }}" as="n" hint-placeholder-count="4">
+              <div style="padding:11px 14px;border-bottom:1px solid var(--line);font-size:12.5px">{{ n.text }}<div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);margin-top:2px">{{ n.time }}</div></div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div style="flex:1;padding:28px 32px 56px;max-width:1400px;width:100%;margin:0 auto">
+
+      <!-- OVERVIEW -->
+      <sc-if value="{{ is_overview }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0 0 4px">Habari, {{ firstName }}</h1>
+        <p style="font-size:14px;color:var(--stone);margin:0 0 24px">{{ todayLabel }} · here's what needs your attention.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px">
+          <div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Today's tasks</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ openTasksCount }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Pending repairs</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ pendingRepairsCount }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Vacant units</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ vacantUnitsCount }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Move-ins due</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ moveInsCount }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Move-outs due</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ moveOutsCount }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Inspections due</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ inspectionsDueCount }}</div></div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+          <button onClick="{{ openTenantModal }}" style="display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>Register Tenant</button>
+          <button onClick="{{ navToUnits }}" style="display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>Assign Unit</button>
+          <button onClick="{{ openTicketModal }}" style="display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path></svg>Report Repair</button>
+          <button onClick="{{ openInspectionModal }}" style="display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M9 11l3 3L22 4"></path></svg>Schedule Inspection</button>
+          <button onClick="{{ recordMeterStub }}" style="display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 2"></path></svg>Record Meter Reading</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px">
+          <div style="border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--white)">
+            <div style="font-weight:600;font-size:15px;margin-bottom:16px">Today's tasks</div>
+            <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border-radius:12px;overflow:hidden">
+              <sc-for list="{{ tasksList }}" as="t" hint-placeholder-count="6">
+                <div style="background:var(--white);padding:13px 16px;display:flex;align-items:center;gap:12px">
+                  <button onClick="{{ t.toggle }}" style="{{ t.checkStyle }}">{{ t.checkMark }}</button>
+                  <span style="{{ t.labelStyle }}">{{ t.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--white)">
+            <div style="font-weight:600;font-size:15px;margin-bottom:14px">Recent tenant requests</div>
+            <sc-if value="{{ noRecentTickets }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:13px;color:var(--stone)">No requests yet.</p></sc-if>
+            <sc-for list="{{ recentTickets }}" as="tk" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)">
+                <div><div style="font-size:13px;font-weight:600">{{ tk.issue }}</div><div style="font-size:11px;color:var(--stone)">{{ tk.tenant }} · {{ tk.unit }}</div></div>
+                <span style="{{ tk.badgeStyle }}">{{ tk.statusLabel }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- MY PROPERTIES -->
+      <sc-if value="{{ is_properties }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">My Properties</h1>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+          <sc-for list="{{ propertiesCards }}" as="p" hint-placeholder-count="2">
+            <div style="border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--white)">
+              <div style="height:120px;background:repeating-linear-gradient(135deg,#EDEBE4,#EDEBE4 10px,#F4F2EC 10px,#F4F2EC 20px);display:flex;align-items:center;justify-content:center"><span style="font-family:'JetBrains Mono';font-size:11px;color:var(--stone)">property photo</span></div>
+              <div style="padding:18px">
+                <div style="font-weight:700;font-size:16px;font-family:'Schibsted Grotesk'">{{ p.name }}</div>
+                <div style="font-size:12px;color:var(--stone);margin-bottom:14px">{{ p.location }}</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+                  <div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:16px">{{ p.occupied }}</div><div style="font-size:11px;color:var(--stone)">Occupied</div></div>
+                  <div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:16px">{{ p.vacant }}</div><div style="font-size:11px;color:var(--stone)">Vacant</div></div>
+                  <div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:16px;color:{{ p.repairsColor }}">{{ p.repairs }}</div><div style="font-size:11px;color:var(--stone)">Repairs</div></div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ p.viewUnits }}" style="flex:1;background:none;border:1.5px solid var(--line-2);border-radius:8px;padding:9px;font-size:12px;font-weight:600">View units</button>
+                  <button onClick="{{ p.register }}" style="flex:1;background:var(--ink);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:600">Register tenant</button>
+                  <button onClick="{{ p.inspect }}" style="flex:1;background:none;border:1.5px solid var(--line-2);border-radius:8px;padding:9px;font-size:12px;font-weight:600">Inspect</button>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- TENANTS -->
+      <sc-if value="{{ is_tenants }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+          <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0">Tenant Directory <span style="color:var(--stone);font-weight:500;font-size:16px">({{ tenantsCount }})</span></h1>
+          <button onClick="{{ openTenantModal }}" style="background:var(--green);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600" style-hover="background:var(--green-deep)">Register Tenant</button>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1.3fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Tenant</span><span>Property</span><span>Unit</span><span>Phone</span><span>Rent</span></div>
+          <sc-for list="{{ tenantsList }}" as="t" hint-placeholder-count="7">
+            <div onClick="{{ t.openDetail }}" style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1.3fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:13px;cursor:pointer" style-hover="background:var(--paper)">
+              <span style="display:flex;align-items:center;gap:10px;font-weight:600"><span style="{{ t.avatarStyle }}">{{ t.avatarInitials }}</span>{{ t.name }}</span>
+              <span style="color:var(--stone)">{{ t.propertyName }}</span>
+              <span style="font-family:'JetBrains Mono'">{{ t.unit }}</span>
+              <span style="color:var(--stone)">{{ t.phone }}</span>
+              <span style="font-family:'JetBrains Mono'">KES {{ t.rent }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- UNITS -->
+      <sc-if value="{{ is_units }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">Units</h1>
+        <sc-for list="{{ buildingsList }}" as="b" hint-placeholder-count="2">
+          <div style="margin-bottom:28px">
+            <div style="font-weight:700;font-size:16px;font-family:'Schibsted Grotesk';margin-bottom:14px">{{ b.name }}</div>
+            <sc-for list="{{ b.floors }}" as="f" hint-placeholder-count="2">
+              <div style="margin-bottom:14px">
+                <div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:8px">{{ f.label }}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <sc-for list="{{ f.units }}" as="u" hint-placeholder-count="6">
+                    <div style="{{ u.style }}">
+                      <div style="font-family:'JetBrains Mono';font-weight:700;font-size:13px">{{ u.code }}</div>
+                      <div style="font-size:10px;margin-top:2px">{{ u.statusLabel }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <!-- MAINTENANCE KANBAN -->
+      <sc-if value="{{ is_maintenance }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+          <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0">Maintenance</h1>
+          <button onClick="{{ openTicketModal }}" style="background:var(--green);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600" style-hover="background:var(--green-deep)">Report Repair</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:start">
+          <sc-for list="{{ kanbanColumns }}" as="col" hint-placeholder-count="4">
+            <div ondragover="{{ allowDrop }}" onDrop="{{ col.onDrop }}" style="background:var(--paper);border-radius:14px;padding:12px;min-height:120px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 4px"><span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--stone)">{{ col.label }}</span><span style="font-family:'JetBrains Mono';font-size:11px;color:var(--stone)">{{ col.count }}</span></div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ col.tickets }}" as="tk" hint-placeholder-count="1">
+                  <div draggable="true" onDragStart="{{ tk.onDragStart }}" onClick="{{ tk.openDetail }}" style="background:var(--white);border:1px solid var(--line);border-radius:10px;padding:12px;cursor:grab">
+                    <div style="{{ tk.priorityStyle }}">{{ tk.priorityLabel }}</div>
+                    <div style="font-size:13px;font-weight:600;margin:6px 0 4px">{{ tk.issue }}</div>
+                    <div style="font-size:11px;color:var(--stone)">{{ tk.tenant }} · {{ tk.unit }}</div>
+                    <sc-if value="{{ tk.hasTechnician }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:var(--green-deep);margin-top:6px;font-weight:600">🔧 {{ tk.technician }}</div></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- INSPECTIONS -->
+      <sc-if value="{{ is_inspections }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+          <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0">Inspections</h1>
+          <button onClick="{{ openInspectionModal }}" style="background:var(--green);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600" style-hover="background:var(--green-deep)">New Inspection</button>
+        </div>
+        <sc-if value="{{ noInspections }}" hint-placeholder-val="{{ true }}">
+          <div style="border:1.5px dashed var(--line-2);border-radius:16px;padding:60px 20px;text-align:center">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--line-2)" stroke-width="1.6" style="margin:0 auto 12px;display:block"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <p style="margin:0;font-size:14px;color:var(--stone)">No inspections logged yet.</p>
+          </div>
+        </sc-if>
+        <sc-if value="{{ !noInspections }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Unit</span><span>Property</span><span>Date</span><span>Status</span></div>
+            <sc-for list="{{ inspectionsList }}" as="i" hint-placeholder-count="2">
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:14px 16px;border-top:1px solid var(--line);align-items:center;font-size:13px">
+                <span style="font-family:'JetBrains Mono';font-weight:600">{{ i.unit }}</span><span style="color:var(--stone)">{{ i.property }}</span><span style="font-family:'JetBrains Mono';font-size:12px">{{ i.date }}</span>
+                <span style="{{ i.statusStyle }}">{{ i.statusLabel }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <!-- CALENDAR -->
+      <sc-if value="{{ is_calendar }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">{{ calendarMonthLabel }}</h1>
+        <div style="border:1px solid var(--line);border-radius:16px;padding:22px;background:var(--white);max-width:520px">
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px">
+            <span style="font-size:11px;color:var(--stone);text-align:center;font-weight:600">M</span><span style="font-size:11px;color:var(--stone);text-align:center;font-weight:600">T</span><span style="font-size:11px;color:var(--stone);text-align:center;font-weight:600">W</span><span style="font-size:11px;color:var(--stone);text-align:center;font-weight:600">T</span><span style="font-size:11px;color:var(--stone);text-align:center;font-weight:600">F</span><span style="font-size:11px;color:var(--stone);text-align:center;font-weight:600">S</span><span style="font-size:11px;color:var(--stone);text-align:center;font-weight:600">S</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+            <sc-for list="{{ calendarCells }}" as="cell" hint-placeholder-count="35">
+              <div style="{{ cell.style }}">{{ cell.day }}</div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:18px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--stone)"><span style="width:7px;height:7px;border-radius:99px;background:var(--green);display:inline-block"></span>Move-in / Move-out</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--stone)"><span style="width:7px;height:7px;border-radius:99px;background:var(--clay);display:inline-block"></span>Inspection scheduled</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SETTINGS -->
+      <sc-if value="{{ is_settings }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">Settings</h1>
+        <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white);max-width:440px;margin-bottom:16px">
+          <div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:14px">Profile</div>
+          <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">
+            <image-slot id="ct-dash-photo" shape="circle" style="width:56px;height:56px;flex-shrink:0" placeholder="photo"></image-slot>
+            <div style="flex:1"><label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">Full name</label><input type="text" value="{{ profileName }}" onInput="{{ updateProfileName }}" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:8px"></div>
+          </div>
+          <div style="margin-bottom:14px"><label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">Phone</label><input type="tel" value="{{ profilePhone }}" onInput="{{ updateProfilePhone }}" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:8px"></div>
+          <div style="margin-bottom:16px"><label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">Language</label>
+            <select value="{{ profileLanguage }}" onChange="{{ updateProfileLanguage }}" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:8px"><option>English</option><option>Kiswahili</option></select>
+          </div>
+          <button onClick="{{ saveProfile }}" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600">Save changes</button>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white);max-width:440px">
+          <div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:12px">Access</div>
+          <p style="font-size:13px;color:var(--stone);margin:0 0 14px;line-height:1.5">You manage day-to-day operations. Payment settings, financial reports and subscriptions are managed by your landlord.</p>
+          <button onClick="{{ openLogoutConfirm }}" style="width:100%;border:1.5px solid rgba(207,75,62,.3);background:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;color:var(--error)">Log out</button>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+
+<!-- AI ASSISTANT -->
+<sc-if value="{{ !aiOpen }}" hint-placeholder-val="{{ true }}">
+  <button onClick="{{ toggleAi }}" style="position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;border:none;border-radius:99px;padding:13px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;z-index:150;box-shadow:0 20px 40px -20px rgba(0,0,0,.4)">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"></path></svg>Ask Makazi
+  </button>
+</sc-if>
+<sc-if value="{{ aiOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:20px;right:20px;width:320px;max-height:460px;background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px -30px rgba(0,0,0,.4);z-index:150;display:flex;flex-direction:column;overflow:hidden">
+    <div style="background:var(--green-deep);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:600;font-size:13px">Ask Makazi</span>
+      <button onClick="{{ toggleAi }}" style="background:none;border:none;color:#fff;font-size:15px">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;max-height:280px">
+      <sc-for list="{{ aiMessages }}" as="m" hint-placeholder-count="1">
+        <div style="{{ m.style }}">{{ m.text }}</div>
+      </sc-for>
+    </div>
+    <div style="padding:10px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px">
+      <sc-for list="{{ aiPrompts }}" as="pr" hint-placeholder-count="4">
+        <button onClick="{{ pr.ask }}" style="background:var(--green-soft);color:var(--green-deep);border:none;border-radius:99px;padding:6px 11px;font-size:11px;font-weight:600">{{ pr.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<!-- CONFETTI -->
+<sc-if value="{{ confettiActive }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden">
+    <sc-for list="{{ confettiPieces }}" as="p" hint-placeholder-count="14">
+      <div style="{{ p.style }}"></div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<!-- MODALS -->
+<sc-if value="{{ anyModalOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(11,20,15,.5);z-index:250;display:flex;align-items:center;justify-content:center;padding:20px" onClick="{{ closeModal }}">
+    <div style="background:var(--white);border-radius:20px;width:100%;max-width:{{ modalMaxWidth }};max-height:88vh;overflow-y:auto;padding:28px;animation:modalIn .25s ease-out" onClick="{{ stopProp }}">
+
+      <!-- REGISTER/EDIT TENANT -->
+      <sc-if value="{{ is_modal_tenant }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px;margin:0 0 6px">{{ tenantModalTitle }}</h3>
+        <p style="font-size:13px;color:var(--stone);margin:0 0 20px">Occupancy and vacancy update immediately after saving.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Full name</label><input type="text" value="{{ fTenantName }}" onInput="{{ updateFTenantName }}" placeholder="Achieng Otieno" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Phone</label><input type="tel" value="{{ fTenantPhone }}" onInput="{{ updateFTenantPhone }}" placeholder="+254 7XX XXX XXX" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">National ID</label><input type="text" value="{{ fTenantId }}" onInput="{{ updateFTenantId }}" placeholder="e.g. 34xxxxxx" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Email (optional)</label><input type="email" value="{{ fTenantEmail }}" onInput="{{ updateFTenantEmail }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Property</label>
+            <select value="{{ fTenantProperty }}" onChange="{{ updateFTenantProperty }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px">
+              <sc-for list="{{ propertiesList }}" as="p" hint-placeholder-count="2"><option value="{{ p.name }}">{{ p.name }}</option></sc-for>
+            </select>
+          </div>
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Unit</label>
+            <select value="{{ fTenantUnit }}" onChange="{{ updateFTenantUnit }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px">
+              <option value="">Select unit</option>
+              <sc-for list="{{ availableUnitsForForm }}" as="u" hint-placeholder-count="6"><option value="{{ u.code }}">{{ u.code }}</option></sc-for>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Monthly rent (KES)</label><input type="text" value="{{ fTenantRent }}" onInput="{{ updateFTenantRent }}" placeholder="25000" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Deposit paid (KES)</label><input type="text" value="{{ fTenantDeposit }}" onInput="{{ updateFTenantDeposit }}" placeholder="25000" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Lease start</label><input type="date" value="{{ fTenantLeaseStart }}" onInput="{{ updateFTenantLeaseStart }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Lease end</label><input type="date" value="{{ fTenantLeaseEnd }}" onInput="{{ updateFTenantLeaseEnd }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+        </div>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Emergency contact</label><input type="text" value="{{ fTenantEmergency }}" onInput="{{ updateFTenantEmergency }}" placeholder="Name and phone number" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+        <div style="margin-bottom:22px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Lease document</label><image-slot id="lease-upload" shape="rounded" radius="10" style="width:100%;height:70px" placeholder="drop lease PDF/photo"></image-slot></div>
+        <button onClick="{{ saveTenant }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:14px" style-hover="background:var(--green-deep)">{{ tenantModalBtnLabel }}</button>
+      </sc-if>
+
+      <!-- TENANT DETAIL -->
+      <sc-if value="{{ is_modal_tenantDetail }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:14px;align-items:center;margin-bottom:20px">
+          <div style="{{ detailAvatarStyle }}">{{ detailAvatarInitials }}</div>
+          <div><div style="font-weight:700;font-size:18px;font-family:'Schibsted Grotesk'">{{ detailName }}</div><div style="font-size:13px;color:var(--stone)">{{ detailProperty }} · Unit {{ detailUnit }}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Phone</div><div style="font-size:13px;font-weight:600">{{ detailPhone }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Monthly rent</div><div style="font-family:'JetBrains Mono';font-size:13px;font-weight:600">KES {{ detailRent }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Lease dates</div><div style="font-size:12px;font-weight:600">{{ detailLeaseStart }} → {{ detailLeaseEnd }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Outstanding balance</div><div style="font-family:'JetBrains Mono';font-size:13px;font-weight:600;color:{{ detailBalanceColor }}">KES {{ detailBalance }}</div></div>
+        </div>
+        <div style="margin-bottom:16px">
+          <div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Maintenance requests</div>
+          <sc-if value="{{ detailNoTickets }}" hint-placeholder-val="{{ true }}"><p style="margin:0;font-size:13px;color:var(--stone)">None reported.</p></sc-if>
+          <sc-for list="{{ detailTickets }}" as="tk" hint-placeholder-count="0"><div style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)">{{ tk.issue }} — <span style="color:var(--stone)">{{ tk.statusLabel }}</span></div></sc-for>
+        </div>
+        <div style="margin-bottom:16px">
+          <div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Documents</div>
+          <p style="margin:0;font-size:13px;color:var(--stone)">{{ detailDocsLabel }}</p>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Communication history</div>
+          <div style="font-size:13px;color:var(--stone);line-height:1.6">Rent reminder sent · 3 days ago<br>Welcome message sent · {{ detailLeaseStart }}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;padding-top:14px;border-top:1px solid var(--line)">
+          <div><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Move to unit</label>
+            <select value="{{ fMoveUnit }}" onChange="{{ updateFMoveUnit }}" style="width:100%;padding:9px 11px;border:1.5px solid var(--line-2);border-radius:8px;font-size:13px">
+              <option value="">Select vacant unit</option>
+              <sc-for list="{{ availableUnitsForForm }}" as="u" hint-placeholder-count="3"><option value="{{ u.code }}">{{ u.code }}</option></sc-for>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end"><button onClick="{{ moveTenant }}" disabled="{{ !fMoveUnit }}" style="width:100%;background:var(--ink);color:#fff;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:600">Move tenant</button></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ editTenantFromDetail }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:9px;padding:11px;font-size:13px;font-weight:600">Edit</button>
+          <button onClick="{{ startMoveOut }}" style="flex:1;border:1.5px solid rgba(207,75,62,.3);background:none;color:var(--error);border-radius:9px;padding:11px;font-size:13px;font-weight:600">Move Out</button>
+        </div>
+      </sc-if>
+
+      <!-- MAINTENANCE TICKET (report / detail) -->
+      <sc-if value="{{ is_modal_ticket }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px;margin:0 0 20px">Report a repair</h3>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Tenant</label>
+          <select value="{{ fTicketTenant }}" onChange="{{ updateFTicketTenant }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px">
+            <option value="">Select tenant</option>
+            <sc-for list="{{ tenantsForForm }}" as="t" hint-placeholder-count="7"><option value="{{ t.name }}">{{ t.name }} — {{ t.unit }}</option></sc-for>
+          </select>
+        </div>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Issue</label><input type="text" value="{{ fTicketIssue }}" onInput="{{ updateFTicketIssue }}" placeholder="Leaking tap in kitchen" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+        <div style="margin-bottom:22px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Priority</label>
+          <select value="{{ fTicketPriority }}" onChange="{{ updateFTicketPriority }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"><option>Low</option><option>Normal</option><option>Urgent</option></select>
+        </div>
+        <button onClick="{{ saveTicket }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:14px" style-hover="background:var(--green-deep)">Log ticket</button>
+      </sc-if>
+
+      <!-- TICKET DETAIL / ASSIGN TECH -->
+      <sc-if value="{{ is_modal_ticketDetail }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px;margin:0 0 6px">{{ tdIssue }}</h3>
+        <p style="font-size:13px;color:var(--stone);margin:0 0 18px">{{ tdTenant }} · {{ tdUnit }} · {{ tdProperty }}</p>
+        <div style="display:flex;gap:10px;margin-bottom:20px"><span style="{{ tdPriorityStyle }}">{{ tdPriorityLabel }}</span><span style="{{ tdStatusStyle }}">{{ tdStatusLabel }}</span></div>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Technician</label><input type="text" value="{{ fTechName }}" onInput="{{ updateFTechName }}" placeholder="e.g. James Mwenda — Plumber" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px">
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Estimated cost (KES)</label><input type="text" value="{{ fTechCost }}" onInput="{{ updateFTechCost }}" placeholder="2500" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          <div><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Scheduled visit</label><input type="date" value="{{ fTechDate }}" onInput="{{ updateFTechDate }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ assignTechnician }}" style="flex:1;background:var(--ink);color:#fff;border:none;border-radius:9px;padding:12px;font-size:13px;font-weight:600">Assign &amp; schedule</button>
+          <button onClick="{{ markTicketCompleted }}" disabled="{{ !canComplete }}" style="flex:1;background:var(--green);color:#fff;border:none;border-radius:9px;padding:12px;font-size:13px;font-weight:600">Mark completed</button>
+        </div>
+      </sc-if>
+
+      <!-- INSPECTION -->
+      <sc-if value="{{ is_modal_inspection }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px;margin:0 0 6px">New inspection</h3>
+        <p style="font-size:13px;color:var(--stone);margin:0 0 18px">Walk through each area and mark its condition.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <div><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Property</label>
+            <select value="{{ fInspProperty }}" onChange="{{ updateFInspProperty }}" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:8px">
+              <sc-for list="{{ propertiesList }}" as="p" hint-placeholder-count="2"><option value="{{ p.name }}">{{ p.name }}</option></sc-for>
+            </select>
+          </div>
+          <div><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Unit</label><input type="text" value="{{ fInspUnit }}" onInput="{{ updateFInspUnit }}" placeholder="e.g. A101" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:8px"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border-radius:10px;overflow:hidden;margin-bottom:16px">
+          <sc-for list="{{ inspectionChecklist }}" as="c" hint-placeholder-count="9">
+            <div style="background:var(--white);padding:10px 12px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:13px">{{ c.label }}</span>
+              <div style="display:flex;gap:6px">
+                <button onClick="{{ c.markPass }}" style="{{ c.passStyle }}">Pass</button>
+                <button onClick="{{ c.markIssue }}" style="{{ c.issueStyle }}">Issue</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Photos</label>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+            <image-slot id="insp-photo-1" shape="rounded" radius="8" style="width:100%;aspect-ratio:1" placeholder="photo"></image-slot>
+            <image-slot id="insp-photo-2" shape="rounded" radius="8" style="width:100%;aspect-ratio:1" placeholder="photo"></image-slot>
+            <image-slot id="insp-photo-3" shape="rounded" radius="8" style="width:100%;aspect-ratio:1" placeholder="photo"></image-slot>
+            <image-slot id="insp-photo-4" shape="rounded" radius="8" style="width:100%;aspect-ratio:1" placeholder="photo"></image-slot>
+          </div>
+        </div>
+        <div style="margin-bottom:22px"><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Comments</label><input type="text" value="{{ fInspComments }}" onInput="{{ updateFInspComments }}" placeholder="Overall notes" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:8px"></div>
+        <button onClick="{{ saveInspection }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:14px" style-hover="background:var(--green-deep)">Save &amp; generate report</button>
+      </sc-if>
+
+      <!-- MOVE OUT WIZARD -->
+      <sc-if value="{{ is_modal_moveOut }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:6px;margin-bottom:20px">
+          <sc-for list="{{ moveOutSteps }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}"></div></sc-for>
+        </div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px;margin:0 0 18px">{{ moveOutStepTitle }}</h3>
+
+        <sc-if value="{{ moveOutStepIs1 }}" hint-placeholder-val="{{ true }}">
+          <p style="font-size:13px;color:var(--stone);margin:0 0 20px">Confirm you're moving out <strong>{{ moveOutTenantName }}</strong> from Unit {{ moveOutUnit }}.</p>
+          <div style="margin-bottom:22px"><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Move-out date</label><input type="date" value="{{ fMoveOutDate }}" onInput="{{ updateFMoveOutDate }}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+        </sc-if>
+        <sc-if value="{{ moveOutStepIs2 }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:13px;color:var(--stone);margin:0 0 16px">Walk through the unit before the tenant leaves.</p>
+          <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border-radius:10px;overflow:hidden;margin-bottom:16px">
+            <sc-for list="{{ moveOutChecklist }}" as="c" hint-placeholder-count="9">
+              <div style="background:var(--white);padding:10px 12px;display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:13px">{{ c.label }}</span>
+                <div style="display:flex;gap:6px"><button onClick="{{ c.markPass }}" style="{{ c.passStyle }}">Pass</button><button onClick="{{ c.markIssue }}" style="{{ c.issueStyle }}">Issue</button></div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ moveOutStepIs3 }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:13px;color:var(--stone);margin:0 0 16px">Note any damage found during inspection.</p>
+          <div style="margin-bottom:22px"><textarea rows="4" value="{{ fMoveOutDamage }}" onInput="{{ updateFMoveOutDamage }}" placeholder="e.g. Cracked kitchen tile, minor wall scuff" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px;resize:vertical;font-family:inherit"></textarea></div>
+        </sc-if>
+        <sc-if value="{{ moveOutStepIs4 }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:13px;color:var(--stone);margin:0 0 16px">Recommend a deposit refund based on the inspection.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px">
+            <div style="border:1px solid var(--line);border-radius:10px;padding:14px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Deposit paid</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:16px">KES {{ moveOutDeposit }}</div></div>
+            <div><label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px">Recommended deduction (KES)</label><input type="text" value="{{ fMoveOutDeduction }}" onInput="{{ updateFMoveOutDeduction }}" placeholder="0" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ moveOutStepIs5 }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:22px">
+            <div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:12px">Move-out report</div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)"><span style="color:var(--stone)">Tenant</span><span style="font-weight:600">{{ moveOutTenantName }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)"><span style="color:var(--stone)">Unit</span><span style="font-weight:600">{{ moveOutUnit }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)"><span style="color:var(--stone)">Damage noted</span><span style="font-weight:600">{{ moveOutDamageDisplay }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0"><span style="color:var(--stone)">Deposit refund</span><span style="font-weight:600;font-family:'JetBrains Mono'">KES {{ moveOutRefund }}</span></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ moveOutStepIs6 }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:10px 0 20px">
+            <div style="width:56px;height:56px;border-radius:99px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:popIn .5s ease-out"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"></path></svg></div>
+            <p style="font-size:14px;color:var(--stone);margin:0">Unit {{ moveOutUnit }} is now vacant and ready for the next tenant.</p>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <sc-if value="{{ moveOutShowBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ moveOutBack }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:9px;padding:12px;font-size:13px;font-weight:600">Back</button></sc-if>
+          <button onClick="{{ moveOutNext }}" style="flex:2;background:var(--green);color:#fff;border:none;border-radius:9px;padding:12px;font-size:13px;font-weight:600" style-hover="background:var(--green-deep)">{{ moveOutNextLabel }}</button>
+        </div>
+      </sc-if>
+
+      <!-- LOGOUT -->
+      <sc-if value="{{ is_modal_logout }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px;margin:0 0 10px">Log out of Makazi?</h3>
+        <p style="font-size:13px;color:var(--stone);margin:0 0 22px">You'll need to log in again to access your dashboard.</p>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ closeModal }}" style="flex:1;background:none;border:1.5px solid var(--line-2);border-radius:10px;padding:13px;font-weight:600;font-size:14px;color:var(--ink)">Cancel</button>
+          <button onClick="{{ confirmLogout }}" style="flex:1;background:var(--error);color:#fff;border:none;border-radius:10px;padding:13px;font-weight:600;font-size:14px">Log out</button>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</sc-if>
+
+<!-- TOAST -->
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 22px;border-radius:99px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;animation:toastUp .3s ease-out;z-index:200">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 12l5 5L20 6"></path></svg>{{ toast }}
+  </div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function genUnits(count) {
+  const list = [];
+  for (let i = 0; i < count; i++) {
+    const floor = Math.floor(i / 6) + 1, n = (i % 6) + 1;
+    list.push(`A${floor}0${n}`);
+  }
+  return list;
+}
+
+class Component extends DCLogic {
+  state = {
+    navActive: 'overview',
+    properties: [
+      { id: 1, name: 'Green Gardens Apartments', location: 'Kilimani, Nairobi', units: 12 },
+      { id: 2, name: 'Sunset Court', location: 'Kileleshwa, Nairobi', units: 8 }
+    ],
+    units: [
+      ...genUnits(12).map(code => ({ code, propertyId: 1 })),
+      { code: 'B203', propertyId: 1 },
+      ...genUnits(8).map(code => ({ code, propertyId: 2 }))
+    ],
+    tenants: [
+      { id: 1, name: 'Achieng Otieno', phone: '+254 712 445 210', nationalId: '', email: '', propertyId: 1, unit: 'A101', rent: '25000', deposit: '25000', leaseStart: '2026-01-05', leaseEnd: '2027-01-04', emergency: '', outstanding: '0' },
+      { id: 2, name: 'Brian Kiplangat', phone: '+254 722 998 341', nationalId: '', email: '', propertyId: 1, unit: 'A102', rent: '22000', deposit: '22000', leaseStart: '2025-11-01', leaseEnd: '2026-10-31', emergency: '', outstanding: '22000' },
+      { id: 3, name: 'Grace Njoki', phone: '+254 733 120 774', nationalId: '', email: '', propertyId: 1, unit: 'A201', rent: '24000', deposit: '24000', leaseStart: '2026-03-14', leaseEnd: '2027-03-13', emergency: '', outstanding: '0' },
+      { id: 4, name: 'Peter Kamau', phone: '+254 701 556 902', nationalId: '', email: '', propertyId: 1, unit: 'A202', rent: '23000', deposit: '23000', leaseStart: '2025-08-20', leaseEnd: '2026-08-19', emergency: '', outstanding: '0' },
+      { id: 5, name: 'Sarah Wanjiku', phone: '+254 712 445 210', nationalId: '', email: '', propertyId: 1, unit: 'B203', rent: '15000', deposit: '15000', leaseStart: '2026-07-01', leaseEnd: '2027-06-30', emergency: '', outstanding: '0' },
+      { id: 6, name: 'Faith Wambui', phone: '+254 745 887 213', nationalId: '', email: '', propertyId: 2, unit: 'A101', rent: '30000', deposit: '30000', leaseStart: '2026-02-01', leaseEnd: '2027-01-31', emergency: '', outstanding: '0' },
+      { id: 7, name: 'Samuel Mutiso', phone: '+254 719 402 665', nationalId: '', email: '', propertyId: 2, unit: 'A102', rent: '28000', deposit: '28000', leaseStart: '2025-12-10', leaseEnd: '2026-12-09', emergency: '', outstanding: '14000' },
+      { id: 8, name: 'Lucy Adhiambo', phone: '+254 728 664 190', nationalId: '', email: '', propertyId: 2, unit: 'A201', rent: '29000', deposit: '29000', leaseStart: '2026-05-01', leaseEnd: '2027-04-30', emergency: '', outstanding: '0' }
+    ],
+    tasks: [
+      { id: 1, label: 'Register new tenant — Sunset Court', done: false },
+      { id: 2, label: 'Inspect Unit A202', done: false },
+      { id: 3, label: 'Follow up leaking tap — Unit B203', done: false },
+      { id: 4, label: 'Conduct move-out inspection — Unit B103', done: false },
+      { id: 5, label: 'Schedule plumber for Sunset Court', done: true },
+      { id: 6, label: 'Take meter readings — Green Gardens', done: false }
+    ],
+    maintenanceTickets: [
+      { id: 1, tenant: 'Sarah Wanjiku', unit: 'B203', propertyId: 1, issue: 'Leaking tap in bathroom', priority: 'Normal', status: 'inprogress', technician: 'Otieno Plumbing', cost: '2500', dueDate: '2026-07-23' },
+      { id: 2, tenant: 'Brian Kiplangat', unit: 'A102', propertyId: 1, issue: 'Leaking sink', priority: 'Urgent', status: 'reported', technician: '', cost: '', dueDate: '' },
+      { id: 3, tenant: 'Samuel Mutiso', unit: 'A102', propertyId: 2, issue: 'Faulty socket', priority: 'Normal', status: 'reported', technician: '', cost: '', dueDate: '' },
+      { id: 4, tenant: 'Peter Kamau', unit: 'A202', propertyId: 1, issue: 'Squeaky door hinge', priority: 'Low', status: 'assigned', technician: 'James Mwenda — Handyman', cost: '1200', dueDate: '2026-07-24' },
+      { id: 5, tenant: 'Grace Njoki', unit: 'A201', propertyId: 1, issue: 'Blocked drain', priority: 'Normal', status: 'inprogress', technician: 'Otieno Plumbing', cost: '3000', dueDate: '2026-07-22' },
+      { id: 6, tenant: 'Faith Wambui', unit: 'A101', propertyId: 2, issue: 'Repainted living room wall', priority: 'Low', status: 'completed', technician: 'Kioko Painters', cost: '4500', dueDate: '2026-07-18' }
+    ],
+    inspections: [
+      { id: 1, unit: 'A101', property: 'Green Gardens Apartments', date: '2026-07-10', status: 'completed' },
+      { id: 2, unit: 'A202', property: 'Sunset Court', date: '2026-07-25', status: 'scheduled' }
+    ],
+    activity: [],
+    modalOpen: null,
+    editingTenantId: null, viewingTenantId: null, movingOutTenantId: null, moveOutStep: 1,
+    viewingTicketId: null,
+    searchOpen: false, searchValue: '', notifOpen: false, profileMenuOpen: false, switcherOpen: false,
+    propertyFilter: 'all',
+    aiOpen: false, aiMessages: [{ text: "Hi! I'm your Makazi assistant. Ask me about today's tasks, vacancies, or repairs.", who: 'ai' }],
+    confettiActive: false, toast: '',
+    fTenantName: '', fTenantPhone: '', fTenantId: '', fTenantEmail: '', fTenantProperty: 'Green Gardens Apartments', fTenantUnit: '',
+    fTenantRent: '', fTenantDeposit: '', fTenantLeaseStart: '', fTenantLeaseEnd: '', fTenantEmergency: '',
+    fMoveUnit: '',
+    fTicketTenant: '', fTicketIssue: '', fTicketPriority: 'Normal',
+    fTechName: '', fTechCost: '', fTechDate: '',
+    fInspProperty: 'Green Gardens Apartments', fInspUnit: '', fInspComments: '',
+    inspChecklist: { Walls: null, Windows: null, Doors: null, Floor: null, Water: null, Electricity: null, Ceiling: null, Kitchen: null, Bathroom: null },
+    moveOutChecklistState: { Walls: null, Windows: null, Doors: null, Floor: null, Water: null, Electricity: null, Ceiling: null, Kitchen: null, Bathroom: null },
+    fMoveOutDate: '', fMoveOutDamage: '', fMoveOutDeduction: '',
+    profileName: '', profilePhone: '', profileLanguage: 'English',
+    sidebarCollapsed: false
+  };
+
+  componentWillUnmount() { clearTimeout(this._toastTimer); clearTimeout(this._confettiTimer); }
+  openModal(name) { this.setState({ modalOpen: name }); }
+  closeModal = () => this.setState({ modalOpen: null });
+  stopProp = (e) => e.stopPropagation();
+  showToast(msg) { this.setState({ toast: msg }); clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.setState({ toast: '' }), 2800); }
+  logActivity(text) { this.setState(s => ({ activity: [{ text, time: 'Just now' }, ...s.activity] })); }
+  burstConfetti() { this.setState({ confettiActive: true }); clearTimeout(this._confettiTimer); this._confettiTimer = setTimeout(() => this.setState({ confettiActive: false }), 1400); }
+
+  renderVals() {
+    const s = this.state;
+    const firstName = (localStorage.getItem('makazi_demo_name') || 'James').split(' ')[0];
+    const initials = firstName.slice(0, 2).toUpperCase();
+    const propById = (id) => s.properties.find(p => p.id === id);
+    const unitsForProperty = (id) => s.units.filter(u => u.propertyId === id);
+    const occupiedCodesForProperty = (id) => s.tenants.filter(t => t.propertyId === id).map(t => t.unit);
+    const vacantUnitsAll = s.units.filter(u => !s.tenants.some(t => t.propertyId === u.propertyId && t.unit === u.code));
+
+    const chip = (active) => active
+      ? 'background:var(--ink);color:#fff;border:none;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:600'
+      : 'background:none;border:1px solid var(--line-2);border-radius:8px;padding:6px 11px;font-size:11px;font-weight:600;color:var(--stone)';
+
+    // TASKS
+    const tasksList = s.tasks.map(t => ({
+      label: t.label, checkMark: t.done ? '✓' : '',
+      checkStyle: `width:20px;height:20px;border-radius:99px;flex-shrink:0;border:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;${t.done ? 'background:var(--green);color:#fff;animation:checkPulse .3s ease-out' : 'border:1.5px solid var(--line-2);background:none'}`,
+      labelStyle: `font-size:13.5px;flex:1;${t.done ? 'color:var(--stone);text-decoration:line-through' : 'color:var(--ink);font-weight:500'}`,
+      toggle: () => {
+        this.setState(prev => ({ tasks: prev.tasks.map(x => x.id === t.id ? { ...x, done: !x.done } : x) }));
+        if (!t.done) { this.burstConfetti(); this.logActivity(`Task completed: ${t.label}`); }
+      }
+    }));
+
+    // MAINTENANCE derived
+    const priorityStyle = (p) => `display:inline-block;font-family:'JetBrains Mono';font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:${p === 'Urgent' ? 'rgba(207,75,62,.12)' : p === 'Normal' ? 'rgba(224,160,8,.12)' : 'var(--green-soft)'};color:${p === 'Urgent' ? 'var(--error)' : p === 'Normal' ? 'var(--warning)' : 'var(--green-deep)'}`;
+    const kanbanCols = [
+      { key: 'reported', label: 'Reported' }, { key: 'assigned', label: 'Assigned' },
+      { key: 'inprogress', label: 'In Progress' }, { key: 'completed', label: 'Completed' }
+    ];
+    const kanbanColumns = kanbanCols.map(col => ({
+      label: col.label,
+      count: s.maintenanceTickets.filter(t => t.status === col.key).length,
+      onDrop: (e) => { e.preventDefault(); const id = parseInt(e.dataTransfer.getData('text/plain')); this.moveTicket(id, col.key); },
+      tickets: s.maintenanceTickets.filter(t => t.status === col.key).map(t => ({
+        issue: t.issue, tenant: t.tenant, unit: t.unit, priorityLabel: t.priority, priorityStyle: priorityStyle(t.priority),
+        hasTechnician: !!t.technician, technician: t.technician,
+        onDragStart: (e) => e.dataTransfer.setData('text/plain', String(t.id)),
+        openDetail: () => this.setState({ modalOpen: 'ticketDetail', viewingTicketId: t.id, fTechName: t.technician, fTechCost: t.cost, fTechDate: t.dueDate })
+      }))
+    }));
+
+    const viewingTicket = s.maintenanceTickets.find(t => t.id === s.viewingTicketId);
+
+    // TENANTS list
+    const avatarColors = ['var(--green)', 'var(--clay)', 'var(--warning)', 'var(--success)'];
+    const tenantsList = s.tenants.map((t, i) => ({
+      name: t.name, propertyName: propById(t.propertyId)?.name || '', unit: t.unit, phone: t.phone, rent: t.rent,
+      avatarInitials: t.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
+      avatarStyle: `width:26px;height:26px;border-radius:99px;background:${avatarColors[i % avatarColors.length]};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700`,
+      openDetail: () => this.setState({ modalOpen: 'tenantDetail', viewingTenantId: t.id, fMoveUnit: '' })
+    }));
+    const viewingTenant = s.tenants.find(t => t.id === s.viewingTenantId);
+
+    // PROPERTIES cards
+    const propertiesCards = s.properties.map(p => {
+      const occ = occupiedCodesForProperty(p.id).length;
+      const repairs = s.maintenanceTickets.filter(t => t.propertyId === p.id && t.status !== 'completed').length;
+      return {
+        name: p.name, location: p.location, occupied: occ, vacant: p.units - occ, repairs,
+        repairsColor: repairs > 0 ? 'var(--warning)' : 'var(--ink)',
+        viewUnits: () => this.setState({ navActive: 'units' }),
+        register: () => this.setState({ modalOpen: 'tenant', editingTenantId: null, fTenantProperty: p.name, fTenantUnit: '', fTenantName: '', fTenantPhone: '', fTenantId: '', fTenantEmail: '', fTenantRent: '', fTenantDeposit: '', fTenantLeaseStart: '', fTenantLeaseEnd: '', fTenantEmergency: '' }),
+        inspect: () => this.setState({ modalOpen: 'inspection', fInspProperty: p.name, fInspUnit: '' })
+      };
+    });
+
+    // BUILDINGS/UNITS view
+    const buildingsList = s.properties.map(p => {
+      const us = unitsForProperty(p.id);
+      const floors = {};
+      us.forEach(u => { const floor = u.code.slice(1, 2); (floors[floor] = floors[floor] || []).push(u); });
+      return {
+        name: p.name,
+        floors: Object.keys(floors).sort().map(fk => ({
+          label: `Floor ${fk}`,
+          units: floors[fk].map(u => {
+            const tenant = s.tenants.find(t => t.propertyId === p.id && t.unit === u.code);
+            const occupied = !!tenant;
+            return {
+              code: u.code, statusLabel: occupied ? 'Occupied' : 'Vacant',
+              style: `width:74px;border-radius:10px;padding:9px;text-align:center;background:${occupied ? 'var(--green-soft)' : 'var(--paper)'};color:${occupied ? 'var(--green-deep)' : 'var(--stone)'};border:1px solid ${occupied ? 'var(--green-line)' : 'var(--line)'}`
+            };
+          })
+        }))
+      };
+    });
+
+    // INSPECTIONS list
+    const inspectionsList = s.inspections.map(i => ({
+      unit: i.unit, property: i.property, date: i.date,
+      statusLabel: i.status === 'completed' ? 'Completed' : 'Scheduled',
+      statusStyle: `font-weight:600;color:${i.status === 'completed' ? 'var(--success)' : 'var(--warning)'}`
+    }));
+
+    // CALENDAR (July 2026)
+    const offset = 2, daysInMonth = 31;
+    const calendarCells = [];
+    for (let i = 0; i < offset; i++) calendarCells.push({ day: '', style: 'height:30px' });
+    for (let d = 1; d <= daysInMonth; d++) {
+      const isToday = d === 21, isInspection = d === 25, isMoveEvent = d === 28;
+      calendarCells.push({
+        day: d,
+        style: `height:30px;display:flex;align-items:center;justify-content:center;font-size:12px;border-radius:7px;${isToday ? 'background:var(--green);color:#fff;font-weight:600' : isInspection ? 'background:var(--clay-soft);color:var(--clay);font-weight:600' : isMoveEvent ? 'background:var(--green-soft);color:var(--green-deep);font-weight:600' : 'color:var(--ink)'}`
+      });
+    }
+
+    // INSPECTION CHECKLIST (shared builder)
+    const buildChecklist = (stateKey, updater) => Object.keys(s[stateKey]).map(label => ({
+      label,
+      passStyle: chip(s[stateKey][label] === 'pass'),
+      issueStyle: chip(s[stateKey][label] === 'issue'),
+      markPass: () => this.setState({ [stateKey]: { ...s[stateKey], [label]: 'pass' } }),
+      markIssue: () => this.setState({ [stateKey]: { ...s[stateKey], [label]: 'issue' } })
+    }));
+
+    // MOVE OUT
+    const movingOutTenant = s.tenants.find(t => t.id === s.movingOutTenantId);
+    const moveOutStepTitles = ['Confirm move-out', 'Inspection', 'Damage assessment', 'Deposit recommendation', 'Move-out report', 'Unit marked vacant'];
+    const deduction = parseInt(s.fMoveOutDeduction) || 0;
+    const deposit = parseInt(movingOutTenant?.deposit) || 0;
+
+    const notifList = s.activity.slice(0, 8).length ? s.activity.slice(0, 8) : [
+      { text: 'New maintenance request: Leaking sink — A102', time: '2h ago' },
+      { text: 'Inspection due: Unit A202', time: '5h ago' },
+      { text: 'Lease expiring soon: Peter Kamau — Aug 19', time: '1d ago' }
+    ];
+
+    const aiPromptDefs = [
+      { label: "Today's tasks", ask: () => this.askAi("Show today's tasks", `You have ${tasksList.filter(t => !t.checkMark).length} open tasks, including "${s.tasks.find(t => !t.done)?.label || 'none'}".`) },
+      { label: 'Vacant units', ask: () => this.askAi('Which units are vacant?', `${vacantUnitsAll.length} units are vacant: ${vacantUnitsAll.slice(0, 4).map(u => u.code).join(', ')}${vacantUnitsAll.length > 4 ? '…' : ''}.`) },
+      { label: 'Overdue repairs', ask: () => this.askAi('Show overdue repairs', `${s.maintenanceTickets.filter(t => t.status !== 'completed').length} repairs are open, ${s.maintenanceTickets.filter(t => t.priority === 'Urgent' && t.status !== 'completed').length} marked urgent.`) },
+      { label: 'Leases expiring', ask: () => this.askAi('Which leases expire this month?', 'Peter Kamau\'s lease at Green Gardens Apartments expires August 19 — worth a renewal check-in.') }
+    ];
+
+    const collapsed = s.sidebarCollapsed;
+    return {
+      sidebarStyle: `width:${collapsed ? '68px' : '230px'};flex-shrink:0;background:var(--ink);color:#fff;padding:${collapsed ? '20px 10px' : '20px 14px'};display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;transition:width .15s ease;overflow:hidden`,
+      navLabelStyle: collapsed ? 'display:none' : 'white-space:nowrap',
+      navCollapseStyle: `display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:#9AA39D;border-radius:9px;padding:10px 10px;font-size:13px;font-weight:500;margin-bottom:6px;justify-content:${collapsed ? 'center' : 'flex-start'}`,
+      collapseIconStyle: `transition:transform .15s;transform:rotate(${collapsed ? '180deg' : '0deg'})`,
+      profileNameWrapStyle: collapsed ? 'display:none' : 'line-height:1.2;flex:1',
+      toggleSidebarCollapsed: () => this.setState({ sidebarCollapsed: !collapsed }),
+      firstName, initials, todayLabel: 'Tuesday, 21 July 2026',
+      is_overview: s.navActive === 'overview', is_properties: s.navActive === 'properties', is_tenants: s.navActive === 'tenants',
+      is_units: s.navActive === 'units', is_maintenance: s.navActive === 'maintenance', is_inspections: s.navActive === 'inspections',
+      is_calendar: s.navActive === 'calendar', is_settings: s.navActive === 'settings',
+      navOverviewStyle: this.nav('overview'), navPropertiesStyle: this.nav('properties'), navTenantsStyle: this.nav('tenants'),
+      navUnitsStyle: this.nav('units'), navMaintenanceStyle: this.nav('maintenance'), navInspectionsStyle: this.nav('inspections'),
+      navCalendarStyle: this.nav('calendar'), navSettingsStyle: this.nav('settings'),
+      navToOverview: () => this.setState({ navActive: 'overview' }), navToProperties: () => this.setState({ navActive: 'properties' }),
+      navToTenants: () => this.setState({ navActive: 'tenants' }), navToUnits: () => this.setState({ navActive: 'units' }),
+      navToMaintenance: () => this.setState({ navActive: 'maintenance' }), navToInspections: () => this.setState({ navActive: 'inspections' }),
+      navToCalendar: () => this.setState({ navActive: 'calendar' }), navToSettings: () => this.setState({ navActive: 'settings' }),
+
+      profileMenuOpen: s.profileMenuOpen, toggleProfileMenu: () => this.setState({ profileMenuOpen: !s.profileMenuOpen }),
+      openLogoutConfirm: () => this.setState({ profileMenuOpen: false, modalOpen: 'logout' }),
+      switcherOpen: s.switcherOpen, toggleSwitcher: () => this.setState({ switcherOpen: !s.switcherOpen }),
+      switcherLabel: s.propertyFilter === 'all' ? 'All Properties' : propById(s.propertyFilter)?.name,
+      propertiesList: s.properties.map(p => ({ name: p.name, select: () => this.setState({ propertyFilter: p.id, switcherOpen: false }) })),
+      selectAllProperties: () => this.setState({ propertyFilter: 'all', switcherOpen: false }),
+
+      searchValue: s.searchValue, updateSearch: (e) => this.setState({ searchValue: e.target.value }),
+      searchOpen: s.searchOpen, openSearch: () => this.setState({ searchOpen: true }),
+      searchResults: s.searchValue ? s.tenants.filter(t => t.name.toLowerCase().includes(s.searchValue.toLowerCase())).map(t => ({
+        label: t.name, sub: `${t.unit}`, select: () => this.setState({ modalOpen: 'tenantDetail', viewingTenantId: t.id, searchOpen: false, searchValue: '' })
+      })) : [],
+      noSearchResults: !s.searchValue || !s.tenants.some(t => t.name.toLowerCase().includes(s.searchValue.toLowerCase())),
+      searchHint: s.searchValue ? 'No matches.' : 'Start typing a tenant name.',
+
+      notifOpen: s.notifOpen, toggleNotif: () => this.setState({ notifOpen: !s.notifOpen }), hasNotifs: true, notifList,
+
+      openTasksCount: s.tasks.filter(t => !t.done).length,
+      pendingRepairsCount: s.maintenanceTickets.filter(t => t.status !== 'completed').length,
+      vacantUnitsCount: vacantUnitsAll.length,
+      moveInsCount: 1, moveOutsCount: 1, inspectionsDueCount: s.inspections.filter(i => i.status === 'scheduled').length,
+      tasksList,
+      noRecentTickets: s.maintenanceTickets.length === 0,
+      recentTickets: s.maintenanceTickets.slice(0, 3).map(t => ({
+        issue: t.issue, tenant: t.tenant, unit: t.unit,
+        statusLabel: t.status === 'reported' ? 'New' : t.status === 'assigned' ? 'Assigned' : t.status === 'inprogress' ? 'In progress' : 'Done',
+        badgeStyle: `font-family:'JetBrains Mono';font-size:10px;font-weight:700;color:${t.status === 'completed' ? 'var(--success)' : t.status === 'reported' ? 'var(--error)' : 'var(--warning)'}`
+      })),
+      openTenantModal: () => this.setState({ modalOpen: 'tenant', editingTenantId: null, fTenantProperty: s.properties[0].name, fTenantUnit: '', fTenantName: '', fTenantPhone: '', fTenantId: '', fTenantEmail: '', fTenantRent: '', fTenantDeposit: '', fTenantLeaseStart: '', fTenantLeaseEnd: '', fTenantEmergency: '' }),
+      openTicketModal: () => this.setState({ modalOpen: 'ticket', fTicketTenant: '', fTicketIssue: '', fTicketPriority: 'Normal' }),
+      openInspectionModal: () => this.setState({ modalOpen: 'inspection', fInspProperty: s.properties[0].name, fInspUnit: '', inspChecklist: { Walls: null, Windows: null, Doors: null, Floor: null, Water: null, Electricity: null, Ceiling: null, Kitchen: null, Bathroom: null }, fInspComments: '' }),
+      recordMeterStub: () => this.showToast('Meter reading recorded.'),
+
+      propertiesCards,
+      tenantsCount: s.tenants.length, tenantsList,
+      buildingsList,
+      kanbanColumns, allowDrop: (e) => e.preventDefault(),
+      noInspections: s.inspections.length === 0, inspectionsList,
+      calendarMonthLabel: 'July 2026', calendarCells,
+
+      profileName: s.profileName || firstName, updateProfileName: (e) => this.setState({ profileName: e.target.value }),
+      profilePhone: s.profilePhone, updateProfilePhone: (e) => this.setState({ profilePhone: e.target.value }),
+      profileLanguage: s.profileLanguage, updateProfileLanguage: (e) => this.setState({ profileLanguage: e.target.value }),
+      saveProfile: () => this.showToast('Profile updated.'),
+
+      // AI
+      aiOpen: s.aiOpen, toggleAi: () => this.setState({ aiOpen: !s.aiOpen }),
+      aiMessages: s.aiMessages.map(m => ({ text: m.text, style: m.who === 'ai' ? 'align-self:flex-start;max-width:88%;background:var(--paper);border-radius:4px 12px 12px 12px;padding:9px 12px;font-size:12.5px;line-height:1.4' : 'align-self:flex-end;max-width:75%;background:var(--green-soft);color:var(--green-deep);border-radius:12px 4px 12px 12px;padding:9px 12px;font-size:12.5px' })),
+      aiPrompts: aiPromptDefs,
+
+      confettiActive: s.confettiActive,
+      confettiPieces: Array.from({ length: 14 }, (_, i) => ({
+        style: `position:absolute;top:-10px;left:${(i * 7) % 100}%;width:8px;height:8px;border-radius:2px;background:${['var(--green)', 'var(--clay)', 'var(--success)', 'var(--warning)'][i % 4]};animation:confettiFall ${1.1 + (i % 5) * 0.1}s ease-in ${(i % 6) * 0.05}s forwards`
+      })),
+      toast: s.toast,
+
+      // MODALS
+      anyModalOpen: !!s.modalOpen, closeModal: this.closeModal, stopProp: this.stopProp,
+      modalMaxWidth: s.modalOpen === 'tenant' || s.modalOpen === 'tenantDetail' ? '560px' : '460px',
+      is_modal_tenant: s.modalOpen === 'tenant', is_modal_tenantDetail: s.modalOpen === 'tenantDetail',
+      is_modal_ticket: s.modalOpen === 'ticket', is_modal_ticketDetail: s.modalOpen === 'ticketDetail',
+      is_modal_inspection: s.modalOpen === 'inspection', is_modal_moveOut: s.modalOpen === 'moveOut', is_modal_logout: s.modalOpen === 'logout',
+
+      tenantModalTitle: s.editingTenantId ? 'Edit tenant' : 'Register tenant', tenantModalBtnLabel: s.editingTenantId ? 'Save changes' : 'Register tenant',
+      fTenantName: s.fTenantName, updateFTenantName: (e) => this.setState({ fTenantName: e.target.value }),
+      fTenantPhone: s.fTenantPhone, updateFTenantPhone: (e) => this.setState({ fTenantPhone: e.target.value }),
+      fTenantId: s.fTenantId, updateFTenantId: (e) => this.setState({ fTenantId: e.target.value }),
+      fTenantEmail: s.fTenantEmail, updateFTenantEmail: (e) => this.setState({ fTenantEmail: e.target.value }),
+      fTenantProperty: s.fTenantProperty, updateFTenantProperty: (e) => this.setState({ fTenantProperty: e.target.value, fTenantUnit: '' }),
+      fTenantUnit: s.fTenantUnit, updateFTenantUnit: (e) => this.setState({ fTenantUnit: e.target.value }),
+      fTenantRent: s.fTenantRent, updateFTenantRent: (e) => this.setState({ fTenantRent: e.target.value }),
+      fTenantDeposit: s.fTenantDeposit, updateFTenantDeposit: (e) => this.setState({ fTenantDeposit: e.target.value }),
+      fTenantLeaseStart: s.fTenantLeaseStart, updateFTenantLeaseStart: (e) => this.setState({ fTenantLeaseStart: e.target.value }),
+      fTenantLeaseEnd: s.fTenantLeaseEnd, updateFTenantLeaseEnd: (e) => this.setState({ fTenantLeaseEnd: e.target.value }),
+      fTenantEmergency: s.fTenantEmergency, updateFTenantEmergency: (e) => this.setState({ fTenantEmergency: e.target.value }),
+      availableUnitsForForm: (() => {
+        const prop = s.properties.find(p => p.name === s.fTenantProperty);
+        if (!prop) return [];
+        const occ = occupiedCodesForProperty(prop.id);
+        return unitsForProperty(prop.id).filter(u => !occ.includes(u.code) || u.code === (s.editingTenantId ? s.tenants.find(t => t.id === s.editingTenantId)?.unit : null)).map(u => ({ code: u.code }));
+      })(),
+      saveTenant: () => {
+        if (!s.fTenantName || !s.fTenantUnit) return;
+        const prop = s.properties.find(p => p.name === s.fTenantProperty);
+        const data = { name: s.fTenantName, phone: s.fTenantPhone, nationalId: s.fTenantId, email: s.fTenantEmail, propertyId: prop.id, unit: s.fTenantUnit, rent: s.fTenantRent || '25000', deposit: s.fTenantDeposit || '0', leaseStart: s.fTenantLeaseStart, leaseEnd: s.fTenantLeaseEnd, emergency: s.fTenantEmergency, outstanding: '0' };
+        if (s.editingTenantId) {
+          this.setState(prev => ({ tenants: prev.tenants.map(t => t.id === s.editingTenantId ? { ...t, ...data } : t), modalOpen: null }));
+          this.logActivity(`Tenant updated: ${data.name}`);
+        } else {
+          this.setState(prev => ({ tenants: [...prev.tenants, { id: Date.now(), ...data }], modalOpen: null }));
+          this.logActivity(`Tenant registered: ${data.name} — ${data.unit}`);
+          this.burstConfetti();
+        }
+      },
+
+      // TENANT DETAIL
+      detailName: viewingTenant?.name || '', detailProperty: propById(viewingTenant?.propertyId)?.name || '', detailUnit: viewingTenant?.unit || '',
+      detailPhone: viewingTenant?.phone || '', detailRent: viewingTenant?.rent || '',
+      detailLeaseStart: viewingTenant?.leaseStart || '—', detailLeaseEnd: viewingTenant?.leaseEnd || '—',
+      detailBalance: viewingTenant?.outstanding || '0', detailBalanceColor: parseInt(viewingTenant?.outstanding || '0') > 0 ? 'var(--warning)' : 'var(--ink)',
+      detailAvatarInitials: (viewingTenant?.name || '').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
+      detailAvatarStyle: 'width:52px;height:52px;border-radius:99px;background:var(--clay);color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Schibsted Grotesk\';font-weight:700;font-size:17px',
+      detailNoTickets: !s.maintenanceTickets.some(t => t.tenant === viewingTenant?.name),
+      detailTickets: s.maintenanceTickets.filter(t => t.tenant === viewingTenant?.name).map(t => ({ issue: t.issue, statusLabel: t.status })),
+      detailDocsLabel: 'Lease agreement uploaded.',
+      fMoveUnit: s.fMoveUnit, updateFMoveUnit: (e) => this.setState({ fMoveUnit: e.target.value }),
+      moveTenant: () => {
+        if (!s.fMoveUnit || !viewingTenant) return;
+        this.setState(prev => ({ tenants: prev.tenants.map(t => t.id === viewingTenant.id ? { ...t, unit: s.fMoveUnit } : t), modalOpen: null, fMoveUnit: '' }));
+        this.logActivity(`${viewingTenant.name} moved to Unit ${s.fMoveUnit}`);
+        this.showToast('Tenant moved successfully.');
+      },
+      editTenantFromDetail: () => {
+        if (!viewingTenant) return;
+        this.setState({
+          modalOpen: 'tenant', editingTenantId: viewingTenant.id,
+          fTenantName: viewingTenant.name, fTenantPhone: viewingTenant.phone, fTenantId: viewingTenant.nationalId, fTenantEmail: viewingTenant.email,
+          fTenantProperty: propById(viewingTenant.propertyId)?.name, fTenantUnit: viewingTenant.unit, fTenantRent: viewingTenant.rent, fTenantDeposit: viewingTenant.deposit,
+          fTenantLeaseStart: viewingTenant.leaseStart, fTenantLeaseEnd: viewingTenant.leaseEnd, fTenantEmergency: viewingTenant.emergency
+        });
+      },
+      startMoveOut: () => {
+        if (!viewingTenant) return;
+        this.setState({ modalOpen: 'moveOut', movingOutTenantId: viewingTenant.id, moveOutStep: 1, fMoveOutDate: '', fMoveOutDamage: '', fMoveOutDeduction: '', moveOutChecklistState: { Walls: null, Windows: null, Doors: null, Floor: null, Water: null, Electricity: null, Ceiling: null, Kitchen: null, Bathroom: null } });
+      },
+
+      // MAINTENANCE
+      tenantsForForm: s.tenants.map(t => ({ name: t.name, unit: t.unit })),
+      fTicketTenant: s.fTicketTenant, updateFTicketTenant: (e) => this.setState({ fTicketTenant: e.target.value }),
+      fTicketIssue: s.fTicketIssue, updateFTicketIssue: (e) => this.setState({ fTicketIssue: e.target.value }),
+      fTicketPriority: s.fTicketPriority, updateFTicketPriority: (e) => this.setState({ fTicketPriority: e.target.value }),
+      saveTicket: () => {
+        if (!s.fTicketTenant || !s.fTicketIssue) return;
+        const t = s.tenants.find(t => t.name === s.fTicketTenant);
+        this.setState(prev => ({ maintenanceTickets: [{ id: Date.now(), tenant: s.fTicketTenant, unit: t?.unit || '', propertyId: t?.propertyId || 1, issue: s.fTicketIssue, priority: s.fTicketPriority, status: 'reported', technician: '', cost: '', dueDate: '' }, ...prev.maintenanceTickets], modalOpen: null }));
+        this.logActivity(`Maintenance reported: ${s.fTicketIssue}`);
+      },
+      tdIssue: viewingTicket?.issue || '', tdTenant: viewingTicket?.tenant || '', tdUnit: viewingTicket?.unit || '', tdProperty: propById(viewingTicket?.propertyId)?.name || '',
+      tdPriorityLabel: viewingTicket?.priority || '', tdPriorityStyle: priorityStyle(viewingTicket?.priority || 'Normal'),
+      tdStatusLabel: viewingTicket ? (viewingTicket.status === 'reported' ? 'Reported' : viewingTicket.status === 'assigned' ? 'Assigned' : viewingTicket.status === 'inprogress' ? 'In progress' : 'Completed') : '',
+      tdStatusStyle: 'display:inline-block;font-size:11px;font-weight:600;color:var(--stone);background:var(--paper);padding:2px 9px;border-radius:99px',
+      fTechName: s.fTechName, updateFTechName: (e) => this.setState({ fTechName: e.target.value }),
+      fTechCost: s.fTechCost, updateFTechCost: (e) => this.setState({ fTechCost: e.target.value }),
+      fTechDate: s.fTechDate, updateFTechDate: (e) => this.setState({ fTechDate: e.target.value }),
+      canComplete: viewingTicket?.status === 'inprogress' || viewingTicket?.status === 'assigned',
+      assignTechnician: () => {
+        if (!s.fTechName || !viewingTicket) return;
+        this.setState(prev => ({ maintenanceTickets: prev.maintenanceTickets.map(t => t.id === viewingTicket.id ? { ...t, status: 'assigned', technician: s.fTechName, cost: s.fTechCost, dueDate: s.fTechDate } : t), modalOpen: null }));
+        this.logActivity(`Technician assigned: ${s.fTechName}`);
+        this.showToast('Technician assigned and scheduled.');
+      },
+      markTicketCompleted: () => {
+        if (!viewingTicket) return;
+        this.setState(prev => ({ maintenanceTickets: prev.maintenanceTickets.map(t => t.id === viewingTicket.id ? { ...t, status: 'completed' } : t), modalOpen: null }));
+        this.logActivity(`Repair completed: ${viewingTicket.issue}`);
+        this.burstConfetti();
+      },
+
+      // INSPECTIONS
+      fInspProperty: s.fInspProperty, updateFInspProperty: (e) => this.setState({ fInspProperty: e.target.value }),
+      fInspUnit: s.fInspUnit, updateFInspUnit: (e) => this.setState({ fInspUnit: e.target.value }),
+      fInspComments: s.fInspComments, updateFInspComments: (e) => this.setState({ fInspComments: e.target.value }),
+      inspectionChecklist: buildChecklist('inspChecklist'),
+      saveInspection: () => {
+        if (!s.fInspUnit) return;
+        this.setState(prev => ({ inspections: [{ id: Date.now(), unit: s.fInspUnit, property: s.fInspProperty, date: '2026-07-21', status: 'completed' }, ...prev.inspections], modalOpen: null }));
+        this.logActivity(`Inspection completed: ${s.fInspUnit}`);
+        this.showToast('Inspection report generated.');
+      },
+
+      // MOVE OUT
+      moveOutSteps: [1, 2, 3, 4, 5, 6].map(n => ({ style: `flex:1;height:4px;border-radius:99px;background:${n <= s.moveOutStep ? 'var(--green)' : 'var(--line)'}` })),
+      moveOutStepTitle: moveOutStepTitles[s.moveOutStep - 1],
+      moveOutStepIs1: s.moveOutStep === 1, moveOutStepIs2: s.moveOutStep === 2, moveOutStepIs3: s.moveOutStep === 3,
+      moveOutStepIs4: s.moveOutStep === 4, moveOutStepIs5: s.moveOutStep === 5, moveOutStepIs6: s.moveOutStep === 6,
+      moveOutTenantName: movingOutTenant?.name || '', moveOutUnit: movingOutTenant?.unit || '',
+      fMoveOutDate: s.fMoveOutDate, updateFMoveOutDate: (e) => this.setState({ fMoveOutDate: e.target.value }),
+      moveOutChecklist: buildChecklist('moveOutChecklistState'),
+      fMoveOutDamage: s.fMoveOutDamage, updateFMoveOutDamage: (e) => this.setState({ fMoveOutDamage: e.target.value }),
+      moveOutDeposit: deposit.toLocaleString(),
+      fMoveOutDeduction: s.fMoveOutDeduction, updateFMoveOutDeduction: (e) => this.setState({ fMoveOutDeduction: e.target.value }),
+      moveOutDamageDisplay: s.fMoveOutDamage || 'None noted',
+      moveOutRefund: Math.max(0, deposit - deduction).toLocaleString(),
+      moveOutShowBack: s.moveOutStep > 1 && s.moveOutStep < 6,
+      moveOutNextLabel: s.moveOutStep === 5 ? 'Mark unit vacant' : s.moveOutStep === 6 ? 'Done' : 'Continue',
+      moveOutBack: () => this.setState(prev => ({ moveOutStep: Math.max(1, prev.moveOutStep - 1) })),
+      moveOutNext: () => {
+        if (s.moveOutStep === 5) {
+          this.setState(prev => ({ tenants: prev.tenants.filter(t => t.id !== s.movingOutTenantId), moveOutStep: 6 }));
+          this.logActivity(`Unit ${movingOutTenant?.unit} marked vacant`);
+          this.burstConfetti();
+        } else if (s.moveOutStep === 6) {
+          this.setState({ modalOpen: null });
+        } else {
+          this.setState(prev => ({ moveOutStep: prev.moveOutStep + 1 }));
+        }
+      },
+
+      confirmLogout: () => { window.location.href = 'Makazi App - Auth.dc.html'; }
+    };
+  }
+
+  nav(n) {
+    const active = this.state.navActive === n;
+    return `display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:${active ? 'rgba(227,237,231,.12)' : 'none'};border:none;color:${active ? '#fff' : '#9AA39D'};border-radius:9px;padding:10px 10px;font-size:13px;font-weight:${active ? 600 : 500}`;
+  }
+  moveTicket(id, status) {
+    this.setState(prev => ({ maintenanceTickets: prev.maintenanceTickets.map(t => t.id === id ? { ...t, status } : t) }));
+    if (status === 'completed') this.burstConfetti();
+  }
+  askAi(question, answer) {
+    this.setState(prev => ({ aiMessages: [...prev.aiMessages, { text: question, who: 'user' }, { text: answer, who: 'ai' }], aiOpen: true }));
+  }
+}
+</script>
+</body>
+</html>

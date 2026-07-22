@@ -1,0 +1,72 @@
+/**
+ * CSS custom properties mirrored from tokens.ts / 05-design-tokens.md.
+ * Imported once into apps/web global stylesheet.
+ */
+:root {
+  /* Color */
+  --ink: #0b140f;
+  --paper: #f6f5f0;
+  --white: #ffffff;
+  --green: #0e5c43;
+  --green-deep: #093c2c;
+  --green-soft: #e3ede7;
+  --green-line: #c9dbd1;
+  --clay: #db6b3b;
+  --clay-hover: #c55a2c;
+  --clay-soft: #f5e4da;
+  --success: #1e9e5a;
+  --warning: #e0a008;
+  --error: #cf4b3e;
+  --stone: #5c665f;
+  --line: #e4e2da;
+  --line-2: #d8d6cd;
+
+  /* Soft tints */
+  --error-bg: rgba(207, 75, 62, 0.08);
+  --error-border: rgba(207, 75, 62, 0.25);
+  --warning-bg: rgba(224, 160, 8, 0.1);
+  --warning-border: rgba(224, 160, 8, 0.25);
+
+  /* Fonts */
+  --font-display: "Schibsted Grotesk", sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm: 9px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 22px;
+  --radius-pill: 999px;
+
+  /* Icon sizes */
+  --icon-xs: 14px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 26px;
+  --icon-xl: 44px;
+
+  /* Elevation */
+  --shadow-card: 0 24px 60px -30px rgba(11, 20, 15, 0.2);
+  --scrim: rgba(11, 20, 15, 0.5);
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-loading: 700ms;
+  --duration-success: 500ms;
+  --easing-standard: ease-out;
+}

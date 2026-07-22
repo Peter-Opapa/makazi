@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#F6F5F0;color:#0B140F;font-family:'Hanken Grotesk',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  :root{
+    --ink:#0B140F;--paper:#F6F5F0;--white:#FFFFFF;
+    --green:#0E5C43;--green-deep:#093C2C;--green-soft:#E3EDE7;--green-line:#C9DBD1;
+    --clay:#DB6B3B;--clay-soft:#F5E4DA;
+    --success:#1E9E5A;--warning:#E0A008;--error:#CF4B3E;
+    --stone:#5C665F;--line:#E4E2DA;--line-2:#D8D6CD;
+  }
+  ::selection{background:#DB6B3B;color:#fff}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+  table{border-collapse:collapse;width:100%}
+</style>
+</helmet>
+
+<!-- NAV -->
+<nav style="position:sticky;top:0;z-index:50;background:rgba(246,245,240,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:16px clamp(20px,4vw,64px);gap:20px;flex-wrap:wrap">
+  <a href="Makazi Website - Home.dc.html" style="display:flex;align-items:center;gap:10px">
+    <img src="assets/makazi-mark.png" alt="Makazi" style="height:28px;width:auto">
+    <span style="font-family:'Schibsted Grotesk';font-weight:800;letter-spacing:.12em;font-size:16px">MAKAZI</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+    <a href="Makazi Website - Features.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Features</a>
+    <a href="Makazi Website - Pricing.dc.html" style="font-size:15px;font-weight:600;color:var(--green)">Pricing</a>
+    <a href="Makazi Website - About.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">About</a>
+    <a href="Makazi Website - Contact.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Contact</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:18px">
+    <a href="#" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Log in</a>
+    <a href="Makazi Website - Contact.dc.html#book-demo" style="background:var(--clay);color:#fff;padding:11px 22px;border-radius:10px;font-size:15px;font-weight:600" style-hover="background:#C55A2C">Book a Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section style="padding:clamp(56px,8vw,100px) clamp(20px,4vw,64px) clamp(32px,5vw,56px);max-width:900px;margin:0 auto;text-align:center">
+  <div style="display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green-deep);background:var(--green-soft);padding:8px 16px;border-radius:99px;margin-bottom:28px">Pricing</div>
+  <h1 style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(34px,4.6vw,58px);line-height:1.06;letter-spacing:-.03em;margin:0 0 22px">Simple, per-unit pricing that scales with you.</h1>
+  <p style="font-size:18px;color:var(--stone);max-width:600px;margin:0 auto 36px;font-weight:400;line-height:1.6">Pay for the units you manage — nothing more. Estimated launch pricing, subject to change.</p>
+  <div style="display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--line);border-radius:99px;padding:5px">
+    <button onClick="{{ selectMonthly }}" style="{{ monthlyBtnStyle }}">Monthly</button>
+    <button onClick="{{ selectAnnual }}" style="{{ annualBtnStyle }}">Annual — save 15%</button>
+  </div>
+</section>
+
+<!-- PRICING CARDS -->
+<section style="padding:0 clamp(20px,4vw,64px) clamp(64px,8vw,100px);max-width:1200px;margin:0 auto">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;align-items:stretch">
+    <div style="border:1px solid var(--line);border-radius:20px;padding:36px;background:var(--white);display:flex;flex-direction:column">
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:16px">Starter</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px"><span style="font-family:'JetBrains Mono';font-weight:700;font-size:38px">KES {{ starterPrice }}</span><span style="font-size:14px;color:var(--stone)">/unit/mo</span></div>
+      <div style="font-size:13px;color:var(--stone);margin-bottom:28px">Up to 20 units · billed {{ billingLabel }}</div>
+      <a href="Makazi Website - Contact.dc.html#book-demo" style="display:block;text-align:center;border:1.5px solid var(--line-2);border-radius:10px;padding:13px;font-weight:600;font-size:14px;margin-bottom:28px" style-hover="border-color:var(--ink)">Book a Demo</a>
+      <div style="display:flex;flex-direction:column;gap:14px;font-size:14px">
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Rent collection &amp; tracking</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Tenant management</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Vacancy tracking</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Basic reports</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Email support</div>
+      </div>
+    </div>
+
+    <div style="border:2px solid var(--green);border-radius:20px;padding:36px;background:var(--white);display:flex;flex-direction:column;position:relative">
+      <div style="position:absolute;top:-14px;left:36px;background:var(--green);color:#fff;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;padding:5px 12px;border-radius:99px">MOST POPULAR</div>
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:16px">Growth</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px"><span style="font-family:'JetBrains Mono';font-weight:700;font-size:38px">KES {{ growthPrice }}</span><span style="font-size:14px;color:var(--stone)">/unit/mo</span></div>
+      <div style="font-size:13px;color:var(--stone);margin-bottom:28px">Up to 200 units · billed {{ billingLabel }}</div>
+      <a href="Makazi Website - Contact.dc.html#book-demo" style="display:block;text-align:center;background:var(--green);color:#fff;border-radius:10px;padding:13px;font-weight:600;font-size:14px;margin-bottom:28px" style-hover="background:var(--green-deep)">Book a Demo</a>
+      <div style="display:flex;flex-direction:column;gap:14px;font-size:14px">
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg><strong>Everything in Starter, plus:</strong></div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Caretaker management</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Maintenance tracking</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>AI insights</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>WhatsApp assistant</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Priority support</div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:20px;padding:36px;background:var(--white);display:flex;flex-direction:column">
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:16px">Enterprise</div>
+      <div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:32px;margin-bottom:6px">Custom pricing</div>
+      <div style="font-size:13px;color:var(--stone);margin-bottom:28px">200+ units or property management companies</div>
+      <a href="Makazi Website - Contact.dc.html#book-demo" style="display:block;text-align:center;border:1.5px solid var(--line-2);border-radius:10px;padding:13px;font-weight:600;font-size:14px;margin-bottom:28px" style-hover="border-color:var(--ink)">Talk to us</a>
+      <div style="display:flex;flex-direction:column;gap:14px;font-size:14px">
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg><strong>Everything in Growth, plus:</strong></div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Dedicated account manager</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>API access</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>Custom reporting</div>
+        <div style="display:flex;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="flex-shrink:0"><path d="M4 12l5 5L20 6"/></svg>SLA &amp; onboarding support</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:1100px;margin:0 auto">
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(24px,2.6vw,32px);letter-spacing:-.02em;margin:0 0 36px;text-align:center">Compare plans</h2>
+    <table>
+      <thead>
+        <tr style="border-bottom:1px solid var(--line)">
+          <th style="text-align:left;padding:14px 12px;font-size:13px;color:var(--stone);font-weight:500">Feature</th>
+          <th style="text-align:center;padding:14px 12px;font-family:'Schibsted Grotesk';font-size:15px">Starter</th>
+          <th style="text-align:center;padding:14px 12px;font-family:'Schibsted Grotesk';font-size:15px;color:var(--green)">Growth</th>
+          <th style="text-align:center;padding:14px 12px;font-family:'Schibsted Grotesk';font-size:15px">Enterprise</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:14px 12px;font-size:14px">Portfolio &amp; tenant management</td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:14px 12px;font-size:14px">USSD &amp; WhatsApp for tenants</td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:14px 12px;font-size:14px">Caretaker &amp; maintenance management</td><td style="text-align:center;color:var(--line-2)">—</td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:14px 12px;font-size:14px">AI insights</td><td style="text-align:center;color:var(--line-2)">—</td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:14px 12px;font-size:14px">Custom reports &amp; API access</td><td style="text-align:center;color:var(--line-2)">—</td><td style="text-align:center;color:var(--line-2)">—</td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td></tr>
+        <tr><td style="padding:14px 12px;font-size:14px">Dedicated account manager &amp; SLA</td><td style="text-align:center;color:var(--line-2)">—</td><td style="text-align:center;color:var(--line-2)">—</td><td style="text-align:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- PRICING FAQ -->
+<section style="padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px);max-width:800px;margin:0 auto">
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(24px,2.6vw,32px);letter-spacing:-.02em;margin:0 0 36px;text-align:center">Pricing questions</h2>
+  <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden">
+    <div style="background:var(--white)">
+      <button onClick="{{ toggleFaq1 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">How is pricing calculated?<span style="{{ faq1IconStyle }}">+</span></button>
+      <sc-if value="{{ faq1Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Pricing is per unit you manage, per month. A 30-unit portfolio on Starter costs 30 × the per-unit rate.</p></sc-if>
+    </div>
+    <div style="background:var(--white)">
+      <button onClick="{{ toggleFaq2 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">Is there a setup fee?<span style="{{ faq2IconStyle }}">+</span></button>
+      <sc-if value="{{ faq2Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">No. There's no setup fee on any plan — you only pay the monthly per-unit rate.</p></sc-if>
+    </div>
+    <div style="background:var(--white)">
+      <button onClick="{{ toggleFaq3 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">Can I change plans later?<span style="{{ faq3IconStyle }}">+</span></button>
+      <sc-if value="{{ faq3Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Yes. You can move between Starter and Growth at any time as your portfolio grows.</p></sc-if>
+    </div>
+    <div style="background:var(--white)">
+      <button onClick="{{ toggleFaq4 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">Do tenants or caretakers pay anything?<span style="{{ faq4IconStyle }}">+</span></button>
+      <sc-if value="{{ faq4Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">No. Only the landlord subscribes. Tenants and caretakers use Makazi at no extra cost.</p></sc-if>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section style="background:var(--green);color:#fff;padding:clamp(64px,8vw,100px) clamp(20px,4vw,64px);text-align:center">
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(28px,3.6vw,44px);letter-spacing:-.02em;margin:0 0 20px;max-width:700px;margin-left:auto;margin-right:auto;line-height:1.1">Not sure which plan fits your portfolio?</h2>
+  <p style="font-size:17px;color:#DCEAE2;margin:0 0 32px">We'll help you find the right one — no pressure.</p>
+  <a href="Makazi Website - Contact.dc.html#book-demo" style="display:inline-block;background:#fff;color:var(--green-deep);padding:17px 34px;border-radius:12px;font-weight:700;font-size:16px">Book a Demo</a>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:var(--ink);color:#9AA39D;padding:64px clamp(20px,4vw,64px) 32px">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><img src="assets/makazi-mark-light.png" alt="Makazi" style="height:26px"><span style="font-family:'Schibsted Grotesk';font-weight:800;font-size:15px;letter-spacing:.12em;color:var(--paper)">MAKAZI</span></div>
+        <p style="font-size:14px;line-height:1.6;max-width:280px;margin:0">The operating system for rental housing across Africa.</p>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Product</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - Features.dc.html" style="color:#C7CEC9">Features</a>
+          <a href="Makazi Website - Pricing.dc.html" style="color:#C7CEC9">Pricing</a>
+          <a href="Makazi Website - Home.dc.html#dashboard-preview" style="color:#C7CEC9">Product tour</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Company</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - About.dc.html" style="color:#C7CEC9">About</a>
+          <a href="Makazi Website - Contact.dc.html" style="color:#C7CEC9">Contact</a>
+          <a href="Makazi Website - Contact.dc.html#book-demo" style="color:#C7CEC9">Book a Demo</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Resources</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - Home.dc.html#faq" style="color:#C7CEC9">FAQ</a>
+          <a href="Makazi Website - Contact.dc.html" style="color:#C7CEC9">Support</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.1);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px">
+      <span>© 2026 Makazi. Not a real estate company. A technology company.</span>
+      <span>Payments always go directly to your account — Makazi never holds funds.</span>
+    </div>
+  </div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { annual: false, faq: null };
+  btnStyle(active) {
+    return active
+      ? 'background:var(--ink);color:var(--paper);padding:11px 20px;border-radius:99px;border:none;font-size:14px;font-weight:600'
+      : 'background:transparent;color:var(--stone);padding:11px 20px;border-radius:99px;border:none;font-size:14px;font-weight:600';
+  }
+  faqIconStyle(open) {
+    return open ? 'font-size:20px;color:var(--green);transform:rotate(45deg);display:inline-block;transition:transform .2s' : 'font-size:20px;color:var(--stone);display:inline-block;transition:transform .2s';
+  }
+  renderVals() {
+    const annual = this.state.annual, f = this.state.faq;
+    return {
+      monthlyBtnStyle: this.btnStyle(!annual),
+      annualBtnStyle: this.btnStyle(annual),
+      selectMonthly: () => this.setState({ annual: false }),
+      selectAnnual: () => this.setState({ annual: true }),
+      billingLabel: annual ? 'annually' : 'monthly',
+      starterPrice: annual ? 84 : 99,
+      growthPrice: annual ? 127 : 149,
+      faq1Open: f === 1, faq2Open: f === 2, faq3Open: f === 3, faq4Open: f === 4,
+      faq1IconStyle: this.faqIconStyle(f === 1), faq2IconStyle: this.faqIconStyle(f === 2),
+      faq3IconStyle: this.faqIconStyle(f === 3), faq4IconStyle: this.faqIconStyle(f === 4),
+      toggleFaq1: () => this.setState({ faq: f === 1 ? null : 1 }),
+      toggleFaq2: () => this.setState({ faq: f === 2 ? null : 2 }),
+      toggleFaq3: () => this.setState({ faq: f === 3 ? null : 3 }),
+      toggleFaq4: () => this.setState({ faq: f === 4 ? null : 4 })
+    };
+  }
+}
+</script>
+</body>
+</html>

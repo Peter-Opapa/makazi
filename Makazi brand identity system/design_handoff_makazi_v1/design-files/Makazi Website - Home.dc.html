@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#F6F5F0;color:#0B140F;font-family:'Hanken Grotesk',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  :root{
+    --ink:#0B140F;--paper:#F6F5F0;--white:#FFFFFF;
+    --green:#0E5C43;--green-deep:#093C2C;--green-soft:#E3EDE7;--green-line:#C9DBD1;
+    --clay:#DB6B3B;--clay-soft:#F5E4DA;
+    --success:#1E9E5A;--warning:#E0A008;--error:#CF4B3E;
+    --stone:#5C665F;--line:#E4E2DA;--line-2:#D8D6CD;
+  }
+  ::selection{background:#DB6B3B;color:#fff}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+  @keyframes revealUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes heroIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+
+<!-- NAV -->
+<nav style="position:sticky;top:0;z-index:50;background:rgba(246,245,240,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:16px clamp(20px,4vw,64px);gap:20px;flex-wrap:wrap">
+  <a href="Makazi Website - Home.dc.html" style="display:flex;align-items:center;gap:10px">
+    <img src="assets/makazi-mark.png" alt="Makazi" style="height:28px;width:auto">
+    <span style="font-family:'Schibsted Grotesk';font-weight:800;letter-spacing:.12em;font-size:16px">MAKAZI</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+    <a href="Makazi Website - Features.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Features</a>
+    <a href="Makazi Website - Pricing.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Pricing</a>
+    <a href="Makazi Website - About.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">About</a>
+    <a href="Makazi Website - Contact.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Contact</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:18px">
+    <a href="Makazi App - Auth.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Log in</a>
+    <a href="Makazi Website - Contact.dc.html#book-demo" style="background:var(--clay);color:#fff;padding:11px 22px;border-radius:10px;font-size:15px;font-weight:600" style-hover="background:#C55A2C">Book a Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="top" style="padding:clamp(64px,9vw,120px) clamp(20px,4vw,64px) clamp(48px,7vw,96px);max-width:1360px;margin:0 auto;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center">
+  <div style="animation:heroIn .7s ease both">
+    <div style="display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green-deep);background:var(--green-soft);padding:8px 16px;border-radius:99px;margin-bottom:28px">AI-powered · Built for Kenya &amp; East Africa</div>
+    <h1 style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(38px,4.6vw,64px);line-height:1.03;letter-spacing:-.03em;margin:0 0 26px">The operating system for rental housing in Africa.</h1>
+    <p style="font-size:19px;color:var(--stone);max-width:520px;margin:0 0 36px;font-weight:400;line-height:1.55">Makazi helps landlords collect rent, manage tenants and run every property from one place — while payments go straight to your PayBill, Till or bank account. We never hold your money.</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:40px">
+      <a href="Makazi Website - Contact.dc.html#book-demo" style="background:var(--green);color:#fff;padding:16px 28px;border-radius:12px;font-size:16px;font-weight:600" style-hover="background:var(--green-deep)">Book a Demo</a>
+      <a href="#dashboard-preview" style="background:transparent;color:var(--ink);border:1.5px solid var(--line-2);padding:16px 28px;border-radius:12px;font-size:16px;font-weight:600;display:flex;align-items:center;gap:10px" style-hover="border-color:var(--ink)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Watch Product Tour
+      </a>
+    </div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap">
+      <div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:22px">5–500</div><div style="font-size:13px;color:var(--stone)">units per landlord</div></div>
+      <div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:22px">0%</div><div style="font-size:13px;color:var(--stone)">of your rent held by us</div></div>
+      <div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:22px">USSD</div><div style="font-size:13px;color:var(--stone)">works with no smartphone</div></div>
+    </div>
+  </div>
+  <div style="position:relative;animation:heroIn .8s ease .1s both">
+    <div style="background:var(--white);border-radius:22px;box-shadow:0 30px 70px -30px rgba(11,20,15,.28);border:1px solid var(--line);padding:26px;max-width:460px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
+        <div style="display:flex;align-items:center;gap:9px"><img src="assets/makazi-mark.png" alt="" style="height:18px"><span style="font-family:'Schibsted Grotesk';font-weight:700;font-size:13px;letter-spacing:.1em">MAKAZI</span></div>
+        <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--stone)">July 2026</span>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:var(--stone);text-transform:uppercase;margin-bottom:6px">Collected this month</div>
+      <div style="font-family:'JetBrains Mono';font-weight:700;font-size:38px;margin-bottom:6px">KES 1.86M</div>
+      <div style="font-size:13px;color:var(--success);margin-bottom:22px">↑ 12% vs June · 96% of expected rent</div>
+      <div style="display:flex;align-items:flex-end;gap:10px;height:90px;margin-bottom:18px">
+        <div style="flex:1;height:52%;background:var(--green-line);border-radius:5px"></div>
+        <div style="flex:1;height:64%;background:var(--green-line);border-radius:5px"></div>
+        <div style="flex:1;height:58%;background:var(--green-line);border-radius:5px"></div>
+        <div style="flex:1;height:78%;background:var(--green);border-radius:5px"></div>
+        <div style="flex:1;height:86%;background:var(--green);border-radius:5px"></div>
+        <div style="flex:1;height:96%;background:var(--clay);border-radius:5px"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--paper);border-radius:11px">
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:99px;background:var(--success)"></span><span style="font-size:13px;font-weight:500">A. Otieno paid via M-Pesa</span></div>
+        <span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500">25,000</span>
+      </div>
+    </div>
+    <div style="position:absolute;bottom:-26px;left:-30px;background:var(--ink);color:#fff;border-radius:16px;padding:16px 20px;box-shadow:0 20px 44px -20px rgba(11,20,15,.4);display:flex;align-items:center;gap:12px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.8"><path d="M12 3 4 6v6c0 4 3.5 7 8 9 4.5-2 8-5 8-9V6l-8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+      <div><div style="font-size:13px;font-weight:600">Direct to your account</div><div style="font-size:11px;color:#9AA39D">Makazi never holds funds</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section style="padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px);max-width:1200px;margin:0 auto">
+  <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">The problem</div>
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0 0 44px;max-width:760px;line-height:1.15">Rental housing still runs on WhatsApp groups, paper ledgers and phone calls.</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+    <div style="border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white)">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:18px"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 8h18M7 13h4"/></svg>
+      <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:18px;margin:0 0 8px">Scattered records</h3>
+      <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Leases, receipts and tenant details spread across notebooks, spreadsheets and phone threads.</p>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white)">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:18px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:18px;margin:0 0 8px">Manual rent chasing</h3>
+      <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Following up on late rent by phone, one tenant at a time, every single month.</p>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white)">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:18px"><path d="M3 17l5-5 4 4 8-9"/><path d="M15 7h5v5"/></svg>
+      <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:18px;margin:0 0 8px">No real visibility</h3>
+      <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">No single view of occupancy, arrears, or which caretaker fixed what — until something goes wrong.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center">
+    <div>
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">The solution</div>
+      <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0 0 20px;line-height:1.15">One platform for landlords, caretakers and tenants.</h2>
+      <p style="font-size:17px;color:var(--stone);margin:0 0 28px;line-height:1.6">Makazi replaces the notebook and the group chat with a single system of record — built for how rentals actually run in Kenya, from PayBill numbers to feature phones.</p>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;gap:12px;align-items:center;font-size:15px;font-weight:500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>Collect rent automatically, every month</div>
+        <div style="display:flex;gap:12px;align-items:center;font-size:15px;font-weight:500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>Manage tenants, caretakers and units in one view</div>
+        <div style="display:flex;gap:12px;align-items:center;font-size:15px;font-weight:500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>Track maintenance from request to repair</div>
+        <div style="display:flex;gap:12px;align-items:center;font-size:15px;font-weight:500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>See reports and AI insights, always up to date</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div style="background:var(--green);color:#fff;border-radius:18px;padding:26px;aspect-ratio:1;display:flex;flex-direction:column;justify-content:space-between">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M4 10h16"/></svg>
+        <div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px">Collect</div><div style="font-size:13px;opacity:.85;margin-top:4px">Rent, on time</div></div>
+      </div>
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:26px;aspect-ratio:1;display:flex;flex-direction:column;justify-content:space-between">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+        <div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px">Manage</div><div style="font-size:13px;color:var(--stone);margin-top:4px">People &amp; units</div></div>
+      </div>
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:26px;aspect-ratio:1;display:flex;flex-direction:column;justify-content:space-between">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.7"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/><path d="M9 13h6M9 17h6"/></svg>
+        <div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px">Maintain</div><div style="font-size:13px;color:var(--stone);margin-top:4px">Repairs, tracked</div></div>
+      </div>
+      <div style="background:var(--clay);color:#fff;border-radius:18px;padding:26px;aspect-ratio:1;display:flex;flex-direction:column;justify-content:space-between">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18V9M10 18V5M16 18v-6M4 18h16"/></svg>
+        <div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:20px">Report</div><div style="font-size:13px;opacity:.85;margin-top:4px">AI-backed insight</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERACTIVE DASHBOARD PREVIEW -->
+<section id="dashboard-preview" style="padding:clamp(64px,8vw,110px) clamp(20px,4vw,64px);max-width:1200px;margin:0 auto">
+  <div style="text-align:center;max-width:700px;margin:0 auto 40px">
+    <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">See it in action</div>
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0;line-height:1.15">One product. Three views.</h2>
+  </div>
+  <div style="display:flex;justify-content:center;gap:8px;margin-bottom:32px;flex-wrap:wrap">
+    <button onClick="{{ selectLandlord }}" style="{{ landlordTabStyle }}">Landlord</button>
+    <button onClick="{{ selectCaretaker }}" style="{{ caretakerTabStyle }}">Caretaker</button>
+    <button onClick="{{ selectTenant }}" style="{{ tenantTabStyle }}">Tenant</button>
+  </div>
+
+  <sc-if value="{{ showLandlord }}" hint-placeholder-val="{{ true }}">
+    <div style="border:1px solid var(--line);border-radius:22px;overflow:hidden;background:var(--white);box-shadow:0 24px 60px -30px rgba(11,20,15,.2)">
+      <div style="display:grid;grid-template-columns:230px 1fr;min-height:580px">
+        <div style="background:var(--ink);color:var(--paper);padding:22px 16px;display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;align-items:center;gap:9px;padding:6px 8px 20px"><img src="assets/makazi-mark-light.png" style="height:22px" alt=""><span style="font-family:'Schibsted Grotesk';font-weight:800;font-size:13px;letter-spacing:.1em">MAKAZI</span></div>
+          <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;background:rgba(227,237,231,.1);font-size:13px;font-weight:500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+          <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;font-size:13px;color:#9AA39D"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="7" height="12"/><rect x="14" y="4" width="7" height="17"/></svg>Properties</div>
+          <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;font-size:13px;color:#9AA39D"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/></svg>Tenants</div>
+          <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;font-size:13px;color:#9AA39D"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Payments</div>
+          <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;font-size:13px;color:#9AA39D"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/></svg>Maintenance</div>
+          <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;font-size:13px;color:#9AA39D"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>AI Insights</div>
+          <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;font-size:13px;color:#9AA39D"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/><path d="M9 13h6M9 17h6"/></svg>Reports</div>
+          <div style="margin-top:auto;display:flex;align-items:center;gap:9px;padding:9px 10px;border-top:1px solid rgba(255,255,255,.1);padding-top:16px">
+            <div style="width:26px;height:26px;border-radius:99px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600">WM</div>
+            <div style="line-height:1.2"><div style="font-size:12px;font-weight:500">Wanjiru M.</div><div style="font-size:10px;color:#9AA39D">3 properties</div></div>
+          </div>
+        </div>
+        <div style="padding:24px 26px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px">Good morning, Wanjiru</div><div style="font-size:12px;color:var(--stone)">42 units across 3 properties</div></div>
+            <div style="background:var(--green);color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600">Send reminders</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+            <div style="background:var(--paper);border-radius:11px;padding:12px"><div style="font-family:'JetBrains Mono';font-size:9px;color:var(--stone);text-transform:uppercase">Collected</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:16px">KES 892K</div><div style="font-size:10px;color:var(--success)">↑ 84%</div></div>
+            <div style="background:var(--paper);border-radius:11px;padding:12px"><div style="font-family:'JetBrains Mono';font-size:9px;color:var(--stone);text-transform:uppercase">Occupancy</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:16px">93%</div><div style="font-size:10px;color:var(--success)">39/42</div></div>
+            <div style="background:var(--paper);border-radius:11px;padding:12px"><div style="font-family:'JetBrains Mono';font-size:9px;color:var(--stone);text-transform:uppercase">Arrears</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:16px;color:var(--warning)">KES 168K</div><div style="font-size:10px;color:var(--warning)">7 tenants</div></div>
+            <div style="background:var(--paper);border-radius:11px;padding:12px"><div style="font-family:'JetBrains Mono';font-size:9px;color:var(--stone);text-transform:uppercase">Requests</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:16px">3</div><div style="font-size:10px;color:var(--stone)">2 assigned</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-bottom:14px">
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:12px;font-weight:600">Rent collection</span><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">6 months</span></div>
+              <div style="display:flex;align-items:flex-end;gap:8px;height:70px">
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="height:52%;background:var(--green-line);border-radius:4px"></div></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="height:60%;background:var(--green-line);border-radius:4px"></div></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="height:56%;background:var(--green-line);border-radius:4px"></div></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="height:76%;background:var(--green);border-radius:4px"></div></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="height:84%;background:var(--green);border-radius:4px"></div></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="height:94%;background:var(--clay);border-radius:4px"></div></div>
+              </div>
+            </div>
+            <div style="background:var(--green-soft);border-radius:12px;padding:14px;display:flex;gap:9px;align-items:flex-start">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.8" style="flex-shrink:0;margin-top:2px"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+              <div style="font-size:11px;color:var(--green-deep);line-height:1.4"><strong>AI:</strong> Unit B2 vacant 34 days — 40% above average. Consider relisting at KES 22,000.</div>
+            </div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px">
+            <div style="font-size:12px;font-weight:600;margin-bottom:10px">Recent payments</div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:99px;background:var(--success)"></span><span style="font-size:12px">A. Otieno · D4</span></div><span style="font-family:'JetBrains Mono';font-size:11px">25,000</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:99px;background:var(--success)"></span><span style="font-size:12px">G. Njoki · B2</span></div><span style="font-family:'JetBrains Mono';font-size:11px">18,500</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:99px;background:var(--warning)"></span><span style="font-size:12px">P. Kamau · A1</span></div><span style="font-family:'JetBrains Mono';font-size:11px;color:var(--warning)">Reminder sent</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showCaretaker }}" hint-placeholder-val="{{ false }}">
+    <div style="border:1px solid var(--line);border-radius:22px;overflow:hidden;background:var(--white);box-shadow:0 24px 60px -30px rgba(11,20,15,.2)">
+      <div style="display:grid;grid-template-columns:230px 1fr;min-height:580px">
+        <div style="background:var(--green-deep);color:var(--paper);padding:22px 16px;display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;align-items:center;gap:9px;padding:6px 8px 20px"><img src="assets/makazi-mark-light.png" style="height:22px" alt=""><span style="font-family:'Schibsted Grotesk';font-weight:800;font-size:12px;letter-spacing:.1em">MAKAZI <span style="color:#8FB0A2;font-weight:500;letter-spacing:0">Caretaker</span></span></div>
+          <div style="padding:9px 10px;border-radius:9px;background:rgba(227,237,231,.14);font-size:13px;font-weight:500">Today</div>
+          <div style="padding:9px 10px;font-size:13px;color:#8FB0A2">Tenants</div>
+          <div style="padding:9px 10px;font-size:13px;color:#8FB0A2">Units &amp; vacancies</div>
+          <div style="padding:9px 10px;font-size:13px;color:#8FB0A2">Inspections</div>
+          <div style="display:flex;align-items:center;padding:9px 10px;font-size:13px;color:#8FB0A2">Maintenance <span style="margin-left:auto;background:var(--clay);color:#fff;font-family:'JetBrains Mono';font-size:9px;padding:1px 6px;border-radius:99px">2</span></div>
+          <div style="padding:9px 10px;font-size:13px;color:#8FB0A2">Meter readings</div>
+          <div style="margin-top:auto;display:flex;align-items:center;gap:9px;padding:9px 10px;border-top:1px solid rgba(255,255,255,.12);padding-top:16px">
+            <div style="width:26px;height:26px;border-radius:99px;background:var(--clay);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600">DK</div>
+            <div style="line-height:1.2"><div style="font-size:12px;font-weight:500">David K.</div><div style="font-size:10px;color:#8FB0A2">Riverside Estates</div></div>
+          </div>
+        </div>
+        <div style="padding:24px 26px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px">Habari, David</div><div style="font-size:12px;color:var(--stone)">3 tasks today · Riverside Estates</div></div>
+            <div style="background:var(--green);color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600">Register tenant</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+            <div style="background:var(--paper);border-radius:11px;padding:12px"><div style="font-family:'JetBrains Mono';font-size:9px;color:var(--stone);text-transform:uppercase">Tasks</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:16px">3</div><div style="font-size:10px;color:var(--clay)">1 due now</div></div>
+            <div style="background:var(--paper);border-radius:11px;padding:12px"><div style="font-family:'JetBrains Mono';font-size:9px;color:var(--stone);text-transform:uppercase">Units</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:16px">42</div><div style="font-size:10px;color:var(--stone)">managed</div></div>
+            <div style="background:var(--paper);border-radius:11px;padding:12px"><div style="font-family:'JetBrains Mono';font-size:9px;color:var(--stone);text-transform:uppercase">Vacant</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:16px;color:var(--warning)">3</div><div style="font-size:10px;color:var(--warning)">to fill</div></div>
+            <div style="background:var(--paper);border-radius:11px;padding:12px"><div style="font-family:'JetBrains Mono';font-size:9px;color:var(--stone);text-transform:uppercase">Repairs</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:16px">2</div><div style="font-size:10px;color:var(--stone)">assigned</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:12px">
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px">
+              <div style="font-size:12px;font-weight:600;margin-bottom:10px">Today's tasks</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="width:7px;height:7px;border-radius:99px;background:var(--clay);flex-shrink:0"></span><div style="flex:1"><div style="font-size:12px;font-weight:500">Move-in inspection · A1</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--clay)">10:00 · due now</div></div></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="width:7px;height:7px;border-radius:99px;background:var(--green);flex-shrink:0"></span><div style="flex:1"><div style="font-size:12px;font-weight:500">Register tenant · Block C</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">deposit confirmed</div></div></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:9px 0"><span style="width:7px;height:7px;border-radius:99px;background:var(--green);flex-shrink:0"></span><div style="flex:1"><div style="font-size:12px;font-weight:500">Leaking tap · D4</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">plumber 14:00</div></div></div>
+            </div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px">
+              <div style="font-size:12px;font-weight:600;margin-bottom:10px">Inspection photos</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+                <image-slot id="ct-inspect-1" shape="rounded" radius="8" style="width:100%;aspect-ratio:1" placeholder="unit photo"></image-slot>
+                <image-slot id="ct-inspect-2" shape="rounded" radius="8" style="width:100%;aspect-ratio:1" placeholder="unit photo"></image-slot>
+                <image-slot id="ct-inspect-3" shape="rounded" radius="8" style="width:100%;aspect-ratio:1" placeholder="unit photo"></image-slot>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--stone)">Unit A1 · logged 08:42</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showTenant }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <div>
+        <div style="background:var(--ink);border-radius:32px;padding:10px;max-width:260px">
+          <div style="background:var(--paper);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;min-height:480px">
+            <div style="background:var(--green);color:#fff;padding:18px 16px 18px">
+              <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:11px;opacity:.85;margin-bottom:14px"><span>9:41</span><span style="letter-spacing:.1em;font-weight:600">MAKAZI</span></div>
+              <div style="font-size:12px;opacity:.85;margin-bottom:4px">Rent due · Unit D4</div>
+              <div style="font-family:'JetBrains Mono';font-weight:600;font-size:24px">KES 25,000</div>
+            </div>
+            <div style="padding:14px 14px 6px;flex:1">
+              <div style="background:var(--clay);color:#fff;border-radius:11px;padding:12px;text-align:center;font-weight:600;font-size:12px;margin-bottom:8px">Pay with M-Pesa</div>
+              <div style="font-family:'JetBrains Mono';font-size:9px;letter-spacing:.1em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Recent activity</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)"><div style="font-size:11px;font-weight:500">July rent</div><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--success)">Paid</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0"><div style="font-size:11px;font-weight:500">June rent</div><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--success)">Paid</span></div>
+            </div>
+            <div style="display:flex;border-top:1px solid var(--line);background:var(--white)">
+              <div style="flex:1;text-align:center;padding:9px 0;color:var(--green)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin:0 auto 2px;display:block"><path d="M3 11l9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span style="font-size:8px;font-weight:600">Home</span></div>
+              <div style="flex:1;text-align:center;padding:9px 0;color:var(--stone)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin:0 auto 2px;display:block"><rect x="7" y="2" width="10" height="20" rx="2"/></svg><span style="font-size:8px">Pay</span></div>
+              <div style="flex:1;text-align:center;padding:9px 0;color:var(--stone)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin:0 auto 2px;display:block"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><span style="font-size:8px">Profile</span></div>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--stone);margin:14px 0 0"><strong style="color:var(--ink)">Mobile app</strong></p>
+      </div>
+
+      <div>
+        <div style="background:var(--ink);border-radius:32px;padding:10px;max-width:260px">
+          <div style="background:#111a15;border-radius:22px;overflow:hidden;min-height:480px;display:flex;flex-direction:column">
+            <div style="padding:16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)"><span style="font-family:'JetBrains Mono';font-size:11px;color:#6f7b73;letter-spacing:.1em">NO DATA</span></div>
+            <div style="flex:1;padding:22px 18px;display:flex;flex-direction:column;justify-content:center">
+              <div style="background:var(--paper);border-radius:9px;padding:16px;font-family:'JetBrains Mono';font-size:13px;color:var(--ink);line-height:1.7">
+                <div style="color:var(--green);font-weight:600;margin-bottom:8px">MAKAZI</div>
+                Rent due: 25,000<br><br>1. Pay rent<br>2. Balance<br>3. Receipts<br>5. Report issue<br><br>0. Exit
+              </div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-size:12px;color:#8b978f;margin-top:16px">dial <span style="color:var(--clay)">*151*7#</span></div>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--stone);margin:14px 0 0"><strong style="color:var(--ink)">USSD</strong></p>
+      </div>
+
+      <div>
+        <div style="background:var(--ink);border-radius:32px;padding:10px;max-width:260px">
+          <div style="background:#E9E4DA;border-radius:22px;overflow:hidden;min-height:480px;display:flex;flex-direction:column">
+            <div style="background:var(--green);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px">
+              <div style="width:30px;height:30px;border-radius:99px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center"><img src="assets/makazi-mark-light.png" alt="" style="width:17px"></div>
+              <div><div style="font-weight:600;font-size:13px">Makazi</div><div style="font-size:10px;opacity:.8">Rent assistant · online</div></div>
+            </div>
+            <div style="flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:9px">
+              <div style="align-self:flex-start;max-width:86%;background:#fff;border-radius:4px 13px 13px 13px;padding:9px 12px;font-size:12px;line-height:1.4">Habari 👋 Your July rent of <strong>KES 25,000</strong> is due 5 Aug. Reply <strong>PAY</strong>.</div>
+              <div style="align-self:flex-end;max-width:65%;background:#D6EAD9;border-radius:13px 4px 13px 13px;padding:9px 12px;font-size:12px">PAY</div>
+              <div style="align-self:flex-start;max-width:86%;background:#fff;border-radius:4px 13px 13px 13px;padding:9px 12px;font-size:12px;line-height:1.4"><span style="color:var(--success);font-weight:600">✓ Payment received</span><br><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">REF QSR9WK4MN1</span></div>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--stone);margin:14px 0 0"><strong style="color:var(--ink)">WhatsApp</strong></p>
+      </div>
+    </div>
+  </sc-if>
+</section>
+
+<!-- FEATURE HIGHLIGHTS -->
+<section style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="text-align:center;max-width:700px;margin:0 auto 48px">
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Everything you need</div>
+      <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0;line-height:1.15">Every part of running rentals, in one place.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden">
+      <div style="background:var(--white);padding:30px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="margin-bottom:16px"><rect x="3" y="9" width="7" height="12"/><rect x="14" y="4" width="7" height="17"/></svg><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Portfolio management</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Every property, block and unit, organised in one view.</p></div>
+      <div style="background:var(--white);padding:30px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="margin-bottom:16px"><circle cx="9" cy="8" r="4"/><path d="M2 20a7 7 0 0 1 14 0"/><circle cx="18" cy="9" r="3"/><path d="M15 20a5 5 0 0 1 9 0"/></svg><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Tenant management</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Leases, contacts and history for every tenant, always current.</p></div>
+      <div style="background:var(--white);padding:30px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="margin-bottom:16px"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Rent collection tracking</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Know instantly who has paid, who hasn't, and why.</p></div>
+      <div style="background:var(--white);padding:30px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="margin-bottom:16px"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 10h18M8 4v3M16 4v3"/></svg><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Vacancy tracking</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Spot empty units fast and see how long they've sat vacant.</p></div>
+      <div style="background:var(--white);padding:30px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="margin-bottom:16px"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">AI insights</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Plain-language flags on arrears risk, vacancy and pricing.</p></div>
+      <div style="background:var(--white);padding:30px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="margin-bottom:16px"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/><path d="M9 13h6M9 17h6"/></svg><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Reports &amp; revenue</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Export-ready reports on collections, expenses and profitability.</p></div>
+      <div style="background:var(--white);padding:30px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="margin-bottom:16px"><path d="M3 12l5 5L20 6"/></svg><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Expense tracking</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Repairs, utilities and fees, logged against each property.</p></div>
+      <div style="background:var(--white);padding:30px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="margin-bottom:16px"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M9 3v4h6V3"/></svg><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Caretaker &amp; maintenance</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Assign caretakers, log inspections, and track repairs to completion.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px);max-width:1200px;margin:0 auto">
+  <div style="text-align:center;max-width:700px;margin:0 auto 48px">
+    <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">How Makazi works</div>
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0;line-height:1.15">Live in an afternoon, not a quarter.</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+    <div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:15px;color:var(--clay);margin-bottom:14px">01</div><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Add your properties</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Import or add blocks, units and rent amounts in minutes.</p></div>
+    <div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:15px;color:var(--clay);margin-bottom:14px">02</div><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Invite tenants &amp; caretakers</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">They're notified by SMS or WhatsApp — no app download required.</p></div>
+    <div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:15px;color:var(--clay);margin-bottom:14px">03</div><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Collect rent automatically</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Reminders go out, payments land directly in your account.</p></div>
+    <div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:15px;color:var(--clay);margin-bottom:14px">04</div><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Get insight &amp; reports</h3><p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">See what needs attention before it becomes a problem.</p></div>
+  </div>
+</section>
+
+<!-- ROLE BENEFITS -->
+<section style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="text-align:center;max-width:700px;margin:0 auto 48px">
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Built for every role</div>
+      <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0;line-height:1.15">One system, three very different days.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px">
+      <div style="border:1px solid var(--line);border-radius:18px;padding:32px;background:var(--paper)">
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.12em;color:var(--green);text-transform:uppercase;margin-bottom:16px">Landlord</div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:20px;margin:0 0 18px">Run your portfolio, not chase it.</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <div>→ Track every unit's rent and occupancy status</div>
+          <div>→ Manage caretakers across properties</div>
+          <div>→ Get AI flags on arrears and vacancy risk</div>
+          <div>→ Generate investor-ready reports in one click</div>
+        </div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:18px;padding:32px;background:var(--paper)">
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.12em;color:var(--green);text-transform:uppercase;margin-bottom:16px">Caretaker</div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:20px;margin:0 0 18px">Everything on-site, in your pocket.</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <div>→ Register tenants and allocate units on the spot</div>
+          <div>→ Log inspections with photos</div>
+          <div>→ Track repairs from request to done</div>
+          <div>→ Update vacancies the moment they change</div>
+        </div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:18px;padding:32px;background:var(--paper)">
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.12em;color:var(--green);text-transform:uppercase;margin-bottom:16px">Tenant</div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:20px;margin:0 0 18px">Pay rent your way, in seconds.</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <div>→ Pay via app, USSD or WhatsApp</div>
+          <div>→ Report maintenance issues with a photo</div>
+          <div>→ View payment history and receipts anytime</div>
+          <div>→ Get reminders before rent is due — not after</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE MAKAZI -->
+<section style="padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px);max-width:1200px;margin:0 auto">
+  <div style="text-align:center;max-width:700px;margin:0 auto 48px">
+    <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Why Makazi</div>
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0;line-height:1.15">Built for how Africa actually pays rent.</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px">
+    <div style="text-align:center;padding:24px 16px"><div style="width:52px;height:52px;border-radius:14px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:16px;margin:0 0 8px">Any phone works</h3><p style="font-size:13px;color:var(--stone);margin:0;line-height:1.5">Smartphone app or plain USSD — no data required.</p></div>
+    <div style="text-align:center;padding:24px 16px"><div style="width:52px;height:52px;border-radius:14px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><path d="M4 4h16v13H8l-4 4z"/></svg></div><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:16px;margin:0 0 8px">WhatsApp native</h3><p style="font-size:13px;color:var(--stone);margin:0;line-height:1.5">Tenants pay and get receipts where they already chat.</p></div>
+    <div style="text-align:center;padding:24px 16px"><div style="width:52px;height:52px;border-radius:14px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><path d="M12 3 4 6v6c0 4 3.5 7 8 9 4.5-2 8-5 8-9V6l-8-3z"/></svg></div><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:16px;margin:0 0 8px">Funds never touch us</h3><p style="font-size:13px;color:var(--stone);margin:0;line-height:1.5">Payments go straight to your PayBill, Till or bank account.</p></div>
+    <div style="text-align:center;padding:24px 16px"><div style="width:52px;height:52px;border-radius:14px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg></div><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:16px;margin:0 0 8px">AI-powered</h3><p style="font-size:13px;color:var(--stone);margin:0;line-height:1.5">Insights on occupancy, collections and maintenance — not just data.</p></div>
+    <div style="text-align:center;padding:24px 16px"><div style="width:52px;height:52px;border-radius:14px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></div><h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:16px;margin:0 0 8px">Built for Africa</h3><p style="font-size:13px;color:var(--stone);margin:0;line-height:1.5">Designed from day one for Kenyan rental realities, not adapted from elsewhere.</p></div>
+  </div>
+</section>
+
+<!-- SECURITY & TRUST -->
+<section style="background:var(--ink);color:var(--paper);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center">
+    <div>
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Security &amp; trust</div>
+      <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0 0 22px;line-height:1.15">We are software. Never a bank.</h2>
+      <p style="font-size:17px;color:#C7CEC9;margin:0;line-height:1.6">Makazi never holds, moves or custodies your rent. Every payment is initiated directly between tenant and landlord — we simply record, reconcile and report on it.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden">
+      <div style="padding:22px 24px;display:flex;gap:14px;align-items:flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.8" style="flex-shrink:0;margin-top:2px"><path d="M12 3 4 6v6c0 4 3.5 7 8 9 4.5-2 8-5 8-9V6l-8-3z"/></svg><div><div style="font-weight:600;font-size:15px;margin-bottom:4px">Direct-to-account payments</div><div style="font-size:14px;color:#9AA39D">Funds move tenant → landlord. Never through Makazi.</div></div></div>
+      <div style="padding:22px 24px;display:flex;gap:14px;align-items:flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.8" style="flex-shrink:0;margin-top:2px"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><div><div style="font-weight:600;font-size:15px;margin-bottom:4px">Encrypted end to end</div><div style="font-size:14px;color:#9AA39D">Data in transit and at rest is fully encrypted.</div></div></div>
+      <div style="padding:22px 24px;display:flex;gap:14px;align-items:flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.8" style="flex-shrink:0;margin-top:2px"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/><path d="M9 13h6M9 17h6"/></svg><div><div style="font-weight:600;font-size:15px;margin-bottom:4px">Full audit trail</div><div style="font-size:14px;color:#9AA39D">Every payment, reminder and change is logged.</div></div></div>
+      <div style="padding:22px 24px;display:flex;gap:14px;align-items:flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.8" style="flex-shrink:0;margin-top:2px"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M17.5 12.2A6.5 6.5 0 0 1 21.5 19"/></svg><div><div style="font-weight:600;font-size:15px;margin-bottom:4px">Consent-based data sharing</div><div style="font-size:14px;color:#9AA39D">Nothing is shared with partners without explicit sign-off.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FUTURE VISION -->
+<section style="padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px);max-width:1200px;margin:0 auto;text-align:center">
+  <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">What's next</div>
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0 0 20px;max-width:760px;margin-left:auto;margin-right:auto;line-height:1.15">Today, property management. Tomorrow, rental infrastructure.</h2>
+  <p style="font-size:17px;color:var(--stone);max-width:640px;margin:0 auto 36px;line-height:1.6">Every payment on Makazi quietly builds a verified rental history. Over time, that history becomes the foundation for services rental housing in Africa has never had.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+    <span style="font-family:'JetBrains Mono';font-size:13px;padding:12px 20px;border:1px solid var(--line-2);border-radius:99px">Rental Passport</span>
+    <span style="font-family:'JetBrains Mono';font-size:13px;padding:12px 20px;border:1px solid var(--line-2);border-radius:99px">Alternative credit score</span>
+    <span style="font-family:'JetBrains Mono';font-size:13px;padding:12px 20px;border:1px solid var(--line-2);border-radius:99px">Deposit financing</span>
+    <span style="font-family:'JetBrains Mono';font-size:13px;padding:12px 20px;border:1px solid var(--line-2);border-radius:99px">Rent advances</span>
+    <span style="font-family:'JetBrains Mono';font-size:13px;padding:12px 20px;border:1px solid var(--line-2);border-radius:99px">Insurance marketplace</span>
+    <span style="font-family:'JetBrains Mono';font-size:13px;padding:12px 20px;border:1px solid var(--line-2);border-radius:99px">AI assistant</span>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="text-align:center;max-width:700px;margin:0 auto 48px">
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Early feedback</div>
+      <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0;line-height:1.15">From our pilot landlords.</h2>
+      <p style="font-size:14px;color:var(--stone);margin:14px 0 0">Placeholder quotes — to be replaced with real customer testimonials at launch.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px">
+      <div style="border:1px solid var(--line);border-radius:18px;padding:28px">
+        <p style="font-size:15px;line-height:1.6;margin:0 0 22px">&ldquo;Quote goes here — a landlord describing the moment Makazi saved them the most time.&rdquo;</p>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;border-radius:99px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Schibsted Grotesk';font-weight:700;font-size:14px">WM</div><div><div style="font-size:14px;font-weight:600">Wanjiru M.</div><div style="font-size:12px;color:var(--stone)">Landlord, 42 units · Nairobi</div></div></div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:18px;padding:28px">
+        <p style="font-size:15px;line-height:1.6;margin:0 0 22px">&ldquo;Quote goes here — a caretaker describing an easier day-to-day workflow.&rdquo;</p>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;border-radius:99px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Schibsted Grotesk';font-weight:700;font-size:14px">DK</div><div><div style="font-size:14px;font-weight:600">David K.</div><div style="font-size:12px;color:var(--stone)">Caretaker · Riverside Estates</div></div></div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:18px;padding:28px">
+        <p style="font-size:15px;line-height:1.6;margin:0 0 22px">&ldquo;Quote goes here — a tenant describing how easy it is to pay rent.&rdquo;</p>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;border-radius:99px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Schibsted Grotesk';font-weight:700;font-size:14px">JM</div><div><div style="font-size:14px;font-weight:600">John M.</div><div style="font-size:12px;color:var(--stone)">Tenant · Green Gardens</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING PREVIEW -->
+<section style="padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px);max-width:1200px;margin:0 auto">
+  <div style="text-align:center;max-width:700px;margin:0 auto 16px">
+    <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Pricing</div>
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0 0 12px;line-height:1.15">Simple, per-unit pricing.</h2>
+    <p style="font-size:14px;color:var(--stone);margin:0">Estimated launch pricing — subject to change.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:40px">
+    <div style="border:1px solid var(--line);border-radius:20px;padding:34px;background:var(--white)">
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:16px">Starter</div>
+      <div style="font-family:'JetBrains Mono';font-weight:700;font-size:34px;margin-bottom:6px">KES 99<span style="font-size:15px;font-weight:400;color:var(--stone)">/unit/mo</span></div>
+      <div style="font-size:13px;color:var(--stone);margin-bottom:24px">Up to 20 units</div>
+      <a href="Makazi Website - Pricing.dc.html" style="display:block;text-align:center;border:1.5px solid var(--line-2);border-radius:10px;padding:13px;font-weight:600;font-size:14px">See full plan</a>
+    </div>
+    <div style="border:2px solid var(--green);border-radius:20px;padding:34px;background:var(--white);position:relative">
+      <div style="position:absolute;top:-13px;left:34px;background:var(--green);color:#fff;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;padding:5px 12px;border-radius:99px">MOST POPULAR</div>
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:16px">Growth</div>
+      <div style="font-family:'JetBrains Mono';font-weight:700;font-size:34px;margin-bottom:6px">KES 149<span style="font-size:15px;font-weight:400;color:var(--stone)">/unit/mo</span></div>
+      <div style="font-size:13px;color:var(--stone);margin-bottom:24px">Up to 200 units</div>
+      <a href="Makazi Website - Pricing.dc.html" style="display:block;text-align:center;background:var(--green);color:#fff;border-radius:10px;padding:13px;font-weight:600;font-size:14px">See full plan</a>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:20px;padding:34px;background:var(--white)">
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:16px">Enterprise</div>
+      <div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;margin-bottom:6px">Custom pricing</div>
+      <div style="font-size:13px;color:var(--stone);margin-bottom:24px">200+ units, property companies</div>
+      <a href="Makazi Website - Contact.dc.html" style="display:block;text-align:center;border:1.5px solid var(--line-2);border-radius:10px;padding:13px;font-weight:600;font-size:14px">Talk to us</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:800px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:44px">
+      <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.18em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">FAQ</div>
+      <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:-.02em;margin:0;line-height:1.15">Common questions.</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden">
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq1 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">Does Makazi ever hold my rent money?<span style="{{ faq1IconStyle }}">+</span></button>
+        <sc-if value="{{ faq1Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">No. Rent is paid directly from tenant to your PayBill, Till or bank account. Makazi only records and reconciles the payment — we never custody funds.</p></sc-if>
+      </div>
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq2 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">Does Makazi work without a smartphone?<span style="{{ faq2IconStyle }}">+</span></button>
+        <sc-if value="{{ faq2Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Yes. Tenants can pay rent, check balances and get receipts by dialling a USSD code on any phone — no app or data connection needed.</p></sc-if>
+      </div>
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq3 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">Can tenants pay through WhatsApp?<span style="{{ faq3IconStyle }}">+</span></button>
+        <sc-if value="{{ faq3Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Yes. Our WhatsApp assistant sends reminders, initiates payment prompts, and delivers receipts — all inside a normal WhatsApp chat.</p></sc-if>
+      </div>
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq4 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">How much does Makazi cost?<span style="{{ faq4IconStyle }}">+</span></button>
+        <sc-if value="{{ faq4Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Pricing is per unit per month, starting at an estimated KES 99. See the Pricing page for full tier details.</p></sc-if>
+      </div>
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq5 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">Is my data secure?<span style="{{ faq5IconStyle }}">+</span></button>
+        <sc-if value="{{ faq5Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Yes. All data is encrypted in transit and at rest, and nothing is shared with third parties without explicit consent.</p></sc-if>
+      </div>
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq6 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">Which regions does Makazi support?<span style="{{ faq6IconStyle }}">+</span></button>
+        <sc-if value="{{ faq6Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Makazi launches in Kenya, expanding across East Africa next, with the rest of the continent as our long-term horizon.</p></sc-if>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section style="background:var(--green);color:#fff;padding:clamp(64px,8vw,110px) clamp(20px,4vw,64px);text-align:center">
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(30px,4vw,52px);letter-spacing:-.02em;margin:0 0 20px;max-width:800px;margin-left:auto;margin-right:auto;line-height:1.08">Ready to simplify your rental business?</h2>
+  <p style="font-size:17px;color:#DCEAE2;margin:0 0 36px;max-width:520px;margin-left:auto;margin-right:auto">Join the landlords running their properties on Makazi — book a demo and see it on your own portfolio.</p>
+  <a href="Makazi Website - Contact.dc.html#book-demo" style="display:inline-block;background:#fff;color:var(--green-deep);padding:17px 34px;border-radius:12px;font-weight:700;font-size:16px">Book a Demo</a>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:var(--ink);color:#9AA39D;padding:64px clamp(20px,4vw,64px) 32px">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><img src="assets/makazi-mark-light.png" alt="Makazi" style="height:26px"><span style="font-family:'Schibsted Grotesk';font-weight:800;font-size:15px;letter-spacing:.12em;color:var(--paper)">MAKAZI</span></div>
+        <p style="font-size:14px;line-height:1.6;max-width:280px;margin:0">The operating system for rental housing across Africa.</p>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Product</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - Features.dc.html" style="color:#C7CEC9">Features</a>
+          <a href="Makazi Website - Pricing.dc.html" style="color:#C7CEC9">Pricing</a>
+          <a href="#dashboard-preview" style="color:#C7CEC9">Product tour</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Company</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - About.dc.html" style="color:#C7CEC9">About</a>
+          <a href="Makazi Website - Contact.dc.html" style="color:#C7CEC9">Contact</a>
+          <a href="Makazi Website - Contact.dc.html#book-demo" style="color:#C7CEC9">Book a Demo</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Resources</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="#faq" style="color:#C7CEC9">FAQ</a>
+          <a href="Makazi Website - Contact.dc.html" style="color:#C7CEC9">Support</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.1);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px">
+      <span>© 2026 Makazi. Not a real estate company. A technology company.</span>
+      <span>Payments always go directly to your account — Makazi never holds funds.</span>
+    </div>
+  </div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { tab: 'landlord', faq: null };
+  tabStyle(active) {
+    return active
+      ? 'background:var(--ink);color:var(--paper);padding:12px 24px;border-radius:99px;border:none;font-size:14px;font-weight:600'
+      : 'background:transparent;color:var(--stone);padding:12px 24px;border-radius:99px;border:1.5px solid var(--line-2);font-size:14px;font-weight:600';
+  }
+  faqIconStyle(open) {
+    return open ? 'font-size:20px;color:var(--green);transform:rotate(45deg);display:inline-block;transition:transform .2s' : 'font-size:20px;color:var(--stone);display:inline-block;transition:transform .2s';
+  }
+  renderVals() {
+    const t = this.state.tab, f = this.state.faq;
+    return {
+      showLandlord: t === 'landlord',
+      showCaretaker: t === 'caretaker',
+      showTenant: t === 'tenant',
+      landlordTabStyle: this.tabStyle(t === 'landlord'),
+      caretakerTabStyle: this.tabStyle(t === 'caretaker'),
+      tenantTabStyle: this.tabStyle(t === 'tenant'),
+      selectLandlord: () => this.setState({ tab: 'landlord' }),
+      selectCaretaker: () => this.setState({ tab: 'caretaker' }),
+      selectTenant: () => this.setState({ tab: 'tenant' }),
+      faq1Open: f === 1, faq2Open: f === 2, faq3Open: f === 3, faq4Open: f === 4, faq5Open: f === 5, faq6Open: f === 6,
+      faq1IconStyle: this.faqIconStyle(f === 1), faq2IconStyle: this.faqIconStyle(f === 2), faq3IconStyle: this.faqIconStyle(f === 3),
+      faq4IconStyle: this.faqIconStyle(f === 4), faq5IconStyle: this.faqIconStyle(f === 5), faq6IconStyle: this.faqIconStyle(f === 6),
+      toggleFaq1: () => this.setState({ faq: f === 1 ? null : 1 }),
+      toggleFaq2: () => this.setState({ faq: f === 2 ? null : 2 }),
+      toggleFaq3: () => this.setState({ faq: f === 3 ? null : 3 }),
+      toggleFaq4: () => this.setState({ faq: f === 4 ? null : 4 }),
+      toggleFaq5: () => this.setState({ faq: f === 5 ? null : 5 }),
+      toggleFaq6: () => this.setState({ faq: f === 6 ? null : 6 })
+    };
+  }
+}
+</script>
+</body>
+</html>

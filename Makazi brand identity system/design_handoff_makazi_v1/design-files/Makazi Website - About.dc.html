@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#F6F5F0;color:#0B140F;font-family:'Hanken Grotesk',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  :root{
+    --ink:#0B140F;--paper:#F6F5F0;--white:#FFFFFF;
+    --green:#0E5C43;--green-deep:#093C2C;--green-soft:#E3EDE7;--green-line:#C9DBD1;
+    --clay:#DB6B3B;--clay-soft:#F5E4DA;
+    --success:#1E9E5A;--warning:#E0A008;--error:#CF4B3E;
+    --stone:#5C665F;--line:#E4E2DA;--line-2:#D8D6CD;
+  }
+  ::selection{background:#DB6B3B;color:#fff}
+  a{color:inherit;text-decoration:none}
+</style>
+</helmet>
+
+<!-- NAV -->
+<nav style="position:sticky;top:0;z-index:50;background:rgba(246,245,240,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:16px clamp(20px,4vw,64px);gap:20px;flex-wrap:wrap">
+  <a href="Makazi Website - Home.dc.html" style="display:flex;align-items:center;gap:10px">
+    <img src="assets/makazi-mark.png" alt="Makazi" style="height:28px;width:auto">
+    <span style="font-family:'Schibsted Grotesk';font-weight:800;letter-spacing:.12em;font-size:16px">MAKAZI</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+    <a href="Makazi Website - Features.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Features</a>
+    <a href="Makazi Website - Pricing.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Pricing</a>
+    <a href="Makazi Website - About.dc.html" style="font-size:15px;font-weight:600;color:var(--green)">About</a>
+    <a href="Makazi Website - Contact.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Contact</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:18px">
+    <a href="#" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Log in</a>
+    <a href="Makazi Website - Contact.dc.html#book-demo" style="background:var(--clay);color:#fff;padding:11px 22px;border-radius:10px;font-size:15px;font-weight:600" style-hover="background:#C55A2C">Book a Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section style="padding:clamp(56px,8vw,100px) clamp(20px,4vw,64px) clamp(48px,6vw,80px);max-width:900px;margin:0 auto;text-align:center">
+  <div style="display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green-deep);background:var(--green-soft);padding:8px 16px;border-radius:99px;margin-bottom:28px">About Makazi</div>
+  <h1 style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(34px,4.6vw,58px);line-height:1.06;letter-spacing:-.03em;margin:0 0 22px">We're building the operating system for rental housing in Africa.</h1>
+  <p style="font-size:18px;color:var(--stone);max-width:620px;margin:0 auto;font-weight:400;line-height:1.6">Not a real estate company. Not a listings site. A technology company, built for how rentals actually work.</p>
+</section>
+
+<!-- PROBLEM / ORIGIN -->
+<section style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:800px;margin:0 auto">
+    <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Where we started</div>
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(26px,3vw,38px);letter-spacing:-.02em;margin:0 0 22px;line-height:1.2">Rental housing runs on some of the most sophisticated informal systems in the world — and none of the software to match.</h2>
+    <p style="font-size:17px;color:var(--stone);margin:0 0 18px;line-height:1.65">Across Kenya, landlords manage everything from five units to five hundred using notebooks, WhatsApp groups and phone calls. Caretakers track repairs from memory. Tenants pay rent in cash or by M-Pesa, with no record beyond a text message.</p>
+    <p style="font-size:17px;color:var(--stone);margin:0;line-height:1.65">It works — but it doesn't scale, and it leaves everyone without the visibility they need: landlords without reliable collections data, tenants without a payment history that counts for anything. We started Makazi to close that gap.</p>
+  </div>
+</section>
+
+<!-- MISSION & VISION -->
+<section style="padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px);max-width:1100px;margin:0 auto">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden">
+    <div style="background:var(--white);padding:40px">
+      <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--stone);text-transform:uppercase;margin-bottom:16px">Our mission</div>
+      <p style="font-family:'Schibsted Grotesk';font-weight:600;font-size:24px;margin:0;line-height:1.3">Simplify rental property management across Africa.</p>
+    </div>
+    <div style="background:var(--green);color:#fff;padding:40px">
+      <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--green-line);text-transform:uppercase;margin-bottom:16px">Our vision</div>
+      <p style="font-family:'Schibsted Grotesk';font-weight:600;font-size:24px;margin:0;line-height:1.3">To become Africa's operating system for rental housing.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY AFRICA -->
+<section style="background:var(--ink);color:var(--paper);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center">
+    <div>
+      <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Why Africa, why Kenya first</div>
+      <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(26px,3vw,38px);letter-spacing:-.02em;margin:0 0 22px;line-height:1.2">The mobile-money continent deserves mobile-money-grade software.</h2>
+      <p style="font-size:16px;color:#C7CEC9;margin:0 0 16px;line-height:1.6">Kenya already runs on mobile money — landlords and tenants trust PayBills and Till numbers more than bank transfers. We started here because the payment rails already exist; what's missing is the system of record on top of them.</p>
+      <p style="font-size:16px;color:#C7CEC9;margin:0;line-height:1.6">From Kenya, we're built to expand across East Africa and, over time, the continent — the same product, the same trust promise, wherever rent gets paid.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden">
+      <div style="padding:22px 24px;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;font-size:15px">Kenya</span><span style="font-family:'JetBrains Mono';font-size:12px;color:var(--clay)">Now</span></div>
+      <div style="padding:22px 24px;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;font-size:15px">East Africa</span><span style="font-family:'JetBrains Mono';font-size:12px;color:#9AA39D">Next</span></div>
+      <div style="padding:22px 24px;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;font-size:15px">Africa</span><span style="font-family:'JetBrains Mono';font-size:12px;color:#9AA39D">Long-term</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="text-align:center;max-width:700px;margin:0 auto 48px">
+      <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Our philosophy</div>
+      <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(26px,3.2vw,42px);letter-spacing:-.02em;margin:0;line-height:1.15">The principles behind every decision.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+      <div style="padding:8px">
+        <div style="font-family:'JetBrains Mono';font-size:13px;color:var(--clay);margin-bottom:12px">01</div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Software, not finance</h3>
+        <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">We never hold, move or custody rent. We record and reconcile it.</p>
+      </div>
+      <div style="padding:8px">
+        <div style="font-family:'JetBrains Mono';font-size:13px;color:var(--clay);margin-bottom:12px">02</div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Built for the phone people have</h3>
+        <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Feature phone or flagship — Makazi meets tenants where they are.</p>
+      </div>
+      <div style="padding:8px">
+        <div style="font-family:'JetBrains Mono';font-size:13px;color:var(--clay);margin-bottom:12px">03</div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Trust is the product</h3>
+        <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Every design and policy decision starts with what earns trust.</p>
+      </div>
+      <div style="padding:8px">
+        <div style="font-family:'JetBrains Mono';font-size:13px;color:var(--clay);margin-bottom:12px">04</div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Simple beats comprehensive</h3>
+        <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">We'd rather do a few things extremely well than everything adequately.</p>
+      </div>
+      <div style="padding:8px">
+        <div style="font-family:'JetBrains Mono';font-size:13px;color:var(--clay);margin-bottom:12px">05</div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:17px;margin:0 0 8px">Designed with, not for</h3>
+        <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.5">Built alongside real landlords, caretakers and tenants, from day one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FUTURE ROADMAP -->
+<section style="padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px);max-width:1100px;margin:0 auto">
+  <div style="text-align:center;max-width:700px;margin:0 auto 48px">
+    <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--clay);text-transform:uppercase;margin-bottom:16px">Where we're headed</div>
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(26px,3.2vw,42px);letter-spacing:-.02em;margin:0;line-height:1.15">From property management to rental infrastructure.</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden">
+    <div style="background:var(--green);color:#fff;padding:32px">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.12em;color:var(--green-line);text-transform:uppercase;margin-bottom:8px">Phase 1 · Now</div>
+      <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 14px">Makazi PropertyOS</h3>
+      <p style="font-size:14px;color:#DCEAE2;margin:0;line-height:1.55">Rent collection, tenant &amp; caretaker management, maintenance tracking, reports.</p>
+    </div>
+    <div style="background:var(--white);padding:32px">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Phase 2 · Next</div>
+      <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 14px">Makazi Operations</h3>
+      <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.55">Technician marketplace, digital leases, expense management, inspections, an AI assistant.</p>
+    </div>
+    <div style="background:var(--white);padding:32px">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Phase 3 · Long-term</div>
+      <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 14px">Makazi Finance</h3>
+      <p style="font-size:14px;color:var(--stone);margin:0;line-height:1.55">Rental Passport, alternative credit scoring, rent advances, deposit financing, insurance.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section style="background:var(--green);color:#fff;padding:clamp(64px,8vw,100px) clamp(20px,4vw,64px);text-align:center">
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(28px,3.6vw,44px);letter-spacing:-.02em;margin:0 0 20px;max-width:700px;margin-left:auto;margin-right:auto;line-height:1.1">Come build this with us.</h2>
+  <p style="font-size:17px;color:#DCEAE2;margin:0 0 32px">Whether you're a landlord ready to switch, or curious about what we're building next.</p>
+  <a href="Makazi Website - Contact.dc.html#book-demo" style="display:inline-block;background:#fff;color:var(--green-deep);padding:17px 34px;border-radius:12px;font-weight:700;font-size:16px">Book a Demo</a>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:var(--ink);color:#9AA39D;padding:64px clamp(20px,4vw,64px) 32px">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><img src="assets/makazi-mark-light.png" alt="Makazi" style="height:26px"><span style="font-family:'Schibsted Grotesk';font-weight:800;font-size:15px;letter-spacing:.12em;color:var(--paper)">MAKAZI</span></div>
+        <p style="font-size:14px;line-height:1.6;max-width:280px;margin:0">The operating system for rental housing across Africa.</p>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Product</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - Features.dc.html" style="color:#C7CEC9">Features</a>
+          <a href="Makazi Website - Pricing.dc.html" style="color:#C7CEC9">Pricing</a>
+          <a href="Makazi Website - Home.dc.html#dashboard-preview" style="color:#C7CEC9">Product tour</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Company</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - About.dc.html" style="color:#C7CEC9">About</a>
+          <a href="Makazi Website - Contact.dc.html" style="color:#C7CEC9">Contact</a>
+          <a href="Makazi Website - Contact.dc.html#book-demo" style="color:#C7CEC9">Book a Demo</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Resources</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - Home.dc.html#faq" style="color:#C7CEC9">FAQ</a>
+          <a href="Makazi Website - Contact.dc.html" style="color:#C7CEC9">Support</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.1);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px">
+      <span>© 2026 Makazi. Not a real estate company. A technology company.</span>
+      <span>Payments always go directly to your account — Makazi never holds funds.</span>
+    </div>
+  </div>
+</footer>
+</x-dc>
+</body>
+</html>

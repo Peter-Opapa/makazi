@@ -1,0 +1,268 @@
+// Makazi core data model.
+// Entities intentionally deferred until their milestone (Admin Portal build-out):
+// SupportTicket, Notification, Technician, Subscription/Finance, SystemHealthEvent.
+// Move-Out Wizard fields are net-new (not present in the design prototype — see
+// 10-implementation-notes.md discrepancy notes) and may need product sign-off.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  LANDLORD
+  CARETAKER
+  TENANT
+  ADMIN
+}
+
+enum AdminSubRole {
+  SUPER_ADMIN
+  OPS
+  SUPPORT
+  FINANCE
+  TECH
+  ANALYST
+}
+
+enum UnitStatus {
+  OCCUPIED
+  VACANT
+  RESERVED
+  UNDER_MAINTENANCE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  LATE
+  FAILED
+}
+
+enum PaymentChannel {
+  STK_PUSH
+  USSD
+  WHATSAPP
+}
+
+enum MaintenanceStatus {
+  REPORTED
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CLOSED
+}
+
+enum MaintenancePriority {
+  LOW
+  NORMAL
+  URGENT
+}
+
+enum InspectionType {
+  MOVE_IN
+  MOVE_OUT
+  ROUTINE
+}
+
+enum CaretakerInviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  phone            String?   @unique
+  passwordHash     String
+  firstName        String
+  lastName         String
+  role             UserRole
+  adminSubRole     AdminSubRole?
+  emailVerifiedAt  DateTime?
+  phoneVerifiedAt  DateTime?
+  suspendedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  propertiesOwned         Property[]            @relation("PropertyLandlord")
+  caretakerAssignments    CaretakerAssignment[]
+  tenancies                Tenancy[]
+  auditLogEntries          AuditLogEntry[]       @relation("AuditActor")
+  maintenanceTicketsFiled  MaintenanceTicket[]   @relation("TicketReportedBy")
+
+  @@map("users")
+}
+
+model Property {
+  id         String   @id @default(cuid())
+  landlordId String
+  landlord   User     @relation("PropertyLandlord", fields: [landlordId], references: [id])
+  name       String
+  location   String
+  county     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  units                 Unit[]
+  caretakerAssignments  CaretakerAssignment[]
+  paymentAccount        PaymentAccount?
+
+  @@map("properties")
+}
+
+/// Landlord-configured payout destination. Makazi never custodies funds —
+/// tenant payments always settle to the landlord's own PayBill/Till/Bank.
+model PaymentAccount {
+  id                String   @id @default(cuid())
+  propertyId        String   @unique
+  property          Property @relation(fields: [propertyId], references: [id])
+  method            String   // paybill | till | bank
+  payBillNumber     String?
+  tillNumber        String?
+  bankName          String?
+  bankAccountNumber String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("payment_accounts")
+}
+
+model Unit {
+  id         String     @id @default(cuid())
+  propertyId String
+  property   Property   @relation(fields: [propertyId], references: [id])
+  code       String     // e.g. "A101"
+  floor      Int?
+  status     UnitStatus @default(VACANT)
+  rentAmount Decimal?   @db.Decimal(12, 2)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  tenancies           Tenancy[]
+  maintenanceTickets  MaintenanceTicket[]
+  inspections         Inspection[]
+
+  @@unique([propertyId, code])
+  @@map("units")
+}
+
+model Tenancy {
+  id            String    @id @default(cuid())
+  unitId        String
+  unit          Unit      @relation(fields: [unitId], references: [id])
+  tenantId      String
+  tenant        User      @relation(fields: [tenantId], references: [id])
+  leaseStart    DateTime
+  leaseEnd      DateTime?
+  depositAmount Decimal?  @db.Decimal(12, 2)
+  rentAmount    Decimal   @db.Decimal(12, 2)
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  payments  Payment[]
+  moveOut   MoveOut?
+
+  @@map("tenancies")
+}
+
+model Payment {
+  id         String         @id @default(cuid())
+  tenancyId  String
+  tenancy    Tenancy        @relation(fields: [tenancyId], references: [id])
+  amount     Decimal        @db.Decimal(12, 2)
+  channel    PaymentChannel
+  status     PaymentStatus  @default(PENDING)
+  reference  String?        @unique
+  dueDate    DateTime?
+  paidAt     DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@map("payments")
+}
+
+model CaretakerAssignment {
+  id           String                 @id @default(cuid())
+  caretakerId  String
+  caretaker    User                   @relation(fields: [caretakerId], references: [id])
+  propertyId   String
+  property     Property               @relation(fields: [propertyId], references: [id])
+  inviteStatus CaretakerInviteStatus  @default(PENDING)
+  invitedAt    DateTime               @default(now())
+  acceptedAt   DateTime?
+
+  @@unique([caretakerId, propertyId])
+  @@map("caretaker_assignments")
+}
+
+/// Shared across Tenant/Caretaker/Landlord/Admin surfaces — a ticket filed by
+/// a tenant must be visible (and status-syncable) on all four (09-screen-connection-map.md).
+model MaintenanceTicket {
+  id             String              @id @default(cuid())
+  ticketNumber   String              @unique // e.g. MKZ-T2291
+  unitId         String
+  unit           Unit                @relation(fields: [unitId], references: [id])
+  reportedById   String
+  reportedBy     User                @relation("TicketReportedBy", fields: [reportedById], references: [id])
+  issue          String
+  category       String?
+  priority       MaintenancePriority @default(NORMAL)
+  status         MaintenanceStatus   @default(REPORTED)
+  technicianName String?
+  photoUrls      String[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@map("maintenance_tickets")
+}
+
+model Inspection {
+  id          String         @id @default(cuid())
+  unitId      String
+  unit        Unit           @relation(fields: [unitId], references: [id])
+  type        InspectionType
+  checklist   Json
+  photoUrls   String[]
+  submittedAt DateTime       @default(now())
+
+  @@map("inspections")
+}
+
+/// Not present in the design prototype (Landlord Tenants is read-only there) —
+/// modeled here per 02-user-flows.md Flow 13. Needs product sign-off before build.
+model MoveOut {
+  id                String    @id @default(cuid())
+  tenancyId         String    @unique
+  tenancy           Tenancy   @relation(fields: [tenancyId], references: [id])
+  step              String    @default("confirm") // confirm | inspect | damage_assessment | deposit_reconciliation | report | vacant
+  damageNotes       String?
+  depositDeductions Decimal?  @db.Decimal(12, 2)
+  reportUrl         String?
+  completedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("move_outs")
+}
+
+/// Every mutating Admin Portal action must append here — compliance
+/// requirement, not just a UI log (07-interaction-spec.md, 10-implementation-notes.md).
+model AuditLogEntry {
+  id         String   @id @default(cuid())
+  actorId    String
+  actor      User     @relation("AuditActor", fields: [actorId], references: [id])
+  action     String
+  targetType String
+  targetId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@map("audit_log_entries")
+}

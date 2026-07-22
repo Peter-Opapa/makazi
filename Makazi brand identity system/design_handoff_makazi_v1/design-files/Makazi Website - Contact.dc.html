@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#F6F5F0;color:#0B140F;font-family:'Hanken Grotesk',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  :root{
+    --ink:#0B140F;--paper:#F6F5F0;--white:#FFFFFF;
+    --green:#0E5C43;--green-deep:#093C2C;--green-soft:#E3EDE7;--green-line:#C9DBD1;
+    --clay:#DB6B3B;--clay-soft:#F5E4DA;
+    --success:#1E9E5A;--warning:#E0A008;--error:#CF4B3E;
+    --stone:#5C665F;--line:#E4E2DA;--line-2:#D8D6CD;
+  }
+  ::selection{background:#DB6B3B;color:#fff}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+  input,textarea{font-family:inherit;font-size:15px}
+  input:focus,textarea:focus{outline:2px solid var(--green);outline-offset:1px}
+</style>
+</helmet>
+
+<!-- NAV -->
+<nav style="position:sticky;top:0;z-index:50;background:rgba(246,245,240,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:16px clamp(20px,4vw,64px);gap:20px;flex-wrap:wrap">
+  <a href="Makazi Website - Home.dc.html" style="display:flex;align-items:center;gap:10px">
+    <img src="assets/makazi-mark.png" alt="Makazi" style="height:28px;width:auto">
+    <span style="font-family:'Schibsted Grotesk';font-weight:800;letter-spacing:.12em;font-size:16px">MAKAZI</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+    <a href="Makazi Website - Features.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Features</a>
+    <a href="Makazi Website - Pricing.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Pricing</a>
+    <a href="Makazi Website - About.dc.html" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">About</a>
+    <a href="Makazi Website - Contact.dc.html" style="font-size:15px;font-weight:600;color:var(--green)">Contact</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:18px">
+    <a href="#" style="font-size:15px;font-weight:500;color:var(--ink)" style-hover="color:var(--green)">Log in</a>
+    <a href="#book-demo" style="background:var(--clay);color:#fff;padding:11px 22px;border-radius:10px;font-size:15px;font-weight:600" style-hover="background:#C55A2C">Book a Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section style="padding:clamp(56px,8vw,100px) clamp(20px,4vw,64px) clamp(40px,6vw,64px);max-width:900px;margin:0 auto;text-align:center">
+  <div style="display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green-deep);background:var(--green-soft);padding:8px 16px;border-radius:99px;margin-bottom:28px">Contact</div>
+  <h1 style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(34px,4.6vw,54px);line-height:1.06;letter-spacing:-.03em;margin:0 0 22px">Let's talk about your portfolio.</h1>
+  <p style="font-size:18px;color:var(--stone);max-width:560px;margin:0 auto;font-weight:400;line-height:1.6">Book a demo, ask a question, or just say habari — we'd love to hear from you.</p>
+</section>
+
+<!-- FORM + CONTACT INFO -->
+<section id="book-demo" style="padding:0 clamp(20px,4vw,64px) clamp(64px,8vw,100px);max-width:1100px;margin:0 auto">
+  <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:32px;align-items:start">
+
+    <div style="border:1px solid var(--line);border-radius:22px;padding:clamp(28px,4vw,44px);background:var(--white)">
+      <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:40px 10px">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" style="margin-bottom:20px"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+          <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:22px;margin:0 0 10px">Asante, {{ formName }}!</h3>
+          <p style="font-size:15px;color:var(--stone);margin:0">We've received your request and will reach out within one business day to schedule your demo.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{ showForm }}" hint-placeholder-val="{{ true }}">
+        <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 6px">Book a Demo</h2>
+        <p style="font-size:14px;color:var(--stone);margin:0 0 28px">Tell us a little about your portfolio and we'll set up a time.</p>
+        <form onSubmit="{{ handleSubmit }}">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Full name</label>
+              <input type="text" required="" value="{{ formName }}" onInput="{{ updateName }}" placeholder="Wanjiru Mwangi" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            </div>
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Email</label>
+              <input type="email" required="" placeholder="you@example.com" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Phone number</label>
+              <input type="tel" placeholder="+254 7XX XXX XXX" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            </div>
+            <div>
+              <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Number of units</label>
+              <input type="text" placeholder="e.g. 42" style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px">
+            </div>
+          </div>
+          <div style="margin-bottom:24px">
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Tell us about your portfolio</label>
+            <textarea rows="4" placeholder="Number of properties, current tools, biggest headache..." style="width:100%;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:10px;resize:vertical"></textarea>
+          </div>
+          <button type="submit" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:15px;font-weight:600;font-size:15px" style-hover="background:var(--green-deep)">Book a Demo</button>
+        </form>
+      </sc-if>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="border:1px solid var(--line);border-radius:20px;padding:28px;background:var(--white)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+          <div style="width:44px;height:44px;border-radius:99px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Schibsted Grotesk';font-weight:700;font-size:15px">PO</div>
+          <div><div style="font-weight:600;font-size:15px">Peter Opapa</div><div style="font-size:13px;color:var(--stone)">Founder, Makazi</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <a href="mailto:opapapeter82@gmail.com" style="display:flex;align-items:center;gap:12px;font-size:14px" style-hover="color:var(--green)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="flex-shrink:0"><path d="M4 4h16v16H4z"/><path d="M4 6l8 7 8-7"/></svg>
+            opapapeter82@gmail.com
+          </a>
+          <a href="tel:+254743695612" style="display:flex;align-items:center;gap:12px;font-size:14px" style-hover="color:var(--green)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="flex-shrink:0"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8 10.3a16 16 0 0 0 6 6l1.5-1.4a2 2 0 0 1 2.1-.4c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2z"/></svg>
+            +254 743 695 612
+          </a>
+          <a href="https://wa.me/254743695612" target="_blank" style="display:flex;align-items:center;gap:12px;font-size:14px" style-hover="color:var(--green)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="flex-shrink:0"><path d="M4 4h16v13H8l-4 4z"/></svg>
+            WhatsApp us
+          </a>
+          <a href="https://www.linkedin.com/in/peter-opapa/" target="_blank" style="display:flex;align-items:center;gap:12px;font-size:14px" style-hover="color:var(--green)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7" style="flex-shrink:0"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 11v5M8 8v.01M12 16v-3a2 2 0 0 1 4 0v3M12 13v3"/></svg>
+            Connect on LinkedIn
+          </a>
+        </div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:20px;padding:28px;background:var(--green-soft)">
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.12em;color:var(--green-deep);text-transform:uppercase;margin-bottom:10px">Response time</div>
+        <p style="margin:0;font-size:14px;color:var(--green-deep);line-height:1.5">We reply to every demo request within one business day, Nairobi time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) clamp(20px,4vw,64px)">
+  <div style="max-width:800px;margin:0 auto">
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(24px,2.6vw,32px);letter-spacing:-.02em;margin:0 0 36px;text-align:center">Before you reach out</h2>
+    <div style="display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden">
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq1 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">What happens after I book a demo?<span style="{{ faq1IconStyle }}">+</span></button>
+        <sc-if value="{{ faq1Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">We'll call or WhatsApp you within a business day to schedule a 20-minute walkthrough tailored to your portfolio.</p></sc-if>
+      </div>
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq2 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">How long does setup take?<span style="{{ faq2IconStyle }}">+</span></button>
+        <sc-if value="{{ faq2Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Most landlords are fully set up — properties, units and tenants added — within an afternoon.</p></sc-if>
+      </div>
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq3 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">Do you support property management companies?<span style="{{ faq3IconStyle }}">+</span></button>
+        <sc-if value="{{ faq3Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Yes — our Enterprise plan is built for property management companies managing multiple owners' portfolios.</p></sc-if>
+      </div>
+      <div style="background:var(--white)">
+        <button onClick="{{ toggleFaq4 }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:none;border:none;text-align:left;font-size:16px;font-weight:600;color:var(--ink)">I have a question that isn't answered here.<span style="{{ faq4IconStyle }}">+</span></button>
+        <sc-if value="{{ faq4Open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 24px 22px;font-size:15px;color:var(--stone);line-height:1.6">Email, call or WhatsApp us directly using the details above — we read and answer every message ourselves.</p></sc-if>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:var(--ink);color:#9AA39D;padding:64px clamp(20px,4vw,64px) 32px">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><img src="assets/makazi-mark-light.png" alt="Makazi" style="height:26px"><span style="font-family:'Schibsted Grotesk';font-weight:800;font-size:15px;letter-spacing:.12em;color:var(--paper)">MAKAZI</span></div>
+        <p style="font-size:14px;line-height:1.6;max-width:280px;margin:0">The operating system for rental housing across Africa.</p>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Product</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - Features.dc.html" style="color:#C7CEC9">Features</a>
+          <a href="Makazi Website - Pricing.dc.html" style="color:#C7CEC9">Pricing</a>
+          <a href="Makazi Website - Home.dc.html#dashboard-preview" style="color:#C7CEC9">Product tour</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Company</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - About.dc.html" style="color:#C7CEC9">About</a>
+          <a href="Makazi Website - Contact.dc.html" style="color:#C7CEC9">Contact</a>
+          <a href="#book-demo" style="color:#C7CEC9">Book a Demo</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;color:#6f7b73;text-transform:uppercase;margin-bottom:16px">Resources</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+          <a href="Makazi Website - Home.dc.html#faq" style="color:#C7CEC9">FAQ</a>
+          <a href="Makazi Website - Contact.dc.html" style="color:#C7CEC9">Support</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.1);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px">
+      <span>© 2026 Makazi. Not a real estate company. A technology company.</span>
+      <span>Payments always go directly to your account — Makazi never holds funds.</span>
+    </div>
+  </div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { submitted: false, name: '', faq: null };
+  faqIconStyle(open) {
+    return open ? 'font-size:20px;color:var(--green);transform:rotate(45deg);display:inline-block;transition:transform .2s' : 'font-size:20px;color:var(--stone);display:inline-block;transition:transform .2s';
+  }
+  renderVals() {
+    const f = this.state.faq;
+    return {
+      submitted: this.state.submitted,
+      showForm: !this.state.submitted,
+      formName: this.state.name,
+      updateName: (e) => this.setState({ name: e.target.value }),
+      handleSubmit: (e) => { e.preventDefault(); this.setState({ submitted: true }); },
+      faq1Open: f === 1, faq2Open: f === 2, faq3Open: f === 3, faq4Open: f === 4,
+      faq1IconStyle: this.faqIconStyle(f === 1), faq2IconStyle: this.faqIconStyle(f === 2),
+      faq3IconStyle: this.faqIconStyle(f === 3), faq4IconStyle: this.faqIconStyle(f === 4),
+      toggleFaq1: () => this.setState({ faq: f === 1 ? null : 1 }),
+      toggleFaq2: () => this.setState({ faq: f === 2 ? null : 2 }),
+      toggleFaq3: () => this.setState({ faq: f === 3 ? null : 3 }),
+      toggleFaq4: () => this.setState({ faq: f === 4 ? null : 4 })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Hanken Grotesk',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  :root{
+    --ink:#0B140F;--paper:#F6F5F0;--white:#FFFFFF;
+    --green:#0E5C43;--green-deep:#093C2C;--green-soft:#E3EDE7;--green-line:#C9DBD1;
+    --clay:#DB6B3B;--clay-soft:#F5E4DA;
+    --success:#1E9E5A;--warning:#E0A008;--error:#CF4B3E;
+    --stone:#5C665F;--line:#E4E2DA;--line-2:#D8D6CD;
+  }
+  a{color:var(--green);text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea{font-family:inherit;font-size:14px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--green);outline-offset:1px}
+  ::selection{background:var(--clay);color:#fff}
+  @keyframes popIn{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+  @keyframes toastUp{from{transform:translate(-50%,16px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+  @keyframes modalIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</helmet>
+
+<!-- ============ LOGIN ============ -->
+<sc-if value="{{ !loggedIn }}" hint-placeholder-val="{{ true }}">
+  <div style="min-height:100vh;display:flex;flex-wrap:wrap">
+    <div style="flex:1 1 300px;min-width:280px;max-width:400px;background:var(--green-deep);color:#fff;padding:clamp(32px,4vw,56px);display:flex;flex-direction:column;justify-content:space-between">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:80px"><img src="assets/makazi-mark-light.png" alt="" style="height:26px"><span style="font-family:'Schibsted Grotesk';font-weight:800;letter-spacing:.12em;font-size:15px">MAKAZI ADMIN</span></div>
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:28px;letter-spacing:-.02em;line-height:1.25;margin:0 0 18px">Internal operations portal</h1>
+        <p style="font-size:14px;color:#C7CEC9;margin:0;line-height:1.6">Restricted to authorized Makazi staff. All actions are logged and audited.</p>
+      </div>
+      <div style="font-size:12px;color:#8FB0A2">Protected by MFA · SOC2-style access controls</div>
+    </div>
+    <div style="flex:2 1 400px;min-width:300px;display:flex;align-items:center;justify-content:center;padding:40px 24px">
+      <div style="width:100%;max-width:380px">
+        <sc-if value="{{ loginStep_creds }}" hint-placeholder-val="{{ true }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;margin:0 0 8px">Staff sign in</h2>
+          <p style="font-size:13px;color:var(--stone);margin:0 0 22px">Use your Makazi staff credentials.</p>
+          <sc-if value="{{ suspiciousLoginFlag }}" hint-placeholder-val="{{ false }}">
+            <div style="background:rgba(224,160,8,.1);border:1px solid rgba(224,160,8,.3);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--warning)">⚠ Sign-in attempted from a new device in Nairobi, KE. If this wasn't you, contact IT Security immediately.</div>
+          </sc-if>
+          <div style="margin-bottom:14px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Work email</label><input type="email" value="{{ loginEmail }}" onInput="{{ updateLoginEmail }}" placeholder="you@makazi.co.ke" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          <div style="margin-bottom:20px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Password</label><input type="password" value="{{ loginPassword }}" onInput="{{ updateLoginPassword }}" placeholder="••••••••" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          <button onClick="{{ submitCreds }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:13px;font-weight:600;font-size:14px;margin-bottom:12px">Continue</button>
+          <a onClick="{{ goForgot }}" style="display:block;text-align:center;font-size:13px;cursor:pointer">Forgot password?</a>
+        </sc-if>
+        <sc-if value="{{ loginStep_mfa }}" hint-placeholder-val="{{ false }}">
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin-bottom:18px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green-deep)" stroke-width="1.7"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></div>
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:22px;margin:0 0 8px">Two-factor verification</h2>
+          <p style="font-size:13px;color:var(--stone);margin:0 0 20px">Enter the 6-digit code from your authenticator app.</p>
+          <div style="display:flex;gap:8px;margin-bottom:20px">
+            <sc-for list="{{ mfaBoxes }}" as="box" hint-placeholder-count="6"><input value="{{ box.value }}" onInput="{{ box.onInput }}" onKeyDown="{{ box.onKeyDown }}" maxlength="1" style="width:42px;height:50px;border:1.5px solid var(--line-2);border-radius:9px;text-align:center;font-family:'JetBrains Mono';font-weight:600;font-size:19px"></sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;font-size:12.5px;color:var(--stone)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--stone)" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"></rect></svg>Signing in from MacBook Pro · Nairobi, KE</div>
+          <button onClick="{{ submitMfa }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:13px;font-weight:600;font-size:14px">Verify &amp; sign in</button>
+        </sc-if>
+        <sc-if value="{{ loginStep_forgot }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:22px;margin:0 0 8px">Reset your password</h2>
+          <p style="font-size:13px;color:var(--stone);margin:0 0 20px">We'll email a secure reset link to your work address.</p>
+          <div style="margin-bottom:20px"><input type="email" placeholder="you@makazi.co.ke" style="width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:9px"></div>
+          <button onClick="{{ sendReset }}" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:13px;font-weight:600;font-size:14px;margin-bottom:14px">Send reset link</button>
+          <a onClick="{{ goCreds }}" style="display:block;text-align:center;font-size:13px;cursor:pointer">← Back to sign in</a>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ============ ADMIN APP ============ -->
+<sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;min-height:100vh">
+  <div style="{{ sidebarStyle }}">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;padding:8px 4px 20px">
+      <div style="display:flex;align-items:center;gap:9px;overflow:hidden"><img src="assets/makazi-mark-light.png" alt="" style="height:22px;flex-shrink:0"><span style="{{ navLabelStyle }}">MAKAZI ADMIN</span></div>
+      <button onClick="{{ toggleSidebarCollapsed }}" style="background:none;border:none;color:#9AA39D;padding:4px;display:flex;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="{{ collapseIconStyle }}"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"></path></svg></button>
+    </div>
+    <button onClick="{{ navTo_dashboard }}" style="{{ nav_dashboard }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg><span style="{{ navLabelStyle }}">Dashboard</span></button>
+    <button onClick="{{ navTo_users }}" style="{{ nav_users }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 19a6.5 6.5 0 0 1 13 0"></path></svg><span style="{{ navLabelStyle }}">Users</span></button>
+    <button onClick="{{ navTo_properties }}" style="{{ nav_properties }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="7" height="12"></rect><rect x="14" y="4" width="7" height="17"></rect></svg><span style="{{ navLabelStyle }}">Properties</span></button>
+    <button onClick="{{ navTo_payments }}" style="{{ nav_payments }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-8 4 16 3-8h4"></path></svg><span style="{{ navLabelStyle }}">Payments</span></button>
+    <button onClick="{{ navTo_support }}" style="{{ nav_support }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-11.8 7.8L3 21l1.7-6.2A8.5 8.5 0 1 1 21 11.5z"></path></svg><span style="{{ navLabelStyle }}">Support</span></button>
+    <button onClick="{{ navTo_maintenance }}" style="{{ nav_maintenance }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path></svg><span style="{{ navLabelStyle }}">Maintenance</span></button>
+    <button onClick="{{ navTo_technicians }}" style="{{ nav_technicians }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 3.3a4 4 0 0 0-5.4 5.4L3 15l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"></path></svg><span style="{{ navLabelStyle }}">Technicians</span></button>
+    <button onClick="{{ navTo_notifications }}" style="{{ nav_notifications }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"></path><path d="M9.5 20a2.5 2.5 0 0 0 5 0"></path></svg><span style="{{ navLabelStyle }}">Notifications</span></button>
+    <button onClick="{{ navTo_finance }}" style="{{ nav_finance }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v10M9 10h4.5a1.5 1.5 0 1 1 0 3H9"></path></svg><span style="{{ navLabelStyle }}">Finance</span></button>
+    <button onClick="{{ navTo_health }}" style="{{ nav_health }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2-7 4 14 2-7h6"></path></svg><span style="{{ navLabelStyle }}">System Health</span></button>
+    <button onClick="{{ navTo_aiops }}" style="{{ nav_aiops }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"></path></svg><span style="{{ navLabelStyle }}">AI Ops</span></button>
+    <button onClick="{{ navTo_audit }}" style="{{ nav_audit }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg><span style="{{ navLabelStyle }}">Audit Log</span></button>
+    <div style="flex:1"></div>
+    <button onClick="{{ navTo_settings }}" style="{{ nav_settings }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg><span style="{{ navLabelStyle }}">Settings</span></button>
+    <div onClick="{{ toggleProfileMenu }}" style="display:flex;align-items:center;gap:9px;padding:10px 8px;margin-top:8px;border-top:1px solid rgba(255,255,255,.1);cursor:pointer;position:relative">
+      <div style="width:28px;height:28px;border-radius:99px;background:var(--clay);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0">AD</div>
+      <div style="{{ profileNameWrapStyle }}"><div style="font-size:12px;font-weight:500">Amina Diallo</div><div style="font-size:10px;color:#9AA39D">{{ currentRoleLabel }}</div></div>
+      <sc-if value="{{ profileMenuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;bottom:48px;left:8px;right:8px;background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 24px 60px -30px rgba(0,0,0,.4);width:200px">
+          <div onClick="{{ navTo_settings }}" style="padding:11px 14px;font-size:13px;color:var(--ink)">Account settings</div>
+          <div onClick="{{ logout }}" style="padding:11px 14px;font-size:13px;color:var(--error);border-top:1px solid var(--line)">Log out</div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <div style="height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 28px;background:var(--white);position:sticky;top:0;z-index:20">
+      <button onClick="{{ toggleSidebarCollapsed }}" style="background:none;border:1px solid var(--line);border-radius:8px;padding:8px;display:flex;color:var(--stone)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></svg></button>
+      <div style="flex:1;max-width:380px;position:relative">
+        <input value="{{ searchValue }}" onInput="{{ updateSearch }}" onFocus="{{ openSearch }}" placeholder="Search users, properties, payments, tickets…" style="width:100%;padding:9px 14px 9px 34px;border:1px solid var(--line);border-radius:9px;background:var(--paper);font-size:13px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--stone)" stroke-width="2" style="position:absolute;left:11px;top:10px"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+        <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:40px;left:0;right:0;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:6px;box-shadow:0 24px 60px -30px rgba(0,0,0,.3);z-index:30;max-height:320px;overflow-y:auto">
+            <sc-if value="{{ noSearchResults }}" hint-placeholder-val="{{ true }}"><p style="margin:0;padding:12px;font-size:12px;color:var(--stone)">{{ searchHint }}</p></sc-if>
+            <sc-for list="{{ searchResults }}" as="r" hint-placeholder-count="0"><div onClick="{{ r.select }}" style="padding:10px 12px;border-radius:8px;font-size:13px;cursor:pointer" style-hover="background:var(--paper)"><span style="font-family:'JetBrains Mono';font-size:9px;color:var(--stone);text-transform:uppercase;margin-right:8px">{{ r.type }}</span>{{ r.label }}</div></sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <div style="position:relative">
+        <button onClick="{{ toggleRolePicker }}" style="display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:12.5px;font-weight:600">{{ currentRoleLabel }}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--stone)" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <sc-if value="{{ rolePickerOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:40px;right:0;background:var(--white);border:1px solid var(--line);border-radius:10px;width:190px;box-shadow:0 24px 60px -30px rgba(0,0,0,.3);overflow:hidden;z-index:30">
+            <sc-for list="{{ roleOptions }}" as="ro" hint-placeholder-count="6"><div onClick="{{ ro.select }}" style="padding:10px 14px;font-size:12.5px;border-bottom:1px solid var(--line)">{{ ro.label }}</div></sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <div style="position:relative">
+        <button onClick="{{ toggleNotif }}" style="position:relative;background:none;border:none;padding:8px;display:flex">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"></path><path d="M9.5 20a2.5 2.5 0 0 0 5 0"></path></svg>
+          <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:99px;background:var(--error)"></span>
+        </button>
+        <sc-if value="{{ notifOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:44px;right:0;background:var(--white);border:1px solid var(--line);border-radius:10px;width:300px;max-height:340px;overflow-y:auto;box-shadow:0 24px 60px -30px rgba(0,0,0,.3);z-index:30">
+            <div style="padding:12px 14px;font-size:12px;font-weight:600;color:var(--stone);border-bottom:1px solid var(--line)">SYSTEM ALERTS</div>
+            <sc-for list="{{ globalAlerts }}" as="al" hint-placeholder-count="4"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-size:12.5px;display:flex;gap:8px"><span style="{{ al.dotStyle }}"></span><div>{{ al.text }}<div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);margin-top:2px">{{ al.time }}</div></div></div></sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="flex:1;padding:28px 32px 56px;max-width:1440px;width:100%;margin:0 auto">
+
+      <!-- DASHBOARD -->
+      <sc-if value="{{ is_dashboard }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 22px">Platform overview</h1>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px">
+          <sc-for list="{{ kpiCards }}" as="k" hint-placeholder-count="12">
+            <div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">{{ k.label }}</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:20px">{{ k.value }}</div><div style="font-size:11px;color:{{ k.deltaColor }};margin-top:4px">{{ k.delta }}</div></div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:16px">
+          <div style="border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--white)">
+            <div style="display:flex;justify-content:space-between;margin-bottom:16px"><span style="font-weight:600;font-size:14px">Daily active users</span><span style="font-family:'JetBrains Mono';font-size:11px;color:var(--stone)">Last 7 days</span></div>
+            <div style="display:flex;align-items:flex-end;gap:10px;height:110px">
+              <sc-for list="{{ dauBars }}" as="b" hint-placeholder-count="7"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end"><div style="{{ b.style }}"></div><span style="font-size:10px;color:var(--stone);font-family:'JetBrains Mono'">{{ b.label }}</span></div></sc-for>
+            </div>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--white)">
+            <div style="font-weight:600;font-size:14px;margin-bottom:14px">Geographic distribution</div>
+            <sc-for list="{{ geoDist }}" as="g" hint-placeholder-count="4">
+              <div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>{{ g.county }}</span><span style="font-family:'JetBrains Mono';color:var(--stone)">{{ g.pct }}%</span></div><div style="height:6px;background:var(--line);border-radius:99px;overflow:hidden"><div style="{{ g.barStyle }}"></div></div></div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--white)">
+            <div style="font-weight:600;font-size:14px;margin-bottom:14px">Revenue growth</div>
+            <div style="display:flex;align-items:flex-end;gap:10px;height:90px">
+              <sc-for list="{{ revBars }}" as="b" hint-placeholder-count="6"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end"><div style="{{ b.style }}"></div><span style="font-size:10px;color:var(--stone);font-family:'JetBrains Mono'">{{ b.label }}</span></div></sc-for>
+            </div>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--green-deep);color:#fff">
+            <div style="font-weight:600;font-size:14px;margin-bottom:12px">Pending verifications</div>
+            <p style="font-size:13px;color:#DCEAE2;margin:0 0 14px">{{ pendingVerifCount }} accounts awaiting identity verification.</p>
+            <button onClick="{{ navTo_users }}" style="background:#fff;color:var(--green-deep);border:none;border-radius:9px;padding:9px 16px;font-size:12.5px;font-weight:700">Review queue</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- USERS -->
+      <sc-if value="{{ is_users }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+          <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0">Users</h1>
+          <div style="display:flex;gap:8px">
+            <sc-for list="{{ userTabList }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+          </div>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Name</span><span>Role</span><span>Status</span><span>Verified</span><span>Joined</span></div>
+          <sc-for list="{{ usersList }}" as="u" hint-placeholder-count="8">
+            <div onClick="{{ u.openDetail }}" style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:13px;cursor:pointer" style-hover="background:var(--paper)">
+              <span style="font-weight:600">{{ u.name }}</span><span style="color:var(--stone)">{{ u.role }}</span><span style="{{ u.statusStyle }}">{{ u.statusLabel }}</span><span style="{{ u.verifiedStyle }}">{{ u.verifiedLabel }}</span><span style="color:var(--stone);font-family:'JetBrains Mono';font-size:12px">{{ u.joined }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- PROPERTIES -->
+      <sc-if value="{{ is_properties }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">Properties</h1>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <select value="{{ propCountyFilter }}" onChange="{{ updatePropCountyFilter }}" style="padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--white);font-size:13px"><option value="">All counties</option><option>Nairobi</option><option>Mombasa</option><option>Kiambu</option></select>
+          <select value="{{ propStatusFilter }}" onChange="{{ updatePropStatusFilter }}" style="padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--white);font-size:13px"><option value="">All statuses</option><option>Active</option><option>Flagged</option></select>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Property</span><span>County</span><span>Landlord</span><span>Units</span><span>Occupancy</span></div>
+          <sc-for list="{{ propertiesList }}" as="p" hint-placeholder-count="6">
+            <div onClick="{{ p.openDetail }}" style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:13px;cursor:pointer">
+              <span style="font-weight:600">{{ p.name }}</span><span style="color:var(--stone)">{{ p.county }}</span><span style="color:var(--stone)">{{ p.landlord }}</span><span style="font-family:'JetBrains Mono'">{{ p.units }}</span><span style="font-family:'JetBrains Mono'">{{ p.occupancy }}%</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- PAYMENTS -->
+      <sc-if value="{{ is_payments }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">Payment monitoring</h1>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <sc-for list="{{ paymentTabList }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1fr 1.3fr 1fr 1fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Time</span><span>Tenant / Property</span><span>Amount</span><span>Method</span><span>Status</span><span>Reference</span></div>
+          <sc-for list="{{ paymentsList }}" as="pm" hint-placeholder-count="6">
+            <div onClick="{{ pm.openDetail }}" style="display:grid;grid-template-columns:1fr 1.3fr 1fr 1fr 1fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:12.5px;cursor:pointer">
+              <span style="font-family:'JetBrains Mono';color:var(--stone)">{{ pm.time }}</span><span>{{ pm.tenant }} · {{ pm.property }}</span><span style="font-family:'JetBrains Mono';font-weight:600">KES {{ pm.amount }}</span><span style="color:var(--stone)">{{ pm.method }}</span><span style="{{ pm.statusStyle }}">{{ pm.statusLabel }}</span><span style="font-family:'JetBrains Mono';color:var(--stone)">{{ pm.ref }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- SUPPORT -->
+      <sc-if value="{{ is_support }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">Support centre</h1>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
+          <div style="border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--white)"><div style="font-size:10px;color:var(--stone);text-transform:uppercase">Open</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:18px">{{ ticketOpenCount }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--white)"><div style="font-size:10px;color:var(--stone);text-transform:uppercase">Escalated</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:18px">{{ ticketEscalatedCount }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--white)"><div style="font-size:10px;color:var(--stone);text-transform:uppercase">Resolved today</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:18px">{{ ticketResolvedCount }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--white)"><div style="font-size:10px;color:var(--stone);text-transform:uppercase">Avg. response</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:18px">12m</div></div>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Ticket</span><span>Subject</span><span>Customer</span><span>Agent</span><span>Status</span></div>
+          <sc-for list="{{ ticketsList }}" as="t" hint-placeholder-count="6">
+            <div onClick="{{ t.openDetail }}" style="display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:12.5px;cursor:pointer">
+              <span style="font-family:'JetBrains Mono';color:var(--stone)">{{ t.id }}</span><span style="font-weight:600">{{ t.subject }}</span><span>{{ t.customer }}</span><span style="color:var(--stone)">{{ t.agent }}</span><span style="{{ t.statusStyle }}">{{ t.statusLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- MAINTENANCE -->
+      <sc-if value="{{ is_maintenance }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">Maintenance oversight</h1>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px">
+          <sc-for list="{{ maintStatusCards }}" as="m" hint-placeholder-count="6"><div style="border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--white);text-align:center"><div style="font-family:'JetBrains Mono';font-weight:700;font-size:17px">{{ m.count }}</div><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-top:4px">{{ m.label }}</div></div></sc-for>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Issue</span><span>Property</span><span>Technician</span><span>Priority</span><span>Status</span></div>
+          <sc-for list="{{ adminMaintList }}" as="m" hint-placeholder-count="6">
+            <div onClick="{{ m.openDetail }}" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:12.5px;cursor:pointer">
+              <span style="font-weight:600">{{ m.issue }}</span><span style="color:var(--stone)">{{ m.property }}</span><span style="color:var(--stone)">{{ m.technician }}</span><span style="{{ m.priorityStyle }}">{{ m.priorityLabel }}</span><span style="{{ m.statusStyle }}">{{ m.statusLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- TECHNICIANS -->
+      <sc-if value="{{ is_technicians }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">Technician directory</h1>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+          <sc-for list="{{ techniciansList }}" as="t" hint-placeholder-count="6">
+            <div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:700;font-size:14px">{{ t.name }}</span><span style="{{ t.statusStyle }}">{{ t.statusLabel }}</span></div>
+              <div style="font-size:12px;color:var(--stone);margin-bottom:10px">{{ t.skills }} · {{ t.county }}</div>
+              <div style="display:flex;justify-content:space-between;font-size:12px"><span>⭐ {{ t.rating }}</span><span style="color:var(--stone)">{{ t.jobs }} jobs completed</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- NOTIFICATIONS CENTRE -->
+      <sc-if value="{{ is_notifications }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">Notification centre</h1>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Channel</span><span>Message</span><span>Recipient</span><span>Status</span></div>
+          <sc-for list="{{ notifLogList }}" as="n" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:12.5px">
+              <span style="font-family:'JetBrains Mono';font-size:11px">{{ n.channel }}</span><span>{{ n.message }}</span><span style="color:var(--stone)">{{ n.recipient }}</span><span style="{{ n.statusStyle }}">{{ n.statusLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- FINANCE -->
+      <sc-if value="{{ is_finance }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">Finance</h1>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:22px">
+          <sc-for list="{{ financeCards }}" as="f" hint-placeholder-count="6"><div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">{{ f.label }}</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:18px">{{ f.value }}</div></div></sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;font-size:15px">Subscriptions</span><button onClick="{{ exportStub }}" style="border:1.5px solid var(--line-2);background:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600">Export report</button></div>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Landlord</span><span>Plan</span><span>Status</span><span>Renews</span></div>
+          <sc-for list="{{ subscriptionsList }}" as="s" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:13px">
+              <span style="font-weight:600">{{ s.landlord }}</span><span>{{ s.plan }}</span><span style="{{ s.statusStyle }}">{{ s.statusLabel }}</span><span style="color:var(--stone);font-family:'JetBrains Mono';font-size:12px">{{ s.renews }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- SYSTEM HEALTH -->
+      <sc-if value="{{ is_health }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">System health</h1>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+          <sc-for list="{{ healthList }}" as="h" hint-placeholder-count="10">
+            <div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white);display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600">{{ h.label }}</span><span style="{{ h.dotStyle }}"></span></div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- AI OPS -->
+      <sc-if value="{{ is_aiops }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">AI operations</h1>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px">
+          <sc-for list="{{ aiOpsCards }}" as="a" hint-placeholder-count="5"><div style="border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--white)"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:6px">{{ a.label }}</div><div style="font-family:'JetBrains Mono';font-weight:700;font-size:18px">{{ a.value }}</div></div></sc-for>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--white)">
+          <div style="font-weight:600;font-size:14px;margin-bottom:12px">Most asked questions</div>
+          <sc-for list="{{ aiTopQuestions }}" as="q" hint-placeholder-count="5"><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px"><span>{{ q.text }}</span><span style="font-family:'JetBrains Mono';color:var(--stone)">{{ q.count }}×</span></div></sc-for>
+        </div>
+      </sc-if>
+
+      <!-- AUDIT LOG -->
+      <sc-if value="{{ is_audit }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">Audit log</h1>
+        <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+          <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr;padding:12px 16px;background:var(--paper);font-size:11px;font-weight:600;color:var(--stone);text-transform:uppercase"><span>Time</span><span>Action</span><span>Admin</span><span>Target</span></div>
+          <sc-for list="{{ auditLogList }}" as="a" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr;padding:13px 16px;border-top:1px solid var(--line);align-items:center;font-size:12.5px">
+              <span style="font-family:'JetBrains Mono';color:var(--stone)">{{ a.time }}</span><span style="font-weight:600">{{ a.action }}</span><span>{{ a.admin }}</span><span style="color:var(--stone)">{{ a.target }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- SETTINGS -->
+      <sc-if value="{{ is_settings }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0 0 18px">Settings</h1>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:900px">
+          <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white)"><div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:12px">General &amp; branding</div><p style="font-size:13px;color:var(--stone);margin:0">Platform name, logo, support contact.</p></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white)"><div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:12px">SMS &amp; WhatsApp providers</div><p style="font-size:13px;color:var(--stone);margin:0">Africa's Talking, WhatsApp Business API keys.</p></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white)"><div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:12px">Payment integrations</div><p style="font-size:13px;color:var(--stone);margin:0">Safaricom Daraja API, bank partner keys.</p></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white)"><div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:12px">Security</div><p style="font-size:13px;color:var(--stone);margin:0">MFA policy, session timeout, IP allowlist.</p></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white)"><div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:12px">API keys</div><p style="font-size:13px;color:var(--stone);margin:0">Manage service credentials and rotate secrets.</p></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--white)"><div style="font-size:13px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:12px">Backups</div><p style="font-size:13px;color:var(--stone);margin:0">Daily automated backups, last run 04:00 EAT.</p></div>
+        </div>
+        <div style="margin-top:22px">
+          <div style="font-weight:600;font-size:15px;margin-bottom:12px">Role &amp; permission matrix</div>
+          <div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white)">
+            <div style="display:grid;grid-template-columns:1.4fr repeat(6,1fr);padding:10px 14px;background:var(--paper);font-size:10.5px;font-weight:600;color:var(--stone);text-transform:uppercase">
+              <span>Permission</span><sc-for list="{{ roleOptions }}" as="ro" hint-placeholder-count="6"><span style="text-align:center">{{ ro.short }}</span></sc-for>
+            </div>
+            <sc-for list="{{ permissionMatrix }}" as="perm" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:1.4fr repeat(6,1fr);padding:10px 14px;border-top:1px solid var(--line);font-size:12.5px;align-items:center">
+                <span>{{ perm.label }}</span>
+                <sc-for list="{{ perm.cells }}" as="c" hint-placeholder-count="6"><span style="text-align:center">{{ c }}</span></sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- MODALS -->
+<sc-if value="{{ anyModalOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(11,20,15,.5);z-index:250;display:flex;align-items:center;justify-content:center;padding:20px" onClick="{{ closeModal }}">
+    <div style="background:var(--white);border-radius:20px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;padding:28px;animation:modalIn .25s ease-out" onClick="{{ stopProp }}">
+
+      <!-- USER DETAIL -->
+      <sc-if value="{{ is_modal_user }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:14px;align-items:center;margin-bottom:18px">
+          <div style="width:48px;height:48px;border-radius:99px;background:var(--clay);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Schibsted Grotesk';font-weight:700;font-size:16px">{{ udInitials }}</div>
+          <div><div style="font-weight:700;font-size:17px">{{ udName }}</div><div style="font-size:12.5px;color:var(--stone)">{{ udRole }} · {{ udEmail }}</div></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:18px"><span style="{{ udStatusStyle }}">{{ udStatusLabel }}</span><span style="{{ udVerifiedStyle }}">{{ udVerifiedLabel }}</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Phone</div><div style="font-size:13px;font-weight:600">{{ udPhone }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Joined</div><div style="font-size:13px;font-weight:600">{{ udJoined }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Assigned property</div><div style="font-size:13px;font-weight:600">{{ udProperty }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Support tickets</div><div style="font-size:13px;font-weight:600">{{ udTicketCount }}</div></div>
+        </div>
+        <div style="margin-bottom:18px">
+          <div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Activity timeline</div>
+          <sc-for list="{{ udTimeline }}" as="ev" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line)"><span>{{ ev.text }}</span><span style="color:var(--stone);font-family:'JetBrains Mono';font-size:11px">{{ ev.time }}</span></div></sc-for>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Login &amp; device history</div>
+          <p style="margin:0;font-size:12.5px;color:var(--stone)">Last login: {{ udLastLogin }} from {{ udLastDevice }}</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button onClick="{{ resetUserPassword }}" style="border:1.5px solid var(--line-2);background:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:600">Reset password</button>
+          <button onClick="{{ verifyUser }}" style="border:1.5px solid var(--line-2);background:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:600">Verify identity</button>
+          <button onClick="{{ toggleSuspendUser }}" style="{{ suspendBtnStyle }}">{{ suspendBtnLabel }}</button>
+          <button onClick="{{ deleteUserStub }}" style="border:1.5px solid rgba(207,75,62,.3);background:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:600;color:var(--error)">Delete (restricted)</button>
+        </div>
+      </sc-if>
+
+      <!-- PROPERTY DETAIL -->
+      <sc-if value="{{ is_modal_property }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 4px">{{ pdName }}</h3>
+        <p style="font-size:12.5px;color:var(--stone);margin:0 0 18px">{{ pdCounty }} · Landlord: {{ pdLandlord }}</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Units</div><div style="font-size:15px;font-weight:700;font-family:'JetBrains Mono'">{{ pdUnits }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Occupancy</div><div style="font-size:15px;font-weight:700;font-family:'JetBrains Mono'">{{ pdOccupancy }}%</div></div>
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Caretakers</div><div style="font-size:13px;font-weight:600">{{ pdCaretakers }}</div></div>
+          <div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--stone);text-transform:uppercase;margin-bottom:4px">Tenants</div><div style="font-size:15px;font-weight:700;font-family:'JetBrains Mono'">{{ pdTenants }}</div></div>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Maintenance history</div>
+        <p style="font-size:12.5px;color:var(--stone);margin:0">{{ pdMaintCount }} requests logged, {{ pdMaintOpen }} currently open.</p>
+      </sc-if>
+
+      <!-- PAYMENT DETAIL -->
+      <sc-if value="{{ is_modal_payment }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 6px">Payment {{ payRef }}</h3>
+        <div style="display:inline-block;margin-bottom:18px"><span style="{{ payStatusStyle }}">{{ payStatusLabel }}</span></div>
+        <div style="border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0"><span style="color:var(--stone)">Tenant</span><span style="font-weight:600">{{ payTenant }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Property</span><span style="font-weight:600">{{ payProperty }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Amount</span><span style="font-weight:600;font-family:'JetBrains Mono'">KES {{ payAmount }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Method</span><span style="font-weight:600">{{ payMethod }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Transaction ID</span><span style="font-weight:600;font-family:'JetBrains Mono'">{{ payTxnId }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--stone)">Callback status</span><span style="{{ payCallbackStyle }}">{{ payCallbackLabel }}</span></div>
+        </div>
+        <sc-if value="{{ payShowRetry }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ retryCallback }}" style="width:100%;background:var(--ink);color:#fff;border:none;border-radius:10px;padding:13px;font-weight:600;font-size:13.5px">{{ retryBtnLabel }}</button>
+        </sc-if>
+      </sc-if>
+
+      <!-- TICKET DETAIL -->
+      <sc-if value="{{ is_modal_ticket }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 4px">{{ tkSubject }}</h3>
+        <p style="font-size:12.5px;color:var(--stone);margin:0 0 18px">{{ tkId }} · {{ tkCustomer }}</p>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:6px">Assign agent</label>
+          <select value="{{ tkAgent }}" onChange="{{ updateTkAgent }}" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:9px"><option>Unassigned</option><option>Amina Diallo</option><option>Brian Otieno</option><option>Faith Njeri</option></select>
+        </div>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:6px">Internal notes</label><textarea rows="3" value="{{ tkNotes }}" onInput="{{ updateTkNotes }}" placeholder="Notes visible to staff only" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:9px;resize:vertical;font-family:inherit"></textarea></div>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ escalateTicket }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:600">Escalate</button>
+          <button onClick="{{ resolveTicket }}" style="flex:1;background:var(--green);color:#fff;border:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:600">Resolve &amp; notify customer</button>
+        </div>
+      </sc-if>
+
+      <!-- MAINTENANCE DETAIL (admin) -->
+      <sc-if value="{{ is_modal_maint }}" hint-placeholder-val="{{ false }}">
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:19px;margin:0 0 4px">{{ amIssue }}</h3>
+        <p style="font-size:12.5px;color:var(--stone);margin:0 0 18px">{{ amProperty }} · {{ amTechnician }}</p>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:6px">Reassign technician</label>
+          <select value="{{ amNewTech }}" onChange="{{ updateAmNewTech }}" style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:9px"><option>James Mwenda — Handyman</option><option>Otieno Plumbing</option><option>Kioko Painters</option></select>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ escalateMaint }}" style="flex:1;border:1.5px solid var(--line-2);background:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:600">Escalate</button>
+          <button onClick="{{ reassignMaint }}" style="flex:1;background:var(--green);color:#fff;border:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:600">Reassign &amp; mark completed</button>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</sc-if>
+
+<!-- TOAST -->
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 22px;border-radius:99px;font-size:13px;font-weight:500;animation:toastUp .3s ease-out;z-index:400;max-width:340px;text-align:center">{{ toast }}</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    loggedIn: false, loginStep: 'creds', loginEmail: '', loginPassword: '', mfaCode: ['', '', '', '', '', ''],
+    suspiciousLoginFlag: true,
+    sidebarCollapsed: false, navActive: 'dashboard', profileMenuOpen: false, notifOpen: false, searchOpen: false, searchValue: '',
+    rolePickerOpen: false, currentRole: 'super',
+    userTab: 'landlords', paymentTab: 'successful', modalOpen: null, viewingUserId: null, viewingPropertyId: null, viewingPaymentId: null, viewingTicketId: null, viewingMaintId: null,
+    tkAgent: 'Unassigned', tkNotes: '', amNewTech: 'James Mwenda — Handyman',
+    users: [
+      { id: 1, name: 'Wanjiru Mwangi', role: 'Landlord', email: 'wanjiru@example.com', phone: '+254 712 000 111', status: 'active', verified: true, joined: '2026-01-12', property: 'Riverside Estates', tickets: 1 },
+      { id: 2, name: 'David Kamau', role: 'Caretaker', email: 'david@example.com', phone: '+254 733 222 333', status: 'active', verified: true, joined: '2026-02-03', property: 'Green Gardens Apartments', tickets: 0 },
+      { id: 3, name: 'Sarah Wanjiku', role: 'Tenant', email: 'sarah@example.com', phone: '+254 712 445 210', status: 'active', verified: true, joined: '2026-07-01', property: 'Green Gardens Apartments · B203', tickets: 2 },
+      { id: 4, name: 'Brian Kiplangat', role: 'Tenant', email: 'brian@example.com', phone: '+254 722 998 341', status: 'active', verified: false, joined: '2025-11-01', property: 'Green Gardens Apartments · A102', tickets: 1 },
+      { id: 5, name: 'Faith Wambui', role: 'Tenant', email: 'faith@example.com', phone: '+254 745 887 213', status: 'suspended', verified: true, joined: '2026-02-01', property: 'Sunset Court · A101', tickets: 3 },
+      { id: 6, name: 'Otieno Ochieng', role: 'Landlord', email: 'otieno@example.com', phone: '+254 701 445 900', status: 'active', verified: false, joined: '2026-04-19', property: 'Otieno Heights', tickets: 0 },
+      { id: 7, name: 'Grace Njoki', role: 'Caretaker', email: 'grace@example.com', phone: '+254 733 120 774', status: 'active', verified: true, joined: '2026-03-14', property: 'Sunset Court', tickets: 1 },
+      { id: 8, name: 'Amina Diallo', role: 'Admin', email: 'amina@makazi.co.ke', phone: '+254 700 000 000', status: 'active', verified: true, joined: '2025-09-01', property: '—', tickets: 0 }
+    ],
+    properties: [
+      { id: 1, name: 'Riverside Estates', county: 'Nairobi', landlord: 'Wanjiru Mwangi', units: 24, occupancy: 88, caretakers: 'David Kamau', tenants: 21, maintCount: 14, maintOpen: 2 },
+      { id: 2, name: 'Green Gardens Apartments', county: 'Nairobi', landlord: 'Wanjiru Mwangi', units: 12, occupancy: 92, caretakers: 'David Kamau', tenants: 11, maintCount: 9, maintOpen: 1 },
+      { id: 3, name: 'Sunset Court', county: 'Nairobi', landlord: 'Wanjiru Mwangi', units: 8, occupancy: 75, caretakers: 'Grace Njoki', tenants: 6, maintCount: 5, maintOpen: 0 },
+      { id: 4, name: 'Otieno Heights', county: 'Mombasa', landlord: 'Otieno Ochieng', units: 16, occupancy: 63, caretakers: 'Unassigned', tenants: 10, maintCount: 3, maintOpen: 1 }
+    ],
+    payments: [
+      { id: 1, time: '09:12', tenant: 'Sarah Wanjiku', property: 'Green Gardens Apts', amount: '15,000', method: 'STK Push', status: 'successful', ref: 'QSR0A13F2WK', txnId: 'TXN-88213', callback: 'Received' },
+      { id: 2, time: '08:47', tenant: 'Brian Kiplangat', property: 'Green Gardens Apts', amount: '22,000', method: 'PayBill', status: 'failed', ref: 'QSR9WK4MN1', txnId: 'TXN-88198', callback: 'Not received' },
+      { id: 3, time: 'Yesterday', tenant: 'Faith Wambui', property: 'Sunset Court', amount: '30,000', method: 'Till', status: 'pending', ref: 'QSR7YT2LP8', txnId: 'TXN-88150', callback: 'Awaiting' },
+      { id: 4, time: 'Yesterday', tenant: 'Achieng Otieno', property: 'Riverside Estates', amount: '25,000', method: 'USSD', status: 'successful', ref: 'QSR2KM9RT3', txnId: 'TXN-88140', callback: 'Received' },
+      { id: 5, time: '2 days ago', tenant: 'Grace Njoki', property: 'Riverside Estates', amount: '24,000', method: 'WhatsApp', status: 'reconciliation', ref: 'QSR5DF8QW2', txnId: 'TXN-88090', callback: 'Mismatch' },
+      { id: 6, time: '3 days ago', tenant: 'Peter Kamau', property: 'Riverside Estates', amount: '23,000', method: 'Bank', status: 'successful', ref: 'QSR3JH7YU5', txnId: 'TXN-88044', callback: 'Received' }
+    ],
+    tickets: [
+      { id: 'TCK-2291', subject: 'Cannot complete STK push payment', customer: 'Brian Kiplangat', agent: 'Unassigned', status: 'open' },
+      { id: 'TCK-2287', subject: 'Rental Passport score looks wrong', customer: 'Sarah Wanjiku', agent: 'Amina Diallo', status: 'escalated' },
+      { id: 'TCK-2280', subject: 'Caretaker cannot register tenant', customer: 'David Kamau', agent: 'Brian Otieno', status: 'in_progress' },
+      { id: 'TCK-2275', subject: 'Refund request for duplicate payment', customer: 'Faith Wambui', agent: 'Faith Njeri', status: 'in_progress' },
+      { id: 'TCK-2270', subject: 'Account verification stuck', customer: 'Otieno Ochieng', agent: 'Amina Diallo', status: 'resolved' },
+      { id: 'TCK-2264', subject: 'WhatsApp bot not responding', customer: 'Grace Njoki', agent: 'Brian Otieno', status: 'resolved' }
+    ],
+    maintenance: [
+      { id: 1, issue: 'Leaking tap in bathroom', property: 'Green Gardens Apts', technician: 'Otieno Plumbing', priority: 'Normal', status: 'inprogress' },
+      { id: 2, issue: 'Blocked drain', property: 'Riverside Estates', technician: 'Otieno Plumbing', priority: 'Normal', status: 'overdue' },
+      { id: 3, issue: 'Faulty socket', property: 'Sunset Court', technician: 'Unassigned', priority: 'Urgent', status: 'reported' },
+      { id: 4, issue: 'Squeaky door hinge', property: 'Green Gardens Apts', technician: 'James Mwenda', priority: 'Low', status: 'assigned' },
+      { id: 5, issue: 'Repainted living room wall', property: 'Sunset Court', technician: 'Kioko Painters', priority: 'Low', status: 'completed' },
+      { id: 6, issue: 'Broken cabinet hinge', property: 'Green Gardens Apts', technician: 'James Mwenda', priority: 'Low', status: 'cancelled' }
+    ],
+    auditLog: [
+      { time: '09:41', action: 'Reset password', admin: 'Amina Diallo', target: 'Brian Kiplangat' },
+      { time: 'Yesterday', action: 'Approved verification', admin: 'Faith Njeri', target: 'Otieno Ochieng' },
+      { time: '2 days ago', action: 'Reviewed payment', admin: 'Amina Diallo', target: 'TXN-88090' },
+      { time: '3 days ago', action: 'Escalated support ticket', admin: 'Brian Otieno', target: 'TCK-2287' },
+      { time: '4 days ago', action: 'Role changed to Finance', admin: 'Amina Diallo', target: 'Faith Njeri' }
+    ],
+    toast: ''
+  };
+
+  componentWillUnmount() { clearTimeout(this._toastTimer); }
+  showToast(msg) { this.setState({ toast: msg }); clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.setState({ toast: '' }), 2600); }
+  logAudit(action, target) {
+    this.setState(prev => ({ auditLog: [{ time: 'Just now', action, admin: 'Amina Diallo', target }, ...prev.auditLog] }));
+  }
+  openModal(name) { this.setState({ modalOpen: name }); }
+  closeModal = () => this.setState({ modalOpen: null });
+  stopProp = (e) => e.stopPropagation();
+
+  mfaBoxHandlers() {
+    return this.state.mfaCode.map((v, i) => ({
+      value: v,
+      onInput: (e) => {
+        const val = e.target.value.replace(/\D/g, '').slice(-1);
+        const copy = [...this.state.mfaCode]; copy[i] = val;
+        this.setState({ mfaCode: copy });
+        if (val && e.target.nextElementSibling) e.target.nextElementSibling.focus();
+      },
+      onKeyDown: (e) => { if (e.key === 'Backspace' && !this.state.mfaCode[i] && e.target.previousElementSibling) e.target.previousElementSibling.focus(); }
+    }));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const collapsed = s.sidebarCollapsed;
+    const on = (n) => s.navActive === n;
+    const nav = (n) => `display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:${on(n) ? 'rgba(227,237,231,.12)' : 'none'};border:none;color:${on(n) ? '#fff' : '#9AA39D'};border-radius:9px;padding:10px 10px;font-size:13px;font-weight:${on(n) ? 600 : 500}`;
+    const chip = (active) => active
+      ? 'background:var(--ink);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600'
+      : 'background:none;border:1px solid var(--line-2);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--stone)';
+
+    const roles = [
+      { key: 'super', label: 'Super Admin', short: 'Super' }, { key: 'ops', label: 'Operations Manager', short: 'Ops' },
+      { key: 'support', label: 'Customer Support', short: 'Supp' }, { key: 'finance', label: 'Finance', short: 'Fin' },
+      { key: 'tech', label: 'Technical Support', short: 'Tech' }, { key: 'analyst', label: 'Read-only Analyst', short: 'View' }
+    ];
+    const roleOptions = roles.map(r => ({ label: r.label, short: r.short, select: () => this.setState({ currentRole: r.key, rolePickerOpen: false }) }));
+    const currentRoleLabel = roles.find(r => r.key === s.currentRole)?.label || 'Super Admin';
+
+    const statusStyle = (st) => `font-weight:600;font-size:12px;color:${st === 'active' ? 'var(--success)' : st === 'suspended' ? 'var(--error)' : 'var(--warning)'}`;
+    const verifiedStyle = (v) => `font-size:12px;font-weight:600;color:${v ? 'var(--success)' : 'var(--warning)'}`;
+
+    const filteredUsers = s.users.filter(u => u.role.toLowerCase() === (s.userTab === 'landlords' ? 'landlord' : s.userTab === 'caretakers' ? 'caretaker' : s.userTab === 'tenants' ? 'tenant' : 'admin'));
+    const userTabDefs = [{ key: 'landlords', label: 'Landlords' }, { key: 'caretakers', label: 'Caretakers' }, { key: 'tenants', label: 'Tenants' }, { key: 'admins', label: 'Admins' }];
+    const userTabList = userTabDefs.map(t => ({ label: t.label, style: chip(s.userTab === t.key), select: () => this.setState({ userTab: t.key }) }));
+
+    const viewingUser = s.users.find(u => u.id === s.viewingUserId);
+
+    const paymentTabDefs = [{ key: 'successful', label: 'Successful' }, { key: 'failed', label: 'Failed' }, { key: 'pending', label: 'Pending' }, { key: 'reconciliation', label: 'Reconciliation' }];
+    const paymentTabList = paymentTabDefs.map(t => ({ label: t.label, style: chip(s.paymentTab === t.key), select: () => this.setState({ paymentTab: t.key }) }));
+    const payStatusMap = { successful: { label: 'Successful', color: 'var(--success)' }, failed: { label: 'Failed', color: 'var(--error)' }, pending: { label: 'Pending', color: 'var(--warning)' }, reconciliation: { label: 'Reconciliation', color: 'var(--warning)' } };
+    const filteredPayments = s.payments.filter(p => p.status === s.paymentTab);
+    const viewingPayment = s.payments.find(p => p.id === s.viewingPaymentId);
+
+    const ticketStatusMap = { open: { label: 'Open', color: 'var(--error)' }, escalated: { label: 'Escalated', color: 'var(--warning)' }, in_progress: { label: 'In progress', color: 'var(--warning)' }, resolved: { label: 'Resolved', color: 'var(--success)' } };
+    const viewingTicket = s.tickets.find(t => t.id === s.viewingTicketId);
+
+    const maintStatusMap = { reported: { label: 'Reported', color: 'var(--error)' }, assigned: { label: 'Assigned', color: 'var(--warning)' }, inprogress: { label: 'In progress', color: 'var(--warning)' }, overdue: { label: 'Overdue', color: 'var(--error)' }, completed: { label: 'Completed', color: 'var(--success)' }, cancelled: { label: 'Cancelled', color: 'var(--stone)' } };
+    const priorityStyle = (p) => `font-weight:600;font-size:12px;color:${p === 'Urgent' ? 'var(--error)' : p === 'Normal' ? 'var(--warning)' : 'var(--green)'}`;
+    const viewingMaint = s.maintenance.find(m => m.id === s.viewingMaintId);
+    const viewingProperty = s.properties.find(p => p.id === s.viewingPropertyId);
+
+    const searchIndex = [
+      ...s.users.map(u => ({ type: 'User', label: u.name, select: () => { this.setState({ viewingUserId: u.id, modalOpen: 'user', searchOpen: false, searchValue: '' }); } })),
+      ...s.properties.map(p => ({ type: 'Property', label: p.name, select: () => { this.setState({ viewingPropertyId: p.id, modalOpen: 'property', searchOpen: false, searchValue: '' }); } })),
+      ...s.tickets.map(t => ({ type: 'Ticket', label: t.subject, select: () => { this.setState({ viewingTicketId: t.id, modalOpen: 'ticket', searchOpen: false, searchValue: '' }); } }))
+    ];
+    const searchResults = s.searchValue ? searchIndex.filter(r => r.label.toLowerCase().includes(s.searchValue.toLowerCase())) : [];
+
+    return {
+      loggedIn: s.loggedIn,
+      loginStep_creds: s.loginStep === 'creds', loginStep_mfa: s.loginStep === 'mfa', loginStep_forgot: s.loginStep === 'forgot',
+      suspiciousLoginFlag: s.suspiciousLoginFlag,
+      loginEmail: s.loginEmail, updateLoginEmail: (e) => this.setState({ loginEmail: e.target.value }),
+      loginPassword: s.loginPassword, updateLoginPassword: (e) => this.setState({ loginPassword: e.target.value }),
+      submitCreds: () => this.setState({ loginStep: 'mfa' }),
+      mfaBoxes: this.mfaBoxHandlers(),
+      submitMfa: () => this.setState({ loggedIn: true }),
+      goForgot: () => this.setState({ loginStep: 'forgot' }), goCreds: () => this.setState({ loginStep: 'creds' }),
+      sendReset: () => { this.showToast('Reset link sent.'); this.setState({ loginStep: 'creds' }); },
+      logout: () => this.setState({ loggedIn: false, loginStep: 'creds', profileMenuOpen: false }),
+
+      sidebarStyle: `width:${collapsed ? '68px' : '230px'};flex-shrink:0;background:var(--ink);color:#fff;padding:${collapsed ? '20px 10px' : '20px 14px'};display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;transition:width .15s ease;overflow:hidden`,
+      navLabelStyle: collapsed ? 'display:none' : 'white-space:nowrap',
+      collapseIconStyle: `transition:transform .15s;transform:rotate(${collapsed ? '180deg' : '0deg'})`,
+      profileNameWrapStyle: collapsed ? 'display:none' : 'line-height:1.2;flex:1',
+      toggleSidebarCollapsed: () => this.setState({ sidebarCollapsed: !collapsed }),
+
+      is_dashboard: on('dashboard'), is_users: on('users'), is_properties: on('properties'), is_payments: on('payments'),
+      is_support: on('support'), is_maintenance: on('maintenance'), is_technicians: on('technicians'), is_notifications: on('notifications'),
+      is_finance: on('finance'), is_health: on('health'), is_aiops: on('aiops'), is_audit: on('audit'), is_settings: on('settings'),
+      nav_dashboard: nav('dashboard'), nav_users: nav('users'), nav_properties: nav('properties'), nav_payments: nav('payments'),
+      nav_support: nav('support'), nav_maintenance: nav('maintenance'), nav_technicians: nav('technicians'), nav_notifications: nav('notifications'),
+      nav_finance: nav('finance'), nav_health: nav('health'), nav_aiops: nav('aiops'), nav_audit: nav('audit'), nav_settings: nav('settings'),
+      navTo_dashboard: () => this.setState({ navActive: 'dashboard' }), navTo_users: () => this.setState({ navActive: 'users' }),
+      navTo_properties: () => this.setState({ navActive: 'properties' }), navTo_payments: () => this.setState({ navActive: 'payments' }),
+      navTo_support: () => this.setState({ navActive: 'support' }), navTo_maintenance: () => this.setState({ navActive: 'maintenance' }),
+      navTo_technicians: () => this.setState({ navActive: 'technicians' }), navTo_notifications: () => this.setState({ navActive: 'notifications' }),
+      navTo_finance: () => this.setState({ navActive: 'finance' }), navTo_health: () => this.setState({ navActive: 'health' }),
+      navTo_aiops: () => this.setState({ navActive: 'aiops' }), navTo_audit: () => this.setState({ navActive: 'audit' }),
+      navTo_settings: () => this.setState({ navActive: 'settings' }),
+
+      profileMenuOpen: s.profileMenuOpen, toggleProfileMenu: () => this.setState({ profileMenuOpen: !s.profileMenuOpen }),
+      currentRoleLabel, roleOptions, rolePickerOpen: s.rolePickerOpen, toggleRolePicker: () => this.setState({ rolePickerOpen: !s.rolePickerOpen }),
+
+      searchValue: s.searchValue, updateSearch: (e) => this.setState({ searchValue: e.target.value }), searchOpen: s.searchOpen, openSearch: () => this.setState({ searchOpen: true }),
+      searchResults, noSearchResults: searchResults.length === 0, searchHint: s.searchValue ? 'No matches.' : 'Start typing to search everything.',
+
+      notifOpen: s.notifOpen, toggleNotif: () => this.setState({ notifOpen: !s.notifOpen }),
+      globalAlerts: [
+        { text: 'Daraja callback failures spiked (12 in last hour)', time: '18m ago', dotStyle: 'width:7px;height:7px;border-radius:99px;background:var(--error);margin-top:5px;flex-shrink:0' },
+        { text: 'SMS gateway latency elevated', time: '1h ago', dotStyle: 'width:7px;height:7px;border-radius:99px;background:var(--warning);margin-top:5px;flex-shrink:0' },
+        { text: 'Payment reconciliation queue delayed', time: '3h ago', dotStyle: 'width:7px;height:7px;border-radius:99px;background:var(--warning);margin-top:5px;flex-shrink:0' },
+        { text: 'Nightly backup completed successfully', time: '6h ago', dotStyle: 'width:7px;height:7px;border-radius:99px;background:var(--success);margin-top:5px;flex-shrink:0' }
+      ],
+
+      kpiCards: [
+        { label: 'Total Landlords', value: '2', delta: '+1 this month' }, { label: 'Total Caretakers', value: '2', delta: '+0' },
+        { label: 'Total Tenants', value: '5', delta: '+2 this month' }, { label: 'Total Properties', value: '4', delta: '+1 this month' },
+        { label: 'Rental Units', value: '60', delta: '+16 this month' }, { label: 'Payments Recorded', value: '1,204', delta: '+38 today' },
+        { label: 'Payments Today', value: 'KES 892K', delta: '↑ 12%' }, { label: 'Maintenance Requests', value: '6', delta: '2 overdue' },
+        { label: 'Support Tickets', value: '6', delta: '1 escalated' }, { label: 'Monthly Revenue', value: 'KES 3.1M', delta: '↑ 8% MoM' },
+        { label: 'Active Users', value: '412', delta: '↑ 5%' }, { label: 'Pending Verifications', value: '2', delta: 'Review needed' }
+      ].map(k => ({ ...k, deltaColor: k.delta.includes('overdue') || k.delta.includes('escalated') || k.delta.includes('Review') ? 'var(--warning)' : 'var(--success)' })),
+      dauBars: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'].map((label, i) => ({ label, style: `width:100%;border-radius:4px 4px 0 0;height:${[52, 60, 58, 40, 38, 70, 84][i]}%;background:${i === 6 ? 'var(--clay)' : 'var(--green-line)'}` })),
+      revBars: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'].map((label, i) => ({ label, style: `width:100%;border-radius:4px 4px 0 0;height:${[40, 48, 55, 62, 70, 84][i]}%;background:${i === 5 ? 'var(--clay)' : 'var(--green-line)'}` })),
+      geoDist: [
+        { county: 'Nairobi', pct: 68, barStyle: 'width:68%;height:100%;background:var(--green)' },
+        { county: 'Mombasa', pct: 15, barStyle: 'width:15%;height:100%;background:var(--green)' },
+        { county: 'Kiambu', pct: 10, barStyle: 'width:10%;height:100%;background:var(--green)' },
+        { county: 'Other', pct: 7, barStyle: 'width:7%;height:100%;background:var(--green)' }
+      ],
+      pendingVerifCount: 2,
+
+      userTabList,
+      usersList: filteredUsers.map(u => ({
+        name: u.name, role: u.role, joined: u.joined,
+        statusLabel: u.status === 'active' ? 'Active' : 'Suspended', statusStyle: statusStyle(u.status),
+        verifiedLabel: u.verified ? 'Verified' : 'Unverified', verifiedStyle: verifiedStyle(u.verified),
+        openDetail: () => this.setState({ viewingUserId: u.id, modalOpen: 'user' })
+      })),
+
+      propCountyFilter: s.propCountyFilter || '', updatePropCountyFilter: (e) => this.setState({ propCountyFilter: e.target.value }),
+      propStatusFilter: s.propStatusFilter || '', updatePropStatusFilter: (e) => this.setState({ propStatusFilter: e.target.value }),
+      propertiesList: s.properties.filter(p => (!s.propCountyFilter || p.county === s.propCountyFilter)).map(p => ({
+        name: p.name, county: p.county, landlord: p.landlord, units: p.units, occupancy: p.occupancy,
+        openDetail: () => this.setState({ viewingPropertyId: p.id, modalOpen: 'property' })
+      })),
+
+      paymentTabList,
+      paymentsList: filteredPayments.map(p => ({
+        time: p.time, tenant: p.tenant, property: p.property, amount: p.amount, method: p.method, ref: p.ref,
+        statusLabel: payStatusMap[p.status].label, statusStyle: `font-weight:600;color:${payStatusMap[p.status].color}`,
+        openDetail: () => this.setState({ viewingPaymentId: p.id, modalOpen: 'payment' })
+      })),
+
+      ticketOpenCount: s.tickets.filter(t => t.status === 'open').length, ticketEscalatedCount: s.tickets.filter(t => t.status === 'escalated').length, ticketResolvedCount: s.tickets.filter(t => t.status === 'resolved').length,
+      ticketsList: s.tickets.map(t => ({
+        id: t.id, subject: t.subject, customer: t.customer, agent: t.agent,
+        statusLabel: ticketStatusMap[t.status].label, statusStyle: `font-weight:600;color:${ticketStatusMap[t.status].color}`,
+        openDetail: () => this.setState({ viewingTicketId: t.id, modalOpen: 'ticket', tkAgent: t.agent, tkNotes: '' })
+      })),
+
+      maintStatusCards: ['reported', 'assigned', 'inprogress', 'overdue', 'completed', 'cancelled'].map(k => ({ label: maintStatusMap[k].label, count: s.maintenance.filter(m => m.status === k).length })),
+      adminMaintList: s.maintenance.map(m => ({
+        issue: m.issue, property: m.property, technician: m.technician,
+        priorityLabel: m.priority, priorityStyle: priorityStyle(m.priority),
+        statusLabel: maintStatusMap[m.status].label, statusStyle: `font-weight:600;color:${maintStatusMap[m.status].color}`,
+        openDetail: () => this.setState({ viewingMaintId: m.id, modalOpen: 'maint', amNewTech: m.technician === 'Unassigned' ? 'James Mwenda — Handyman' : m.technician })
+      })),
+
+      techniciansList: [
+        { name: 'Otieno Plumbing', skills: 'Plumbing', county: 'Nairobi', rating: '4.8', jobs: 62, statusLabel: 'Available', statusStyle: 'font-weight:600;font-size:11px;color:var(--success)' },
+        { name: 'James Mwenda', skills: 'General handyman', county: 'Nairobi', rating: '4.6', jobs: 41, statusLabel: 'Available', statusStyle: 'font-weight:600;font-size:11px;color:var(--success)' },
+        { name: 'Kioko Painters', skills: 'Painting', county: 'Nairobi', rating: '4.9', jobs: 28, statusLabel: 'On a job', statusStyle: 'font-weight:600;font-size:11px;color:var(--warning)' },
+        { name: 'Mombasa Electric Co.', skills: 'Electrical', county: 'Mombasa', rating: '4.5', jobs: 19, statusLabel: 'Available', statusStyle: 'font-weight:600;font-size:11px;color:var(--success)' },
+        { name: 'Coastal Locksmiths', skills: 'Security', county: 'Mombasa', rating: '4.3', jobs: 12, statusLabel: 'Suspended', statusStyle: 'font-weight:600;font-size:11px;color:var(--error)' },
+        { name: 'Kiambu Repairs', skills: 'General handyman', county: 'Kiambu', rating: '4.7', jobs: 33, statusLabel: 'Available', statusStyle: 'font-weight:600;font-size:11px;color:var(--success)' }
+      ],
+
+      notifLogList: [
+        { channel: 'SMS', message: 'Rent reminder — July', recipient: 'Brian Kiplangat', statusLabel: 'Delivered', statusStyle: 'color:var(--success);font-weight:600' },
+        { channel: 'WhatsApp', message: 'Payment confirmation', recipient: 'Sarah Wanjiku', statusLabel: 'Delivered', statusStyle: 'color:var(--success);font-weight:600' },
+        { channel: 'Push', message: 'Maintenance scheduled', recipient: 'Faith Wambui', statusLabel: 'Delivered', statusStyle: 'color:var(--success);font-weight:600' },
+        { channel: 'Email', message: 'Monthly statement', recipient: 'Wanjiru Mwangi', statusLabel: 'Failed — retrying', statusStyle: 'color:var(--error);font-weight:600' },
+        { channel: 'USSD', message: 'Session: balance check', recipient: '+254 712 445 210', statusLabel: 'Completed', statusStyle: 'color:var(--success);font-weight:600' },
+        { channel: 'SMS', message: 'Verification code', recipient: 'Otieno Ochieng', statusLabel: 'Delivered', statusStyle: 'color:var(--success);font-weight:600' },
+        { channel: 'WhatsApp', message: 'Repair completed', recipient: 'Grace Njoki', statusLabel: 'Pending', statusStyle: 'color:var(--warning);font-weight:600' },
+        { channel: 'Push', message: 'New support reply', recipient: 'Brian Kiplangat', statusLabel: 'Delivered', statusStyle: 'color:var(--success);font-weight:600' }
+      ],
+
+      financeCards: [
+        { label: 'MRR', value: 'KES 3.1M' }, { label: 'ARR', value: 'KES 37.2M' }, { label: 'Outstanding invoices', value: 'KES 214K' },
+        { label: 'Failed payments', value: 'KES 88K' }, { label: 'Refunds (30d)', value: 'KES 22K' }, { label: 'Churn', value: '2.1%' }
+      ],
+      exportStub: () => this.showToast('Report exported (demo).'),
+      subscriptionsList: [
+        { landlord: 'Wanjiru Mwangi', plan: 'Growth', statusLabel: 'Active', statusStyle: 'color:var(--success);font-weight:600', renews: '2026-08-14' },
+        { landlord: 'Otieno Ochieng', plan: 'Starter', statusLabel: 'Trial', statusStyle: 'color:var(--warning);font-weight:600', renews: '2026-07-28' },
+        { landlord: 'Kimani Properties Ltd', plan: 'Enterprise', statusLabel: 'Active', statusStyle: 'color:var(--success);font-weight:600', renews: '2026-09-02' },
+        { landlord: 'Achieng Holdings', plan: 'Growth', statusLabel: 'Past due', statusStyle: 'color:var(--error);font-weight:600', renews: '2026-07-19' },
+        { landlord: 'Njoroge & Sons', plan: 'Starter', statusLabel: 'Active', statusStyle: 'color:var(--success);font-weight:600', renews: '2026-08-05' }
+      ],
+
+      healthList: [
+        { label: 'API', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--success)' },
+        { label: 'Database', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--success)' },
+        { label: 'SMS Gateway', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--warning)' },
+        { label: 'WhatsApp API', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--success)' },
+        { label: 'Daraja (M-Pesa) API', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--error)' },
+        { label: 'Email service', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--success)' },
+        { label: 'Storage', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--success)' },
+        { label: 'CPU load: 42%', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--success)' },
+        { label: 'Memory: 61%', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--warning)' },
+        { label: 'Queue depth: 12', dotStyle: 'width:9px;height:9px;border-radius:99px;background:var(--success)' }
+      ],
+
+      aiOpsCards: [
+        { label: 'Total conversations', value: '8,412' }, { label: 'Failed responses', value: '31' },
+        { label: 'Escalated to human', value: '19' }, { label: 'Avg. rating', value: '4.6 / 5' }, { label: 'Prompt usage today', value: '612' }
+      ],
+      aiTopQuestions: [
+        { text: 'When is my next rent due?', count: 1204 }, { text: 'Show my receipts', count: 891 },
+        { text: 'Report a maintenance issue', count: 640 }, { text: 'Which units are vacant?', count: 322 },
+        { text: 'Explain my Rental Passport', count: 210 }
+      ],
+
+      auditLogList: s.auditLog,
+
+      permissionMatrix: [
+        { label: 'Can suspend users', cells: ['✓', '✓', '—', '—', '—', '—'] },
+        { label: 'Can view payments', cells: ['✓', '✓', '✓', '✓', '—', '✓'] },
+        { label: 'Can export reports', cells: ['✓', '✓', '—', '✓', '—', '✓'] },
+        { label: 'Can delete records', cells: ['✓', '—', '—', '—', '—', '—'] },
+        { label: 'Can manage billing', cells: ['✓', '—', '—', '✓', '—', '—'] },
+        { label: 'Can view AI logs', cells: ['✓', '✓', '—', '—', '✓', '✓'] }
+      ],
+
+      anyModalOpen: !!s.modalOpen, closeModal: this.closeModal, stopProp: this.stopProp,
+      is_modal_user: s.modalOpen === 'user', is_modal_property: s.modalOpen === 'property', is_modal_payment: s.modalOpen === 'payment',
+      is_modal_ticket: s.modalOpen === 'ticket', is_modal_maint: s.modalOpen === 'maint',
+
+      udName: viewingUser?.name || '', udRole: viewingUser?.role || '', udEmail: viewingUser?.email || '', udPhone: viewingUser?.phone || '', udJoined: viewingUser?.joined || '',
+      udProperty: viewingUser?.property || '', udTicketCount: viewingUser?.tickets ?? 0,
+      udInitials: (viewingUser?.name || '').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
+      udStatusLabel: viewingUser?.status === 'active' ? 'Active' : 'Suspended', udStatusStyle: `font-family:'JetBrains Mono';font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;background:${viewingUser?.status === 'active' ? 'var(--green-soft)' : 'rgba(207,75,62,.12)'};color:${viewingUser?.status === 'active' ? 'var(--green-deep)' : 'var(--error)'}`,
+      udVerifiedLabel: viewingUser?.verified ? 'Verified' : 'Unverified', udVerifiedStyle: `font-family:'JetBrains Mono';font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;background:${viewingUser?.verified ? 'var(--green-soft)' : 'rgba(224,160,8,.12)'};color:${viewingUser?.verified ? 'var(--green-deep)' : 'var(--warning)'}`,
+      udTimeline: [{ text: 'Logged in', time: '2h ago' }, { text: 'Updated profile photo', time: '3d ago' }, { text: 'Made a payment', time: '3w ago' }],
+      udLastLogin: '21 Jul 2026, 08:12', udLastDevice: 'iPhone 14 · Nairobi, KE',
+      suspendBtnLabel: viewingUser?.status === 'active' ? 'Suspend account' : 'Reactivate account',
+      suspendBtnStyle: `border:1.5px solid ${viewingUser?.status === 'active' ? 'rgba(207,75,62,.3)' : 'var(--line-2)'};background:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:600;color:${viewingUser?.status === 'active' ? 'var(--error)' : 'var(--ink)'}`,
+      toggleSuspendUser: () => {
+        if (!viewingUser) return;
+        const newStatus = viewingUser.status === 'active' ? 'suspended' : 'active';
+        this.setState(prev => ({ users: prev.users.map(u => u.id === viewingUser.id ? { ...u, status: newStatus } : u) }));
+        this.logAudit(newStatus === 'suspended' ? 'Suspended user' : 'Reactivated user', viewingUser.name);
+        this.showToast(newStatus === 'suspended' ? 'Account suspended.' : 'Account reactivated.');
+      },
+      resetUserPassword: () => { this.logAudit('Reset password', viewingUser?.name); this.showToast('Password reset email sent.'); },
+      verifyUser: () => {
+        if (!viewingUser) return;
+        this.setState(prev => ({ users: prev.users.map(u => u.id === viewingUser.id ? { ...u, verified: true } : u) }));
+        this.logAudit('Verified identity', viewingUser.name);
+        this.showToast('Identity verified.');
+      },
+      deleteUserStub: () => this.showToast('Deletion requires Super Admin + second approver.'),
+
+      pdName: viewingProperty?.name || '', pdCounty: viewingProperty?.county || '', pdLandlord: viewingProperty?.landlord || '',
+      pdUnits: viewingProperty?.units || 0, pdOccupancy: viewingProperty?.occupancy || 0, pdCaretakers: viewingProperty?.caretakers || '', pdTenants: viewingProperty?.tenants || 0,
+      pdMaintCount: viewingProperty?.maintCount || 0, pdMaintOpen: viewingProperty?.maintOpen || 0,
+
+      payRef: viewingPayment?.ref || '', payTenant: viewingPayment?.tenant || '', payProperty: viewingPayment?.property || '', payAmount: viewingPayment?.amount || '',
+      payMethod: viewingPayment?.method || '', payTxnId: viewingPayment?.txnId || '',
+      payStatusLabel: viewingPayment ? payStatusMap[viewingPayment.status].label : '', payStatusStyle: viewingPayment ? `font-family:'JetBrains Mono';font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;background:${payStatusMap[viewingPayment.status].color === 'var(--success)' ? 'var(--green-soft)' : 'rgba(224,160,8,.12)'};color:${payStatusMap[viewingPayment.status].color}` : '',
+      payCallbackLabel: viewingPayment?.callback || '', payCallbackStyle: `font-weight:600;color:${viewingPayment?.callback === 'Received' ? 'var(--success)' : 'var(--warning)'}`,
+      payShowRetry: viewingPayment && viewingPayment.status !== 'successful',
+      retryBtnLabel: viewingPayment?.status === 'pending' ? 'Investigating callback…' : 'Retry callback',
+      retryCallback: () => {
+        if (!viewingPayment) return;
+        this.setState(prev => ({ payments: prev.payments.map(p => p.id === viewingPayment.id ? { ...p, status: 'successful', callback: 'Received' } : p) }));
+        this.logAudit('Retried payment callback', viewingPayment.ref);
+        this.showToast('Callback retried — payment marked successful.');
+      },
+
+      tkSubject: viewingTicket?.subject || '', tkId: viewingTicket?.id || '', tkCustomer: viewingTicket?.customer || '',
+      tkAgent: s.tkAgent, updateTkAgent: (e) => this.setState({ tkAgent: e.target.value }),
+      tkNotes: s.tkNotes, updateTkNotes: (e) => this.setState({ tkNotes: e.target.value }),
+      escalateTicket: () => {
+        if (!viewingTicket) return;
+        this.setState(prev => ({ tickets: prev.tickets.map(t => t.id === viewingTicket.id ? { ...t, status: 'escalated', agent: s.tkAgent } : t), modalOpen: null }));
+        this.logAudit('Escalated support ticket', viewingTicket.id);
+        this.showToast('Ticket escalated.');
+      },
+      resolveTicket: () => {
+        if (!viewingTicket) return;
+        this.setState(prev => ({ tickets: prev.tickets.map(t => t.id === viewingTicket.id ? { ...t, status: 'resolved', agent: s.tkAgent } : t), modalOpen: null }));
+        this.logAudit('Resolved support ticket', viewingTicket.id);
+        this.showToast('Ticket resolved — customer notified.');
+      },
+
+      amIssue: viewingMaint?.issue || '', amProperty: viewingMaint?.property || '', amTechnician: viewingMaint?.technician || '',
+      amNewTech: s.amNewTech, updateAmNewTech: (e) => this.setState({ amNewTech: e.target.value }),
+      escalateMaint: () => {
+        if (!viewingMaint) return;
+        this.setState(prev => ({ maintenance: prev.maintenance.map(m => m.id === viewingMaint.id ? { ...m, status: 'overdue' } : m), modalOpen: null }));
+        this.logAudit('Escalated maintenance ticket', viewingMaint.issue);
+        this.showToast('Maintenance ticket escalated.');
+      },
+      reassignMaint: () => {
+        if (!viewingMaint) return;
+        this.setState(prev => ({ maintenance: prev.maintenance.map(m => m.id === viewingMaint.id ? { ...m, status: 'completed', technician: s.amNewTech } : m), modalOpen: null }));
+        this.logAudit('Reassigned technician & completed', viewingMaint.issue);
+        this.showToast('Technician reassigned — marked completed.');
+      },
+
+      toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

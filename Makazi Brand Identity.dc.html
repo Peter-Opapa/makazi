@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#F6F5F0;color:#0B140F;font-family:'Hanken Grotesk',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  :root{
+    --ink:#0B140F;--paper:#F6F5F0;--white:#FFFFFF;
+    --green:#0E5C43;--green-deep:#093C2C;--green-soft:#E3EDE7;--green-line:#C9DBD1;
+    --clay:#DB6B3B;--clay-soft:#F5E4DA;
+    --success:#1E9E5A;--warning:#E0A008;--error:#CF4B3E;
+    --stone:#5C665F;--line:#E4E2DA;--line-2:#D8D6CD;
+  }
+  ::selection{background:#DB6B3B;color:#fff}
+  a{color:var(--green);text-decoration:none}
+  a:hover{color:var(--clay)}
+</style>
+</helmet>
+
+<div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--clay);z-index:100;transform:scaleX({{ progress }});transform-origin:left;transition:transform .1s linear"></div>
+
+<nav style="position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:90;display:flex;flex-direction:column;gap:16px" aria-label="Sections">
+  <a href="#cover" style="width:9px;height:9px;border-radius:99px;background:var(--ink);opacity:.9" title="Cover"></a>
+  <a href="#strategy" style="width:9px;height:9px;border-radius:99px;border:1.5px solid var(--ink);opacity:.5" title="Strategy"></a>
+  <a href="#logo" style="width:9px;height:9px;border-radius:99px;border:1.5px solid var(--ink);opacity:.5" title="Logo"></a>
+  <a href="#color" style="width:9px;height:9px;border-radius:99px;border:1.5px solid var(--ink);opacity:.5" title="Colour"></a>
+  <a href="#type" style="width:9px;height:9px;border-radius:99px;border:1.5px solid var(--ink);opacity:.5" title="Type"></a>
+  <a href="#system" style="width:9px;height:9px;border-radius:99px;border:1.5px solid var(--ink);opacity:.5" title="System"></a>
+  <a href="#ui" style="width:9px;height:9px;border-radius:99px;border:1.5px solid var(--ink);opacity:.5" title="Product"></a>
+  <a href="#voice" style="width:9px;height:9px;border-radius:99px;border:1.5px solid var(--ink);opacity:.5" title="Voice"></a>
+</nav>
+
+<!-- ========== COVER ========== -->
+<section id="cover" style="min-height:100vh;background:var(--ink);color:var(--paper);display:flex;flex-direction:column;justify-content:space-between;padding:48px clamp(28px,6vw,96px) 40px;position:relative;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;position:relative;z-index:2">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img src="assets/makazi-mark-light.png" alt="Makazi" style="height:36px;width:auto;display:block">
+      <span style="font-family:'Schibsted Grotesk';font-weight:800;letter-spacing:.14em;font-size:18px">MAKAZI</span>
+    </div>
+    <span style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.6">Brand Identity System — v1.0</span>
+  </div>
+
+  <div style="position:relative;z-index:2;max-width:1000px">
+    <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--clay);margin-bottom:28px">Kenyan PropTech · Est. 2026</div>
+    <h1 style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(44px,7.5vw,108px);line-height:.98;letter-spacing:-.03em;margin:0 0 30px">The operating system<br>for rental housing<br>across Africa.</h1>
+    <p style="font-size:clamp(17px,2.1vw,23px);max-width:640px;color:#C7CEC9;margin:0;font-weight:300">A complete visual identity for Makazi — the platform that lets landlords, caretakers and tenants run rentals from one place. Not a real-estate company. A technology company.</p>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:2;flex-wrap:wrap;gap:16px">
+    <div style="font-family:'JetBrains Mono';font-size:12px;opacity:.55;letter-spacing:.05em">Prepared as an investor-ready brand proposal · Nairobi</div>
+    <div style="font-family:'JetBrains Mono';font-size:12px;opacity:.55;letter-spacing:.05em">Scroll ↓</div>
+  </div>
+
+  <!-- oversized watermark mark -->
+  <img src="assets/makazi-mark-light.png" alt="" aria-hidden="true" style="position:absolute;right:-90px;bottom:-120px;width:520px;height:auto;opacity:.06;z-index:1">
+</section>
+
+<!-- ========== 01 STRATEGY ========== -->
+<section id="strategy" style="padding:clamp(72px,10vw,130px) clamp(28px,6vw,96px);max-width:1240px;margin:0 auto">
+  <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.2em;color:var(--clay);margin-bottom:18px">01 — BRAND STRATEGY</div>
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(30px,4.4vw,58px);line-height:1.02;letter-spacing:-.02em;margin:0 0 20px;max-width:900px">Makazi is infrastructure, not a listings site.</h2>
+  <p style="font-size:clamp(17px,1.9vw,21px);max-width:720px;color:var(--stone);margin:0 0 64px;font-weight:300">Everything below serves one job: making a fragmented, cash-based, paper-driven category feel calm, modern and trustworthy — the way Stripe made payments feel, or Flutterwave made African money movement feel.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:56px">
+    <div style="background:var(--white);padding:34px 30px">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.16em;color:var(--stone);text-transform:uppercase;margin-bottom:14px">Mission</div>
+      <p style="margin:0;font-size:18px;font-weight:500;line-height:1.4">Simplify rental housing across Africa.</p>
+    </div>
+    <div style="background:var(--white);padding:34px 30px">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.16em;color:var(--stone);text-transform:uppercase;margin-bottom:14px">Vision</div>
+      <p style="margin:0;font-size:18px;font-weight:500;line-height:1.4">Become the operating system for rental housing across the continent.</p>
+    </div>
+    <div style="background:var(--white);padding:34px 30px">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.16em;color:var(--stone);text-transform:uppercase;margin-bottom:14px">Trust promise</div>
+      <p style="margin:0;font-size:18px;font-weight:500;line-height:1.4">Makazi never holds your money. Rent goes tenant → landlord directly. We automate the record.</p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:36px">
+    <div>
+      <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:22px;margin:0 0 16px">Positioning</h3>
+      <p style="color:var(--stone);margin:0 0 14px">We sit beside the fintech infrastructure players, not the property portals. Think of the reference set as a spectrum of craft:</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span style="font-family:'JetBrains Mono';font-size:12px;padding:7px 13px;border:1px solid var(--line-2);border-radius:99px">Stripe</span>
+        <span style="font-family:'JetBrains Mono';font-size:12px;padding:7px 13px;border:1px solid var(--line-2);border-radius:99px">Linear</span>
+        <span style="font-family:'JetBrains Mono';font-size:12px;padding:7px 13px;border:1px solid var(--line-2);border-radius:99px">Notion</span>
+        <span style="font-family:'JetBrains Mono';font-size:12px;padding:7px 13px;border:1px solid var(--line-2);border-radius:99px">Ramp</span>
+        <span style="font-family:'JetBrains Mono';font-size:12px;padding:7px 13px;border:1px solid var(--line-2);border-radius:99px">Moniepoint</span>
+        <span style="font-family:'JetBrains Mono';font-size:12px;padding:7px 13px;border:1px solid var(--line-2);border-radius:99px">Flutterwave</span>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:22px;margin:0 0 16px">Personality</h3>
+      <p style="color:var(--stone);margin:0 0 14px">Ten adjectives, expressed through restraint — flat colour, generous space, precise type. Premium is what we <em>don't</em> add.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span style="font-size:13px;padding:7px 13px;background:var(--green-soft);color:var(--green-deep);border-radius:99px;font-weight:500">Modern</span>
+        <span style="font-size:13px;padding:7px 13px;background:var(--green-soft);color:var(--green-deep);border-radius:99px;font-weight:500">Trustworthy</span>
+        <span style="font-size:13px;padding:7px 13px;background:var(--green-soft);color:var(--green-deep);border-radius:99px;font-weight:500">Intelligent</span>
+        <span style="font-size:13px;padding:7px 13px;background:var(--green-soft);color:var(--green-deep);border-radius:99px;font-weight:500">Premium</span>
+        <span style="font-size:13px;padding:7px 13px;background:var(--green-soft);color:var(--green-deep);border-radius:99px;font-weight:500">Minimal</span>
+        <span style="font-size:13px;padding:7px 13px;background:var(--clay-soft);color:#9C4A22;border-radius:99px;font-weight:500">African</span>
+        <span style="font-size:13px;padding:7px 13px;background:var(--clay-soft);color:#9C4A22;border-radius:99px;font-weight:500">Friendly</span>
+        <span style="font-size:13px;padding:7px 13px;background:var(--green-soft);color:var(--green-deep);border-radius:99px;font-weight:500">Reliable</span>
+        <span style="font-size:13px;padding:7px 13px;background:var(--green-soft);color:var(--green-deep);border-radius:99px;font-weight:500">Innovative</span>
+        <span style="font-size:13px;padding:7px 13px;background:var(--green-soft);color:var(--green-deep);border-radius:99px;font-weight:500">Financially secure</span>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:22px;margin:0 0 16px">Not this</h3>
+      <p style="color:var(--stone);margin:0 0 14px">Guardrails matter as much as the vision. We are never mistaken for:</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:10px;align-items:center;font-size:15px"><span style="color:var(--error);font-family:'JetBrains Mono'">✕</span> A construction company</div>
+        <div style="display:flex;gap:10px;align-items:center;font-size:15px"><span style="color:var(--error);font-family:'JetBrains Mono'">✕</span> A real-estate agency</div>
+        <div style="display:flex;gap:10px;align-items:center;font-size:15px"><span style="color:var(--error);font-family:'JetBrains Mono'">✕</span> A housing developer</div>
+        <div style="display:flex;gap:10px;align-items:center;font-size:15px"><span style="color:var(--error);font-family:'JetBrains Mono'">✕</span> A roofs-and-keys clip-art brand</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 02 LOGO ========== -->
+<section id="logo" style="background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(72px,10vw,130px) clamp(28px,6vw,96px)">
+  <div style="max-width:1240px;margin:0 auto">
+    <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.2em;color:var(--clay);margin-bottom:18px">02 — LOGO SYSTEM</div>
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(30px,4.4vw,58px);line-height:1.02;letter-spacing:-.02em;margin:0 0 20px;max-width:900px">One mark, built from blocks.</h2>
+    <p style="font-size:clamp(17px,1.9vw,21px);max-width:800px;color:var(--stone);margin:0 0 52px;font-weight:300">The Makazi mark is an isometric &ldquo;M&rdquo; monogram assembled from modular blocks &mdash; individual units stacking and connecting into a single structure. It reads as digital infrastructure, growth and connection, never a house. Abstract, geometric, and legible from favicon to signage.</p>
+
+    <!-- HERO showcase: primary + reversed -->
+    <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:24px;margin-bottom:24px">
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;min-height:340px">
+        <img src="assets/makazi-lockup.png" alt="Makazi primary logo" style="width:min(66%,300px);height:auto;display:block">
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone)">PRIMARY VERTICAL LOCKUP</div>
+      </div>
+      <div style="display:grid;grid-template-rows:1fr 1fr;gap:24px">
+        <div style="background:var(--ink);border-radius:24px;padding:28px;display:flex;align-items:center;justify-content:center"><img src="assets/makazi-lockup-light.png" alt="Makazi logo reversed on ink" style="width:min(58%,190px);height:auto"></div>
+        <div style="background:var(--green);border-radius:24px;padding:28px;display:flex;align-items:center;justify-content:center"><img src="assets/makazi-lockup-light.png" alt="Makazi logo on green" style="width:min(58%,190px);height:auto"></div>
+      </div>
+    </div>
+
+    <!-- symbolism -->
+    <div style="background:var(--ink);border-radius:24px;padding:clamp(30px,5vw,56px);margin-bottom:48px;color:var(--paper);display:grid;grid-template-columns:.85fr 1.15fr;gap:48px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:20px;align-items:center">
+        <div style="background:var(--paper);width:100%;max-width:280px;aspect-ratio:1;border-radius:28px;display:flex;align-items:center;justify-content:center"><img src="assets/makazi-mark.png" alt="Makazi mark" style="width:58%;height:auto"></div>
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:#8B948E">THE ISOMETRIC M</div>
+      </div>
+      <div>
+        <div style="display:grid;gap:20px">
+          <div><span style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--clay)">SYMBOLISM</span><p style="margin:5px 0 0;color:#D6DCD7;font-size:15px">Stacked, interlocking isometric blocks. Each block is a unit, a home, a record; together they assemble into one connected structure &mdash; the operating system beneath rental housing.</p></div>
+          <div><span style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--clay)">WHY IT FITS</span><p style="margin:5px 0 0;color:#D6DCD7;font-size:15px">Landlords manage 5&ndash;500 units; the mark literally stacks them. The 3-D build signals technology and infrastructure, the upward assembly signals growth, and the interlock signals connection &mdash; all without a roof, key or house.</p></div>
+          <div><span style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--clay)">HOW IT SCALES</span><p style="margin:5px 0 0;color:#D6DCD7;font-size:15px">Mark alone for app icon and favicon; vertical lockup for website, deck and print; horizontal lockup for product chrome and signage. Solid green stays crisp small; reversed to a single light tone on ink and green fields.</p></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+            <div><span style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--success)">STRENGTHS</span><p style="margin:5px 0 0;color:#D6DCD7;font-size:14px">Distinctive ownable &ldquo;M&rdquo;, rich infrastructure story, premium isometric craft.</p></div>
+            <div><span style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--warning)">CARE</span><p style="margin:5px 0 0;color:#D6DCD7;font-size:14px">Keep line weights even; below ~20px use a simplified single-tone cut.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- construction row -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
+      <div style="border:1px solid var(--line);border-radius:16px;padding:26px">
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone);margin-bottom:16px">CLEARSPACE</div>
+        <div style="background:var(--paper);border-radius:10px;padding:26px;display:flex;justify-content:center">
+          <div style="padding:20px;border:1px dashed var(--clay);border-radius:8px"><img src="assets/makazi-mark.png" alt="" style="height:56px;width:auto;display:block"></div>
+        </div>
+        <p style="color:var(--stone);font-size:13px;margin:14px 0 0">Clear margin = the width of one block on every side. Never crowd the mark.</p>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:16px;padding:26px">
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone);margin-bottom:16px">MINIMUM SIZES</div>
+        <div style="display:flex;align-items:flex-end;gap:26px;justify-content:center;padding:14px 0">
+          <div style="text-align:center"><img src="assets/makazi-mark.png" alt="" style="height:16px;width:auto;margin:0 auto;display:block"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);margin-top:8px">16px<br>favicon</div></div>
+          <div style="text-align:center"><img src="assets/makazi-mark.png" alt="" style="height:32px;width:auto;margin:0 auto;display:block"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);margin-top:8px">app icon</div></div>
+          <div style="text-align:center"><img src="assets/makazi-lockup.png" alt="" style="height:50px;width:auto;margin:0 auto;display:block"><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);margin-top:8px">120px min<br>lockup</div></div>
+        </div>
+        <p style="color:var(--stone);font-size:13px;margin:8px 0 0">Full lockup never below 120px wide (print: 22mm). Use the mark alone below that.</p>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:16px;padding:26px">
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone);margin-bottom:16px">APP ICON &amp; FAVICON</div>
+        <div style="display:flex;gap:14px;justify-content:center;padding:8px 0;flex-wrap:wrap">
+          <div style="width:64px;height:64px;border-radius:15px;background:var(--green);display:flex;align-items:center;justify-content:center"><img src="assets/makazi-mark-light.png" alt="" style="width:58%"></div>
+          <div style="width:64px;height:64px;border-radius:15px;background:var(--ink);display:flex;align-items:center;justify-content:center"><img src="assets/makazi-mark-light.png" alt="" style="width:58%"></div>
+          <div style="width:64px;height:64px;border-radius:15px;background:var(--paper);border:1px solid var(--line);display:flex;align-items:center;justify-content:center"><img src="assets/makazi-mark.png" alt="" style="width:58%"></div>
+        </div>
+        <p style="color:var(--stone);font-size:13px;margin:14px 0 0">Mark centred on a solid tile, 15px-radius corner. Green tile is the default.</p>
+      </div>
+    </div>
+
+    <!-- misuse -->
+    <div style="margin-top:24px;border:1px solid var(--line);border-radius:16px;padding:26px">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone);margin-bottom:20px">MISUSE &mdash; NEVER</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px">
+        <div style="text-align:center"><div style="height:74px;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,#f00,#00f);border-radius:10px;margin-bottom:8px"><img src="assets/makazi-mark-light.png" alt="" style="height:40px"></div><span style="font-size:12px;color:var(--stone)"><span style="color:var(--error)">&#10005;</span> No gradient grounds</span></div>
+        <div style="text-align:center"><div style="height:74px;display:flex;align-items:center;justify-content:center;background:var(--paper);border-radius:10px;margin-bottom:8px"><img src="assets/makazi-mark.png" alt="" style="height:58px;width:42px;object-fit:fill"></div><span style="font-size:12px;color:var(--stone)"><span style="color:var(--error)">&#10005;</span> Never distort</span></div>
+        <div style="text-align:center"><div style="height:74px;display:flex;align-items:center;justify-content:center;background:var(--paper);border-radius:10px;margin-bottom:8px;filter:drop-shadow(4px 6px 4px rgba(0,0,0,.4))"><img src="assets/makazi-mark.png" alt="" style="height:40px"></div><span style="font-size:12px;color:var(--stone)"><span style="color:var(--error)">&#10005;</span> No drop-shadow</span></div>
+        <div style="text-align:center"><div style="height:74px;display:flex;align-items:center;justify-content:center;background:var(--clay);border-radius:10px;margin-bottom:8px"><img src="assets/makazi-mark.png" alt="" style="height:40px"></div><span style="font-size:12px;color:var(--stone)"><span style="color:var(--error)">&#10005;</span> No green-on-clay clash</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 03 COLOUR ========== -->
+<section id="color" style="padding:clamp(72px,10vw,130px) clamp(28px,6vw,96px);max-width:1240px;margin:0 auto">
+  <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.2em;color:var(--clay);margin-bottom:18px">03 — COLOUR SYSTEM</div>
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(30px,4.4vw,58px);line-height:1.02;letter-spacing:-.02em;margin:0 0 20px;max-width:900px">Deep green, warm clay, honest ink.</h2>
+  <p style="font-size:clamp(17px,1.9vw,21px);max-width:760px;color:var(--stone);margin:0 0 56px;font-weight:300">Green carries money, land and the mobile-money category tenants already trust; clay grounds us in African daylight and earth; ink keeps everything premium and legible. Flat fills only — no gradients.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden">
+    <sc-for list="{{ colors }}" as="c" hint-placeholder-count="10">
+      <div style="background:var(--white)">
+        <div style="height:120px;background:{{ c.hex }}"></div>
+        <div style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+            <span style="font-family:'Schibsted Grotesk';font-weight:600;font-size:16px">{{ c.name }}</span>
+            <span style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.1em;color:var(--stone);text-transform:uppercase">{{ c.role }}</span>
+          </div>
+          <div style="font-family:'JetBrains Mono';font-size:12px;color:var(--stone);margin-bottom:2px">{{ c.hex }}</div>
+          <div style="font-family:'JetBrains Mono';font-size:12px;color:var(--stone);margin-bottom:12px">rgb({{ c.rgb }})</div>
+          <p style="font-size:13px;color:var(--stone);margin:0;line-height:1.45">{{ c.psych }}</p>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:32px">
+    <div style="border:1px solid var(--line);border-radius:16px;padding:26px">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone);margin-bottom:16px">USAGE RATIO — THE 60·30·10</div>
+      <div style="display:flex;height:44px;border-radius:8px;overflow:hidden;margin-bottom:12px">
+        <div style="flex:60;background:var(--paper);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:11px;color:var(--stone)">60% Paper / White</div>
+        <div style="flex:30;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:11px;color:#fff">30% Green</div>
+        <div style="flex:10;background:var(--clay);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:11px;color:#fff">10%</div>
+      </div>
+      <p style="font-size:13px;color:var(--stone);margin:0">Space dominates. Green carries brand and primary action. Clay is a spice — CTAs and delight only, never a background wash.</p>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:16px;padding:26px">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone);margin-bottom:16px">SEMANTIC STATES</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:7px;background:var(--success)"></span><span style="font-size:14px"><strong>Success</strong> — Payment confirmed · reconciled · occupied</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:7px;background:var(--warning)"></span><span style="font-size:14px"><strong>Warning</strong> — Rent due · arrears · reminder sent</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:7px;background:var(--error)"></span><span style="font-size:14px"><strong>Error</strong> — Payment failed · overdue · vacant</span></div>
+      </div>
+      <p style="font-size:13px;color:var(--stone);margin:14px 0 0">Success green is brighter than brand green so states never blur into identity.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 04 TYPOGRAPHY ========== -->
+<section id="type" style="background:var(--ink);color:var(--paper);padding:clamp(72px,10vw,130px) clamp(28px,6vw,96px)">
+  <div style="max-width:1240px;margin:0 auto">
+    <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.2em;color:var(--clay);margin-bottom:18px">04 — TYPOGRAPHY</div>
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(30px,4.4vw,58px);line-height:1.02;letter-spacing:-.02em;margin:0 0 20px;max-width:900px">Two grotesks and a monospace.</h2>
+    <p style="font-size:clamp(17px,1.9vw,21px);max-width:760px;color:#B9C1BB;margin:0 0 56px;font-weight:300">A confident display voice, a quiet reading voice, and a precise numeric voice for the thing that matters most — money.</p>
+
+    <div style="display:grid;gap:1px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden">
+      <div style="background:var(--ink);padding:38px 34px">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px">
+          <div><div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--clay)">DISPLAY / HEADLINES / WORDMARK</div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:26px;margin-top:6px">Schibsted Grotesk</div></div>
+          <div style="font-family:'JetBrains Mono';font-size:12px;color:#8B948E;max-width:280px">Weights 600–900. Tight tracking. Norwegian grotesk with just enough warmth to feel human, not corporate.</div>
+        </div>
+        <div style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(38px,6vw,76px);letter-spacing:-.03em;line-height:1">Housing, kept in order.</div>
+      </div>
+      <div style="background:var(--ink);padding:38px 34px">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px">
+          <div><div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--clay)">TEXT / UI / BODY</div><div style="font-family:'Hanken Grotesk';font-weight:600;font-size:26px;margin-top:6px">Hanken Grotesk</div></div>
+          <div style="font-family:'JetBrains Mono';font-size:12px;color:#8B948E;max-width:280px">Weights 300–700. A humanist workhorse — highly legible at 14px in dense dashboards and long reading alike.</div>
+        </div>
+        <div style="font-family:'Hanken Grotesk';font-weight:300;font-size:clamp(18px,2.4vw,26px);max-width:820px;line-height:1.5">From a single dashboard, a landlord in Kileleshwa tracks rent across 40 units, dispatches a caretaker to a leaking tap, and sends a reminder over WhatsApp — before the morning matatu ride is over.</div>
+      </div>
+      <div style="background:var(--ink);padding:38px 34px">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px">
+          <div><div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--clay)">MONO / DATA / MONEY / USSD</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:26px;margin-top:6px">JetBrains Mono</div></div>
+          <div style="font-family:'JetBrains Mono';font-size:12px;color:#8B948E;max-width:280px">Weights 400–600. Tabular figures for amounts, references and receipts — where alignment signals trust.</div>
+        </div>
+        <div style="font-family:'JetBrains Mono';font-weight:500;font-size:clamp(18px,2.4vw,28px);color:var(--green-soft)">KES 25,000.00 &nbsp;·&nbsp; REF QSR4XK9TZ2 &nbsp;·&nbsp; *151*7#</div>
+      </div>
+    </div>
+
+    <div style="margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:22px">
+      <div style="border-top:1px solid rgba(255,255,255,.15);padding-top:16px"><div style="font-family:'Schibsted Grotesk';font-weight:800;font-size:40px;letter-spacing:-.02em">Aa</div><div style="font-family:'JetBrains Mono';font-size:11px;color:#8B948E;margin-top:8px">Display 800 · -3% track</div></div>
+      <div style="border-top:1px solid rgba(255,255,255,.15);padding-top:16px"><div style="font-family:'Schibsted Grotesk';font-weight:600;font-size:34px">H1 · 48/52</div><div style="font-family:'JetBrains Mono';font-size:11px;color:#8B948E;margin-top:8px">Section titles</div></div>
+      <div style="border-top:1px solid rgba(255,255,255,.15);padding-top:16px"><div style="font-family:'Hanken Grotesk';font-weight:500;font-size:20px">Body · 16/26</div><div style="font-family:'JetBrains Mono';font-size:11px;color:#8B948E;margin-top:8px">Reading + UI</div></div>
+      <div style="border-top:1px solid rgba(255,255,255,.15);padding-top:16px"><div style="font-family:'JetBrains Mono';font-size:15px;color:var(--green-soft)">LABEL · 11/16</div><div style="font-family:'JetBrains Mono';font-size:11px;color:#8B948E;margin-top:8px">Mono · +14% track · caps</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 05 BRAND SYSTEM ========== -->
+<section id="system" style="padding:clamp(72px,10vw,130px) clamp(28px,6vw,96px);max-width:1240px;margin:0 auto">
+  <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.2em;color:var(--clay);margin-bottom:18px">05 — BRAND SYSTEM</div>
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(30px,4.4vw,58px);line-height:1.02;letter-spacing:-.02em;margin:0 0 20px;max-width:900px">The rules that make it feel like one thing.</h2>
+  <p style="font-size:clamp(17px,1.9vw,21px);max-width:760px;color:var(--stone);margin:0 0 56px;font-weight:300">A shared toolkit for spacing, icons, illustration, photography, buttons and layout — so every touchpoint, from an SMS to an investor deck, reads unmistakably Makazi.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px">
+
+    <div style="border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white)">
+      <h4 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:19px;margin:0 0 14px">Spacing — the 8-point grid</h4>
+      <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:14px">
+        <div style="width:8px;height:8px;background:var(--green-soft)"></div>
+        <div style="width:16px;height:16px;background:var(--green-line)"></div>
+        <div style="width:24px;height:24px;background:var(--green)"></div>
+        <div style="width:32px;height:32px;background:var(--green)"></div>
+        <div style="width:48px;height:48px;background:var(--green-deep)"></div>
+      </div>
+      <p style="font-size:14px;color:var(--stone);margin:0">Everything spaces in multiples of 8 (4 for fine detail). Radii: 8px controls, 16px cards, 24px surfaces, 99px pills.</p>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white)">
+      <h4 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:19px;margin:0 0 14px">Icon style</h4>
+      <div style="display:flex;gap:18px;margin-bottom:14px;color:var(--ink)">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M4 10h16"/></svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18V9M10 18V5M16 18v-6M4 18h16"/></svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M6 8l6-5 6 5"/></svg>
+      </div>
+      <p style="font-size:14px;color:var(--stone);margin:0">1.7px monoline, rounded joins, 24px grid, generous counters. Never filled, never duotone. The same clean, geometric logic as the mark.</p>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white)">
+      <h4 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:19px;margin:0 0 14px">Illustration style</h4>
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <div style="width:44px;height:44px;border-radius:10px;background:var(--green)"></div>
+        <div style="width:44px;height:44px;border-radius:99px;background:var(--clay)"></div>
+        <div style="width:44px;height:44px;border-radius:10px 10px 10px 30px;background:var(--green-line)"></div>
+        <div style="width:44px;height:44px;border-radius:30px 10px;background:var(--green-deep)"></div>
+      </div>
+      <p style="font-size:14px;color:var(--stone);margin:0">Flat geometric compositions built from the logo's isometric blocks and modular units. Two colours max per scene. No characters, no gradients.</p>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white)">
+      <h4 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:19px;margin:0 0 14px">Photography direction</h4>
+      <div style="border-radius:10px;overflow:hidden;margin-bottom:14px;border:1px solid var(--line);background:repeating-linear-gradient(135deg,#EDEBE4,#EDEBE4 9px,#F4F2EC 9px,#F4F2EC 18px);height:96px;display:flex;align-items:center;justify-content:center"><span style="font-family:'JetBrains Mono';font-size:11px;color:var(--stone)">real Kenyan landlords · natural light</span></div>
+      <p style="font-size:14px;color:var(--stone);margin:0">Documentary, warm daylight, real people and real estates — not stock skyscrapers. Faces of the actual users: landlords, caretakers, tenants. Muted, filmic grade that sits beside the green.</p>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white)">
+      <h4 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:19px;margin:0 0 16px">Button style</h4>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <button style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-family:'Hanken Grotesk';font-weight:600;font-size:15px;text-align:left;cursor:pointer">Primary — Collect rent</button>
+        <button style="background:var(--clay);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-family:'Hanken Grotesk';font-weight:600;font-size:15px;text-align:left;cursor:pointer">Accent — the one action that matters</button>
+        <button style="background:transparent;color:var(--ink);border:1.5px solid var(--line-2);border-radius:10px;padding:12px 20px;font-family:'Hanken Grotesk';font-weight:600;font-size:15px;text-align:left;cursor:pointer">Secondary — Export report</button>
+      </div>
+      <p style="font-size:14px;color:var(--stone);margin:0">Flat fills, 10px radius, no shadow. One accent button per screen, maximum.</p>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white)">
+      <h4 style="font-family:'Schibsted Grotesk';font-weight:600;font-size:19px;margin:0 0 14px">Dashboard & marketing tone</h4>
+      <p style="font-size:14px;color:var(--stone);margin:0 0 10px"><strong style="color:var(--ink)">Dashboard —</strong> Calm, dense-but-airy, hairline dividers instead of boxes-in-boxes, data-first, money in mono. Linear's structure, Notion's ease.</p>
+      <p style="font-size:14px;color:var(--stone);margin:0"><strong style="color:var(--ink)">Marketing —</strong> Confident whitespace, one idea per screen, big type, one product truth at a time. Stripe-grade restraint with Kenyan warmth.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 06 UI / PRODUCT ========== -->
+<section id="ui" style="background:var(--white);border-top:1px solid var(--line);padding:clamp(72px,10vw,130px) clamp(28px,6vw,96px)">
+  <div style="max-width:1240px;margin:0 auto">
+    <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.2em;color:var(--clay);margin-bottom:18px">06 — PRODUCT / UI DIRECTION</div>
+    <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(30px,4.4vw,58px);line-height:1.02;letter-spacing:-.02em;margin:0 0 20px;max-width:960px">Three roles. One system.</h2>
+    <p style="font-size:clamp(17px,1.9vw,21px);max-width:860px;color:var(--stone);margin:0 0 60px;font-weight:300">The landlord gets a Linear-grade command centre. The caretaker gets a field console for move-ins, inspections and repairs. The tenant meets us wherever they already are &mdash; app, USSD or WhatsApp &mdash; while a Rental Passport quietly builds a verified history in the background.</p>
+
+    <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--green);margin-bottom:16px;text-transform:uppercase">&#9670; Landlord &middot; command centre</div>
+    <!-- DASHBOARD -->
+    <div style="border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:56px;background:var(--paper)">
+      <div style="display:grid;grid-template-columns:230px 1fr;min-height:560px">
+        <!-- sidebar -->
+        <div style="background:var(--ink);color:var(--paper);padding:22px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:9px;padding:6px 8px 20px">
+            <img src="assets/makazi-mark-light.png" alt="Makazi" style="height:24px;width:auto;display:block">
+            <span style="font-family:'Schibsted Grotesk';font-weight:800;font-size:14px;letter-spacing:.12em">MAKAZI</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;background:rgba(227,237,231,.1);font-size:14px;font-weight:500">Overview</div>
+          <div style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;font-size:14px;color:#9AA39D">Properties</div>
+          <div style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;font-size:14px;color:#9AA39D">Tenants</div>
+          <div style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;font-size:14px;color:#9AA39D">Payments</div>
+          <div style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;font-size:14px;color:#9AA39D">Maintenance <span style="margin-left:auto;background:var(--clay);color:#fff;font-family:'JetBrains Mono';font-size:10px;padding:1px 7px;border-radius:99px">3</span></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;font-size:14px;color:#9AA39D">Caretakers</div>
+          <div style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;font-size:14px;color:#9AA39D">Reports</div>
+          <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding:9px 10px;border-top:1px solid rgba(255,255,255,.1);padding-top:16px">
+            <div style="width:30px;height:30px;border-radius:99px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">WM</div>
+            <div style="line-height:1.2"><div style="font-size:13px;font-weight:500">Wanjiru M.</div><div style="font-size:11px;color:#9AA39D">Riverside Estates</div></div>
+          </div>
+        </div>
+        <!-- main -->
+        <div style="padding:26px 30px;background:var(--paper)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+            <div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em">Good morning, Wanjiru</div><div style="font-size:13px;color:var(--stone)">July 2026 · 42 units across 3 properties</div></div>
+            <button style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-family:'Hanken Grotesk';font-weight:600;font-size:14px">Send rent reminders</button>
+          </div>
+          <!-- KPIs -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px">
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Collected · Jul</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:21px">KES 892K</div><div style="font-size:12px;color:var(--success);margin-top:4px">↑ 84% of expected</div></div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Occupancy</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:21px">39/42</div><div style="font-size:12px;color:var(--success);margin-top:4px">93% occupied</div></div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Arrears</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:21px;color:var(--warning)">KES 168K</div><div style="font-size:12px;color:var(--warning);margin-top:4px">7 tenants</div></div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Open requests</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:21px">3</div><div style="font-size:12px;color:var(--stone);margin-top:4px">2 assigned</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px">
+            <!-- chart -->
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:18px"><span style="font-size:13px;font-weight:600">Rent collection</span><span style="font-family:'JetBrains Mono';font-size:11px;color:var(--stone)">6 months</span></div>
+              <div style="display:flex;align-items:flex-end;gap:12px;height:130px">
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;height:100%"><div style="height:62%;background:var(--green-line);border-radius:5px"></div><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-align:center">Feb</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;height:100%"><div style="height:70%;background:var(--green-line);border-radius:5px"></div><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-align:center">Mar</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;height:100%"><div style="height:66%;background:var(--green-line);border-radius:5px"></div><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-align:center">Apr</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;height:100%"><div style="height:80%;background:var(--green);border-radius:5px"></div><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-align:center">May</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;height:100%"><div style="height:76%;background:var(--green);border-radius:5px"></div><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-align:center">Jun</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;height:100%"><div style="height:84%;background:var(--clay);border-radius:5px"></div><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone);text-align:center">Jul</span></div>
+              </div>
+            </div>
+            <!-- recent payments -->
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px">Recent payments</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:9px"><span style="width:7px;height:7px;border-radius:99px;background:var(--success)"></span><div style="line-height:1.25"><div style="font-size:13px;font-weight:500">A. Otieno · D4</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">QSR4XK9TZ2</div></div></div><span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500">25,000</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:9px"><span style="width:7px;height:7px;border-radius:99px;background:var(--success)"></span><div style="line-height:1.25"><div style="font-size:13px;font-weight:500">G. Njoki · B2</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">QSR7YT2PL8</div></div></div><span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500">18,500</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:9px"><span style="width:7px;height:7px;border-radius:99px;background:var(--warning)"></span><div style="line-height:1.25"><div style="font-size:13px;font-weight:500">P. Kamau · A1</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--warning)">Reminder sent</div></div></div><span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500;color:var(--warning)">24,000</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:9px"><span style="width:7px;height:7px;border-radius:99px;background:var(--success)"></span><div style="line-height:1.25"><div style="font-size:13px;font-weight:500">M. Achieng · C3</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">QSR9WK4MN1</div></div></div><span style="font-family:'JetBrains Mono';font-size:12px;font-weight:500">22,000</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARETAKER CONSOLE -->
+    <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--green);margin-bottom:16px;text-transform:uppercase">&#9670; Caretaker &middot; field console</div>
+    <div style="border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:56px;background:var(--paper)">
+      <div style="display:grid;grid-template-columns:230px 1fr;min-height:520px">
+        <div style="background:var(--green-deep);color:var(--paper);padding:22px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:9px;padding:6px 8px 20px">
+            <img src="assets/makazi-mark-light.png" alt="Makazi" style="height:24px;width:auto;display:block">
+            <span style="font-family:'Schibsted Grotesk';font-weight:800;font-size:13px;letter-spacing:.1em">MAKAZI <span style="color:#8FB0A2;font-weight:500;letter-spacing:0">Caretaker</span></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;background:rgba(227,237,231,.14);font-size:14px;font-weight:500">Today</div>
+          <div style="padding:9px 10px;border-radius:9px;font-size:14px;color:#8FB0A2">Tenants</div>
+          <div style="padding:9px 10px;border-radius:9px;font-size:14px;color:#8FB0A2">Units &amp; vacancies</div>
+          <div style="padding:9px 10px;border-radius:9px;font-size:14px;color:#8FB0A2">Inspections</div>
+          <div style="display:flex;align-items:center;padding:9px 10px;border-radius:9px;font-size:14px;color:#8FB0A2">Maintenance <span style="margin-left:auto;background:var(--clay);color:#fff;font-family:'JetBrains Mono';font-size:10px;padding:1px 7px;border-radius:99px">2</span></div>
+          <div style="padding:9px 10px;border-radius:9px;font-size:14px;color:#8FB0A2">Meter readings</div>
+          <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding:9px 10px;border-top:1px solid rgba(255,255,255,.12);padding-top:16px">
+            <div style="width:30px;height:30px;border-radius:99px;background:var(--clay);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">DK</div>
+            <div style="line-height:1.2"><div style="font-size:13px;font-weight:500">David K.</div><div style="font-size:11px;color:#8FB0A2">Riverside Estates</div></div>
+          </div>
+        </div>
+        <div style="padding:26px 30px;background:var(--paper)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+            <div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:24px;letter-spacing:-.02em">Habari, David</div><div style="font-size:13px;color:var(--stone)">3 tasks today &middot; Riverside Estates</div></div>
+            <button style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-family:'Hanken Grotesk';font-weight:600;font-size:14px">Register tenant</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px">
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Tasks today</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:21px">3</div><div style="font-size:12px;color:var(--clay);margin-top:4px">1 due now</div></div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Units</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:21px">42</div><div style="font-size:12px;color:var(--stone);margin-top:4px">managed</div></div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Vacant</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:21px;color:var(--warning)">3</div><div style="font-size:12px;color:var(--warning);margin-top:4px">to fill</div></div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px"><div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:8px">Open repairs</div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:21px">2</div><div style="font-size:12px;color:var(--stone);margin-top:4px">assigned to me</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:14px">
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px">Today&rsquo;s tasks</div>
+              <div style="display:flex;flex-direction:column;gap:0">
+                <div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)"><span style="width:8px;height:8px;border-radius:99px;background:var(--clay);flex-shrink:0"></span><div style="flex:1;line-height:1.3"><div style="font-size:13px;font-weight:500">Move-in inspection &middot; Unit A1</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--clay)">10:00 &middot; due now</div></div><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">HIGH</span></div>
+                <div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)"><span style="width:8px;height:8px;border-radius:99px;background:var(--green);flex-shrink:0"></span><div style="flex:1;line-height:1.3"><div style="font-size:13px;font-weight:500">Assign unit to new tenant &middot; Block C</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">C3 &middot; deposit confirmed</div></div></div>
+                <div style="display:flex;align-items:center;gap:11px;padding:11px 0"><span style="width:8px;height:8px;border-radius:99px;background:var(--green);flex-shrink:0"></span><div style="flex:1;line-height:1.3"><div style="font-size:13px;font-weight:500">Follow-up: leaking tap &middot; Unit D4</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--stone)">plumber booked 14:00</div></div></div>
+              </div>
+            </div>
+            <div style="background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px">Quick actions</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+                <div style="border:1px solid var(--line);border-radius:11px;padding:14px 12px;font-size:13px;font-weight:500;color:var(--green)">Register tenant</div>
+                <div style="border:1px solid var(--line);border-radius:11px;padding:14px 12px;font-size:13px;font-weight:500;color:var(--green)">Assign unit</div>
+                <div style="border:1px solid var(--line);border-radius:11px;padding:14px 12px;font-size:13px;font-weight:500;color:var(--green)">Log inspection</div>
+                <div style="border:1px solid var(--line);border-radius:11px;padding:14px 12px;font-size:13px;font-weight:500;color:var(--green)">Update vacancy</div>
+              </div>
+              <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin:16px 0 10px">Open repairs</div>
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:7px;background:repeating-linear-gradient(135deg,#EDEBE4,#EDEBE4 5px,#F4F2EC 5px,#F4F2EC 10px);flex-shrink:0"></div><div style="flex:1;line-height:1.25"><div style="font-size:12px;font-weight:500">Leaking tap &middot; D4</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--error)">HIGH</div></div></div>
+                <div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:7px;background:repeating-linear-gradient(135deg,#EDEBE4,#EDEBE4 5px,#F4F2EC 5px,#F4F2EC 10px);flex-shrink:0"></div><div style="flex:1;line-height:1.25"><div style="font-size:12px;font-weight:500">Broken gate lock &middot; Main</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--warning)">MEDIUM</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.14em;color:var(--green);margin-bottom:24px;text-transform:uppercase">&#9670; Tenant &middot; three ways in &rarr;</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;align-items:start">
+
+      <!-- MOBILE APP -->
+      <div>
+        <div style="background:var(--ink);border-radius:34px;padding:12px;max-width:300px;margin:0 auto">
+          <div style="background:var(--paper);border-radius:24px;overflow:hidden">
+            <div style="background:var(--green);color:#fff;padding:20px 18px 22px">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono';font-size:11px;opacity:.8;margin-bottom:18px"><span>9:41</span><span style="letter-spacing:.12em;font-weight:600">MAKAZI</span></div>
+              <div style="font-size:13px;opacity:.85;margin-bottom:4px">Rent due · Unit D4</div>
+              <div style="font-family:'JetBrains Mono';font-weight:600;font-size:30px">KES 25,000</div>
+              <div style="font-size:12px;opacity:.85;margin-top:4px">Due 5 Aug · Riverside Estates</div>
+            </div>
+            <div style="padding:16px 16px 20px">
+              <button style="width:100%;background:var(--clay);color:#fff;border:none;border-radius:11px;padding:13px;font-family:'Hanken Grotesk';font-weight:600;font-size:15px;margin-bottom:9px">Pay with M-Pesa</button>
+              <div style="display:flex;gap:9px;margin-bottom:20px"><button style="flex:1;background:var(--white);border:1.5px solid var(--line);border-radius:11px;padding:11px;font-family:'Hanken Grotesk';font-weight:600;font-size:13px">USSD</button><button style="flex:1;background:var(--white);border:1.5px solid var(--line);border-radius:11px;padding:11px;font-family:'Hanken Grotesk';font-weight:600;font-size:13px">WhatsApp</button></div>
+              <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:12px">History</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)"><div><div style="font-size:13px;font-weight:500">July rent</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--success)">Paid · receipt</div></div><span style="font-family:'JetBrains Mono';font-size:12px">25,000</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)"><div><div style="font-size:13px;font-weight:500">June rent</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--success)">Paid · receipt</div></div><span style="font-family:'JetBrains Mono';font-size:12px">25,000</span></div>
+              <button style="width:100%;background:transparent;border:none;color:var(--green);font-family:'Hanken Grotesk';font-weight:600;font-size:13px;padding:12px 0 2px;text-align:left">Report a maintenance issue →</button>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--stone);margin:16px 0 0"><strong style="color:var(--ink)">Mobile app</strong> — the premium door for smartphone tenants.</p>
+      </div>
+
+      <!-- USSD -->
+      <div>
+        <div style="background:var(--ink);border-radius:34px;padding:12px;max-width:300px;margin:0 auto">
+          <div style="background:#111a15;border-radius:24px;overflow:hidden;min-height:430px;display:flex;flex-direction:column">
+            <div style="padding:18px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)"><span style="font-family:'JetBrains Mono';font-size:12px;color:#6f7b73;letter-spacing:.1em">FEATURE PHONE · NO DATA</span></div>
+            <div style="flex:1;padding:26px 22px;display:flex;flex-direction:column;justify-content:center">
+              <div style="background:var(--paper);border-radius:8px;padding:18px;font-family:'JetBrains Mono';font-size:14px;color:var(--ink);line-height:1.7">
+                <div style="color:var(--green);font-weight:600;margin-bottom:10px">MAKAZI</div>
+                Unit D4 · Riverside<br>Rent due: KES 25,000<br><br>1. Pay full rent<br>2. Pay part<br>3. Balance<br>4. Get receipt<br>5. Report issue<br><br>0. Exit
+              </div>
+              <div style="text-align:center;font-family:'JetBrains Mono';font-size:13px;color:#8b978f;margin-top:20px">dial <span style="color:var(--clay)">*151*7#</span></div>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--stone);margin:16px 0 0"><strong style="color:var(--ink)">USSD</strong> — full rent flow with zero data or app. Nobody is left out.</p>
+      </div>
+
+      <!-- WHATSAPP -->
+      <div>
+        <div style="background:var(--ink);border-radius:34px;padding:12px;max-width:300px;margin:0 auto">
+          <div style="background:#E9E4DA;border-radius:24px;overflow:hidden;min-height:430px;display:flex;flex-direction:column">
+            <div style="background:var(--green);color:#fff;padding:16px 18px;display:flex;align-items:center;gap:11px">
+              <div style="width:34px;height:34px;border-radius:99px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center"><img src="assets/makazi-mark-light.png" alt="Makazi" style="width:20px;height:auto"></div>
+              <div style="line-height:1.2"><div style="font-weight:600;font-size:14px">Makazi</div><div style="font-size:11px;opacity:.8">Rent assistant · online</div></div>
+            </div>
+            <div style="flex:1;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
+              <div style="align-self:flex-start;max-width:82%;background:#fff;border-radius:4px 14px 14px 14px;padding:10px 13px;font-size:13px;line-height:1.45">Habari Achieng 👋 Your July rent of <strong>KES 25,000</strong> for Unit D4 is due 5 Aug. Reply <strong>PAY</strong> to get an M-Pesa prompt.</div>
+              <div style="align-self:flex-end;max-width:70%;background:#D6EAD9;border-radius:14px 4px 14px 14px;padding:10px 13px;font-size:13px">PAY</div>
+              <div style="align-self:flex-start;max-width:82%;background:#fff;border-radius:4px 14px 14px 14px;padding:10px 13px;font-size:13px;line-height:1.45">Check your phone for the M-Pesa prompt to <strong>Riverside PayBill 400200</strong>. 💚</div>
+              <div style="align-self:flex-start;max-width:82%;background:#fff;border-radius:4px 14px 14px 14px;padding:10px 13px;font-size:13px;line-height:1.5"><span style="color:var(--success);font-weight:600">✓ Payment received</span><br><span style="font-family:'JetBrains Mono';font-size:11px;color:var(--stone)">REF QSR9WK4MN1 · KES 25,000</span><br>Receipt saved. Asante!</div>
+            </div>
+            <div style="padding:10px 14px;background:#fff;display:flex;gap:8px;align-items:center"><div style="flex:1;background:var(--paper);border-radius:99px;padding:9px 14px;font-size:12px;color:var(--stone)">Message</div></div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--stone);margin:16px 0 0"><strong style="color:var(--ink)">WhatsApp</strong> — reminders and receipts where tenants already chat.</p>
+      </div>
+    </div>
+
+    <!-- RENTAL PASSPORT -->
+    <div style="margin-top:56px;background:var(--ink);border-radius:24px;padding:clamp(30px,5vw,56px);color:var(--paper);display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--clay);padding:6px 12px;border-radius:99px;margin-bottom:22px">&#9733; Flagship feature</div>
+        <h3 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(24px,3vw,38px);letter-spacing:-.02em;margin:0 0 14px">Makazi Rental Passport</h3>
+        <p style="color:#C7CEC9;margin:0 0 16px;font-size:16px;line-height:1.55">Every payment, lease and move quietly builds a tenant&rsquo;s verified rental history &mdash; from day one, whether they open the app or not. Think LinkedIn for renting: a portable, Makazi-verified record of trust.</p>
+        <p style="color:#C7CEC9;margin:0 0 22px;font-size:16px;line-height:1.55">Over years, this longitudinal data becomes the foundation for alternative credit scoring, rent advances and deposit financing &mdash; surfaced to partners only with the tenant&rsquo;s explicit consent. It is difficult for new entrants to replicate, and one of Makazi&rsquo;s strongest long-term moats.</p>
+        <div style="border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:16px 18px">
+          <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--clay);margin-bottom:8px">WHAT IT NEVER STORES (YET)</div>
+          <p style="margin:0;color:#9AA39D;font-size:14px">No credit score. No loan eligibility. No lending decisions. Just a verified, consent-based history. Trust first &mdash; finance comes later.</p>
+        </div>
+      </div>
+      <div style="background:var(--paper);border-radius:20px;padding:26px;color:var(--ink)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:46px;height:46px;border-radius:99px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Schibsted Grotesk';font-weight:700;font-size:16px">JM</div>
+            <div><div style="font-family:'Schibsted Grotesk';font-weight:700;font-size:18px">John Mwangi</div><div style="font-size:12px;color:var(--stone)">Green Gardens &middot; Active</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono';font-size:10px;color:var(--green);background:var(--green-soft);padding:5px 9px;border-radius:99px">&#10003; VERIFIED</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+          <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-family:'JetBrains Mono';font-weight:600;font-size:20px">4 yrs</div><div style="font-size:11px;color:var(--stone)">History</div></div>
+          <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-family:'JetBrains Mono';font-weight:600;font-size:20px;color:var(--success)">96%</div><div style="font-size:11px;color:var(--stone)">On-time</div></div>
+          <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:12px"><div style="font-family:'JetBrains Mono';font-weight:600;font-size:20px">3</div><div style="font-size:11px;color:var(--stone)">Leases done</div></div>
+        </div>
+        <div style="font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--stone);text-transform:uppercase;margin-bottom:12px">Payment timeline</div>
+        <div style="display:flex;flex-direction:column;gap:0">
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="width:8px;height:8px;border-radius:99px;background:var(--green);flex-shrink:0"></span><span style="font-size:13px;font-weight:500">Mar 2026</span><span style="margin-left:auto;font-size:12px;color:var(--stone)">Moved in &middot; <span style="color:var(--green);font-weight:600">Verified</span></span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="width:8px;height:8px;border-radius:99px;background:var(--success);flex-shrink:0"></span><span style="font-size:13px;font-weight:500">April</span><span style="margin-left:auto;font-size:12px;color:var(--success)">Paid</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="width:8px;height:8px;border-radius:99px;background:var(--success);flex-shrink:0"></span><span style="font-size:13px;font-weight:500">May</span><span style="margin-left:auto;font-size:12px;color:var(--success)">Paid</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="width:8px;height:8px;border-radius:99px;background:var(--success);flex-shrink:0"></span><span style="font-size:13px;font-weight:500">June</span><span style="margin-left:auto;font-size:12px;color:var(--success)">Paid</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="width:8px;height:8px;border-radius:99px;background:var(--warning);flex-shrink:0"></span><span style="font-size:13px;font-weight:500">July</span><span style="margin-left:auto;font-size:12px;color:var(--warning)">Late by 2 days</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 0"><span style="width:8px;height:8px;border-radius:99px;background:var(--success);flex-shrink:0"></span><span style="font-size:13px;font-weight:500">August</span><span style="margin-left:auto;font-size:12px;color:var(--success)">Paid</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;background:var(--green-soft);border-radius:16px;padding:26px 30px;display:flex;gap:14px;align-items:flex-start">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--green-deep)" stroke-width="1.7" style="flex-shrink:0;margin-top:2px"><path d="M12 3 4 6v6c0 4 3.5 7 8 9 4.5-2 8-5 8-9V6l-8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+      <p style="margin:0;color:var(--green-deep);font-size:15px;line-height:1.5"><strong>Money never touches Makazi.</strong> Every flow initiates a direct payment to the landlord's own PayBill, Till or bank account. We surface the prompt, capture the reference, and reconcile the record — the trust promise, built into the UI.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 07 VOICE ========== -->
+<section id="voice" style="padding:clamp(72px,10vw,130px) clamp(28px,6vw,96px);max-width:1240px;margin:0 auto">
+  <div style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.2em;color:var(--clay);margin-bottom:18px">07 — BRAND VOICE</div>
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:700;font-size:clamp(30px,4.4vw,58px);line-height:1.02;letter-spacing:-.02em;margin:0 0 20px;max-width:900px">Clear, warm, never salesy.</h2>
+  <p style="font-size:clamp(17px,1.9vw,21px);max-width:760px;color:var(--stone);margin:0 0 56px;font-weight:300">We speak like a competent friend who happens to be brilliant with money and systems. Plain English and Swahili warmth. We explain, we don't hype.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:40px">
+    <div style="background:var(--white);padding:26px"><div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone);margin-bottom:10px">WE ARE</div><p style="margin:0;font-size:15px;line-height:1.6">Clear · Calm · Warm · Precise · Human · Confident · Local</p></div>
+    <div style="background:var(--white);padding:26px"><div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone);margin-bottom:10px">WE ARE NOT</div><p style="margin:0;font-size:15px;line-height:1.6">Hypey · Corporate · Jargon-heavy · Pushy · Cold · Patronising</p></div>
+    <div style="background:var(--white);padding:26px"><div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--stone);margin-bottom:10px">TAGLINE</div><p style="margin:0;font-family:'Schibsted Grotesk';font-weight:600;font-size:19px;line-height:1.35">Rent, sorted.<br><span style="font-size:14px;color:var(--stone);font-weight:400;font-family:'Hanken Grotesk'">— or —</span><br>The home of rent.</p></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="border:1px solid var(--success);border-radius:16px;padding:26px;background:var(--white)">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--success);margin-bottom:16px">✓ SAY THIS</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <p style="margin:0;font-size:15px">"Your rent of KES 25,000 is due on 5 Aug. Pay in seconds with M-Pesa."</p>
+        <p style="margin:0;font-size:15px">"Payment received. Your receipt is saved."</p>
+        <p style="margin:0;font-size:15px">"3 tenants are behind this month. Send a friendly reminder?"</p>
+      </div>
+    </div>
+    <div style="border:1px solid var(--error);border-radius:16px;padding:26px;background:var(--white)">
+      <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.14em;color:var(--error);margin-bottom:16px">✕ NOT THIS</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <p style="margin:0;font-size:15px;color:var(--stone)">"Leverage our best-in-class rental payment infrastructure solution!"</p>
+        <p style="margin:0;font-size:15px;color:var(--stone)">"Transaction successfully processed by the system."</p>
+        <p style="margin:0;font-size:15px;color:var(--stone)">"WARNING: You have DEFAULTERS. Take action NOW!!!"</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CLOSING ========== -->
+<section style="background:var(--green);color:#fff;padding:clamp(72px,10vw,130px) clamp(28px,6vw,96px);text-align:center">
+  <img src="assets/makazi-mark-light.png" alt="Makazi" style="height:66px;width:auto;margin:0 auto 30px;display:block">
+  <h2 style="font-family:'Schibsted Grotesk';font-weight:800;font-size:clamp(30px,5vw,60px);letter-spacing:-.03em;margin:0 auto 20px;max-width:900px;line-height:1.02">A brand built to become<br>Africa's rental infrastructure.</h2>
+  <p style="max-width:600px;margin:0 auto 12px;color:#DCEAE2;font-size:18px;font-weight:300">One mark that keeps things safe. One green that means growth. One system that scales from a WhatsApp message to a continent.</p>
+  <div style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:.16em;color:#A9C6B9;margin-top:28px">MAKAZI · BRAND IDENTITY SYSTEM · 2026</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { progress: 0 };
+  componentDidMount() {
+    this._onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      this.setState({ progress: max > 0 ? Math.min(1, h.scrollTop / max) : 0 });
+    };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    this._onScroll();
+  }
+  componentWillUnmount() { window.removeEventListener('scroll', this._onScroll); }
+  renderVals() {
+    return {
+      progress: this.state.progress,
+      colors: [
+        { name: 'Makazi Green', role: 'Primary', hex: '#0E5C43', rgb: '14, 92, 67', psych: 'Growth, prosperity and land. Green is the colour of money across Africa and echoes the mobile-money category tenants already trust — reassurance without shouting.' },
+        { name: 'Forest', role: 'Primary deep', hex: '#093C2C', rgb: '9, 60, 44', psych: 'The darker anchor for large fields and depth. Adds gravitas and premium weight where the primary needs to recede.' },
+        { name: 'Clay', role: 'Accent', hex: '#DB6B3B', rgb: '219, 107, 59', psych: 'Warm terracotta grounds Makazi in African earth and daylight. Energy and human warmth, reserved for the single most important action.' },
+        { name: 'Ink', role: 'Secondary / Text', hex: '#0B140F', rgb: '11, 20, 15', psych: 'A near-black with a green undertone. Confident, premium and legible — the backbone of type and interface chrome.' },
+        { name: 'Stone', role: 'Neutral / Muted', hex: '#5C665F', rgb: '92, 102, 95', psych: 'Secondary text, metadata and quiet UI. A green-grey that keeps the neutrals in the family instead of going cold.' },
+        { name: 'Paper', role: 'Background', hex: '#F6F5F0', rgb: '246, 245, 240', psych: 'A warm off-white. Softer than pure white, it feels human and premium across long reading and large surfaces.' },
+        { name: 'Surface', role: 'Background', hex: '#FFFFFF', rgb: '255, 255, 255', psych: 'Cards, sheets and product surfaces sit cleanly on paper — the crisp layer that holds data.' },
+        { name: 'Success', role: 'State', hex: '#1E9E5A', rgb: '30, 158, 90', psych: 'Confirmed payments and reconciled records. Brighter than brand green so status never blurs into identity.' },
+        { name: 'Warning', role: 'State', hex: '#E0A008', rgb: '224, 160, 8', psych: 'Arrears, due dates and reminders. Amber signals attention without alarm — a nudge, not a threat.' },
+        { name: 'Error', role: 'State', hex: '#CF4B3E', rgb: '207, 75, 62', psych: 'Failed transactions, overdue rent and destructive actions. A muted red — serious, never panicked.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
