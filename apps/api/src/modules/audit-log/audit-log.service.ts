@@ -25,6 +25,10 @@ export class AuditLogService {
   }
 
   findAll() {
-    return this.prisma.auditLogEntry.findMany({ orderBy: { createdAt: "desc" } });
+    return this.prisma.auditLogEntry.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { actor: { select: { firstName: true, lastName: true } } },
+      take: 200,
+    });
   }
 }
