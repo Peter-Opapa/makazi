@@ -1,8 +1,14 @@
 // Makazi core data model.
-// Entities intentionally deferred until their milestone (Admin Portal build-out):
-// SupportTicket, Notification, Technician, Subscription/Finance, SystemHealthEvent.
+// Entities intentionally deferred (not part of any approved module yet):
+// Subscription/Finance (billing), SystemHealthEvent. Technician and
+// SupportTicket were originally slated for the Admin Portal milestone but
+// Technician was brought forward for the Maintenance module; SupportTicket
+// was brought forward for the Admin Portal build-out itself.
 // Move-Out Wizard fields are net-new (not present in the design prototype — see
 // 10-implementation-notes.md discrepancy notes) and may need product sign-off.
+// Notification was originally deferred to the Admin Portal milestone too, but
+// was brought forward for the Caretaker module (real per-user notifications,
+// not just the Admin broadcast log).
 
 generator client {
   provider = "prisma-client-js"
@@ -47,6 +53,9 @@ enum PaymentChannel {
   STK_PUSH
   USSD
   WHATSAPP
+  /// Tenant paid the landlord's PayBill/Till directly on their phone, outside
+  /// the app — reconciled via the M-Pesa C2B confirmation webhook, same as USSD.
+  PAYBILL_DIRECT
 }
 
 enum MaintenanceStatus {
@@ -63,6 +72,31 @@ enum MaintenancePriority {
   URGENT
 }
 
+enum MaintenanceCategory {
+  PLUMBING
+  ELECTRICAL
+  STRUCTURAL
+  APPLIANCE
+  PEST_CONTROL
+  CLEANING
+  SECURITY
+  OTHER
+}
+
+enum MaintenanceActivityType {
+  CREATED
+  COMMENT
+  STATUS_CHANGED
+  TECHNICIAN_ASSIGNED
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  ESCALATED
+  RESOLVED
+}
+
 enum InspectionType {
   MOVE_IN
   MOVE_OUT
@@ -75,45 +109,166 @@ enum CaretakerInviteStatus {
   DECLINED
 }
 
-model User {
-  id               String    @id @default(cuid())
-  email            String    @unique
-  phone            String?   @unique
-  passwordHash     String
-  firstName        String
-  lastName         String
-  role             UserRole
-  adminSubRole     AdminSubRole?
-  emailVerifiedAt  DateTime?
-  phoneVerifiedAt  DateTime?
-  suspendedAt      DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+enum PropertyType {
+  APARTMENT_BLOCK
+  BUNGALOWS
+  GATED_COMMUNITY
+  COMMERCIAL
+}
 
-  propertiesOwned         Property[]            @relation("PropertyLandlord")
+enum NotificationType {
+  MAINTENANCE_CREATED
+  MAINTENANCE_STATUS_CHANGED
+  CARETAKER_INVITE
+  CARETAKER_INVITE_ACCEPTED
+  PAYMENT_SUCCEEDED
+  PAYMENT_FAILED
+  MAINTENANCE_COMMENT
+  TECHNICIAN_ASSIGNED
+  /// Overdue rent and unmatched-PayBill alerts — split out from GENERAL so
+  /// they correctly fall under the "payments" preference category instead
+  /// of the "account" catch-all.
+  PAYMENT_ALERT
+  GENERAL
+}
+
+model User {
+  id                     String        @id @default(cuid())
+  /// Nullable: a tenant created via "Assign Tenant" (see UnitsService) has no
+  /// email until they claim their account with their tenantCode — required
+  /// for every other creation path (self-registration, staff seeding).
+  email                  String?       @unique
+  phone                  String?       @unique
+  /// Null for Landlord/Caretaker/Tenant accounts, which authenticate entirely
+  /// via Clerk (see clerkUserId) and never have a Makazi-managed password.
+  /// Still required in practice for Admin/staff, who stay on the original
+  /// email+password+MFA flow (AuthService.staffLogin) — enforced in code,
+  /// not the schema, since Prisma can't express "required unless role=X".
+  passwordHash           String?
+  /// Set once a Landlord/Caretaker/Tenant signs in via Clerk — see
+  /// ClerkStrategy/ClerkIdentityStrategy. Null for Admin/staff, who have no
+  /// Clerk identity at all.
+  clerkUserId            String?       @unique
+  firstName              String
+  lastName               String
+  role                   UserRole
+  adminSubRole           AdminSubRole?
+  emailVerifiedAt        DateTime?
+  phoneVerifiedAt        DateTime?
+  /// Manual admin attestation ("Verify identity" in Admin > Users) — distinct
+  /// from emailVerifiedAt/phoneVerifiedAt, which are just OTP checks anyone
+  /// completes during signup. Makazi has no document-upload/KYC pipeline, so
+  /// this only records that a staff member reviewed and approved the account;
+  /// it does not imply any ID document was actually checked.
+  identityVerifiedAt     DateTime?
+  suspendedAt            DateTime?
+  passwordResetCodeHash  String?
+  passwordResetExpiresAt DateTime?
+  /// Set only for tenants created via "Assign Tenant" ahead of self-service
+  /// signup — format "MKZ-XXXXX" (01-screen-inventory.md). Emailed as an
+  /// invitation link when the tenant has an email on file (see
+  /// InvitationEmailService); otherwise the landlord/caretaker relays it
+  /// directly. Redeemed via /auth/claim-tenant to link a Makazi account.
+  tenantCode             String?       @unique
+  tenantCodeClaimedAt    DateTime?
+  /// Last time the tenant invitation email was actually sent — distinct from
+  /// tenantCode's creation time, since registration and email dispatch can
+  /// happen at different points (see TenantsService.registerTenant /
+  /// UnitsService.assignTenant).
+  tenantCodeInvitedAt    DateTime?
+  /// Set when a landlord/caretaker registers this tenant ahead of assigning
+  /// them a unit (see TenantsService.registerTenant) — lets "my tenants"
+  /// queries surface not-yet-assigned tenants without needing a Tenancy row.
+  registeredById         String?
+  registeredBy           User?         @relation("TenantRegisteredBy", fields: [registeredById], references: [id])
+  /// Pre-created caretaker's claim link, mirrors tenantCode but is a long
+  /// opaque token (not a short human-typed code) since it's only ever
+  /// delivered as a clickable email link, never manually relayed by voice/
+  /// chat — see CaretakersService.invite / AuthService.claimCaretakerInviteWithClerk.
+  caretakerInviteToken           String?   @unique
+  caretakerInviteTokenExpiresAt  DateTime?
+  caretakerInviteClaimedAt       DateTime?
+  /// The landlord who originally invited this not-yet-claimed caretaker.
+  /// Security-critical, not just informational: while unclaimed, only THIS
+  /// landlord may add more properties to the invite or resend its token —
+  /// otherwise a second landlord could attach their own PENDING assignment
+  /// to someone else's pending invitee and piggyback on claimCaretakerInviteWithClerk's
+  /// bulk-accept to gain access to the original landlord's property. Once
+  /// the caretaker has claimed (clerkUserId set), this no longer matters —
+  /// any landlord can invite them via the ordinary in-app assignment flow.
+  caretakerInvitedById           String?
+  caretakerInvitedBy             User?     @relation("CaretakerInvitedBy", fields: [caretakerInvitedById], references: [id])
+  invitedCaretakers              User[]    @relation("CaretakerInvitedBy")
+  /// Progressive-profile fields collected post-claim (never at registration
+  /// time) — see AuthService.updateMe. All optional; a skipped field simply
+  /// stays null indefinitely.
+  nationalId             String?       @unique
+  profilePhotoUrl        String?
+  emergencyContactName   String?
+  emergencyContactPhone  String?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  propertiesOwned         Property[]              @relation("PropertyLandlord")
   caretakerAssignments    CaretakerAssignment[]
-  tenancies                Tenancy[]
-  auditLogEntries          AuditLogEntry[]       @relation("AuditActor")
-  maintenanceTicketsFiled  MaintenanceTicket[]   @relation("TicketReportedBy")
+  tenancies               Tenancy[]
+  auditLogEntries         AuditLogEntry[]         @relation("AuditActor")
+  maintenanceTicketsFiled MaintenanceTicket[]     @relation("TicketReportedBy")
+  registeredTenants       User[]                  @relation("TenantRegisteredBy")
+  notifications           Notification[]
+  technicians             Technician[]            @relation("TechnicianLandlord")
+  maintenanceActivities   MaintenanceActivity[]
+  notificationPreference  NotificationPreference?
+  supportTicketsFiled     SupportTicket[]         @relation("SupportTicketCustomer")
+  supportTicketsAssigned  SupportTicket[]         @relation("SupportTicketAgent")
+  platformSettingsUpdates PlatformSettings[]      @relation("PlatformSettingsUpdatedBy")
 
   @@map("users")
 }
 
 model Property {
-  id         String   @id @default(cuid())
-  landlordId String
-  landlord   User     @relation("PropertyLandlord", fields: [landlordId], references: [id])
-  name       String
-  location   String
-  county     String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id              String       @id @default(cuid())
+  landlordId      String
+  landlord        User         @relation("PropertyLandlord", fields: [landlordId], references: [id])
+  name            String
+  location        String
+  county          String?
+  /// Neighbourhood/estate within the town — more specific than `location`
+  /// (Town/City) but coarser than `physicalAddress`.
+  estateArea      String?
+  physicalAddress String?
+  propertyType    PropertyType @default(APARTMENT_BLOCK)
+  /// Best-effort geocode of `location` (+ `county`) via MapsGateway, run
+  /// fire-and-forget after create/update — never blocks the request and may
+  /// stay null if geocoding fails or hasn't run yet (see PropertiesService).
+  latitude     Float?
+  longitude    Float?
+  geocodedAt   DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
-  units                 Unit[]
-  caretakerAssignments  CaretakerAssignment[]
-  paymentAccount        PaymentAccount?
+  units                Unit[]
+  photos               PropertyPhoto[]
+  caretakerAssignments CaretakerAssignment[]
+  paymentAccount       PaymentAccount?
+  unmatchedPayments    UnmatchedPayment[]
 
   @@map("properties")
+}
+
+/// Gallery images for a property. Uploads go directly from the browser to
+/// S3-compatible object storage via a presigned URL (see S3Service) — this
+/// row is only created after the upload succeeds, so it never stores bytes,
+/// just the resulting public URL.
+model PropertyPhoto {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  url        String
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@map("property_photos")
 }
 
 /// Landlord-configured payout destination. Makazi never custodies funds —
@@ -122,7 +277,7 @@ model PaymentAccount {
   id                String   @id @default(cuid())
   propertyId        String   @unique
   property          Property @relation(fields: [propertyId], references: [id])
-  method            String   // paybill | till | bank
+  method            String // paybill | till | bank
   payBillNumber     String?
   tillNumber        String?
   bankName          String?
@@ -137,65 +292,101 @@ model Unit {
   id         String     @id @default(cuid())
   propertyId String
   property   Property   @relation(fields: [propertyId], references: [id])
-  code       String     // e.g. "A101"
+  code       String // e.g. "A101"
   floor      Int?
   status     UnitStatus @default(VACANT)
   rentAmount Decimal?   @db.Decimal(12, 2)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
-  tenancies           Tenancy[]
-  maintenanceTickets  MaintenanceTicket[]
-  inspections         Inspection[]
+  tenancies          Tenancy[]
+  maintenanceTickets MaintenanceTicket[]
+  inspections        Inspection[]
 
   @@unique([propertyId, code])
   @@map("units")
 }
 
 model Tenancy {
-  id            String    @id @default(cuid())
-  unitId        String
-  unit          Unit      @relation(fields: [unitId], references: [id])
-  tenantId      String
-  tenant        User      @relation(fields: [tenantId], references: [id])
-  leaseStart    DateTime
-  leaseEnd      DateTime?
-  depositAmount Decimal?  @db.Decimal(12, 2)
-  rentAmount    Decimal   @db.Decimal(12, 2)
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  unitId           String
+  unit             Unit      @relation(fields: [unitId], references: [id])
+  tenantId         String
+  tenant           User      @relation(fields: [tenantId], references: [id])
+  leaseStart       DateTime
+  leaseEnd         DateTime?
+  depositAmount    Decimal?  @db.Decimal(12, 2)
+  rentAmount       Decimal   @db.Decimal(12, 2)
+  active           Boolean   @default(true)
+  /// Generated lazily on first request (see LeaseService) — an HTML lease
+  /// agreement rendered server-side and stored the same way as the Move-Out
+  /// report. Not a general document vault, just this one document.
+  leaseDocumentUrl String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
-  payments  Payment[]
-  moveOut   MoveOut?
+  payments Payment[]
+  moveOut  MoveOut?
 
   @@map("tenancies")
 }
 
 model Payment {
-  id         String         @id @default(cuid())
-  tenancyId  String
-  tenancy    Tenancy        @relation(fields: [tenancyId], references: [id])
-  amount     Decimal        @db.Decimal(12, 2)
-  channel    PaymentChannel
-  status     PaymentStatus  @default(PENDING)
-  reference  String?        @unique
-  dueDate    DateTime?
-  paidAt     DateTime?
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  id               String         @id @default(cuid())
+  tenancyId        String
+  tenancy          Tenancy        @relation(fields: [tenancyId], references: [id])
+  amount           Decimal        @db.Decimal(12, 2)
+  channel          PaymentChannel
+  status           PaymentStatus  @default(PENDING)
+  reference        String?        @unique
+  /// Cached HTML receipt, generated on first request once status is PAID.
+  receiptUrl       String?
+  dueDate          DateTime?
+  paidAt           DateTime?
+  /// Daraja CheckoutRequestID for an in-flight STK push — correlates the
+  /// async callback back to this row. Not set for USSD/PayBill (they're
+  /// reconciled by account reference instead, via the C2B webhook).
+  gatewayRequestId String?        @unique
+  /// Raw STK callback / C2B confirmation payload, kept verbatim for audit —
+  /// Makazi only records transactions, so what Safaricom actually said matters.
+  gatewayResponse  Json?
+  payerPhone       String?
+  accountReference String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   @@map("payments")
 }
 
+/// A PayBill/USSD payment Safaricom confirmed that couldn't be matched to any
+/// tenancy — wrong/garbled account reference, most likely. Never discarded
+/// (Makazi only records transactions); a landlord/caretaker resolves it by
+/// hand via PaymentsService.resolveUnmatchedPayment.
+model UnmatchedPayment {
+  id                String    @id @default(cuid())
+  businessShortCode String
+  amount            Decimal   @db.Decimal(12, 2)
+  payerPhone        String
+  accountReference  String
+  transactionId     String    @unique
+  rawPayload        Json
+  matchedPropertyId String?
+  matchedProperty   Property? @relation(fields: [matchedPropertyId], references: [id])
+  resolvedAt        DateTime?
+  resolvedPaymentId String?
+  createdAt         DateTime  @default(now())
+
+  @@map("unmatched_payments")
+}
+
 model CaretakerAssignment {
-  id           String                 @id @default(cuid())
+  id           String                @id @default(cuid())
   caretakerId  String
-  caretaker    User                   @relation(fields: [caretakerId], references: [id])
+  caretaker    User                  @relation(fields: [caretakerId], references: [id])
   propertyId   String
-  property     Property               @relation(fields: [propertyId], references: [id])
-  inviteStatus CaretakerInviteStatus  @default(PENDING)
-  invitedAt    DateTime               @default(now())
+  property     Property              @relation(fields: [propertyId], references: [id])
+  inviteStatus CaretakerInviteStatus @default(PENDING)
+  invitedAt    DateTime              @default(now())
   acceptedAt   DateTime?
 
   @@unique([caretakerId, propertyId])
@@ -205,22 +396,65 @@ model CaretakerAssignment {
 /// Shared across Tenant/Caretaker/Landlord/Admin surfaces — a ticket filed by
 /// a tenant must be visible (and status-syncable) on all four (09-screen-connection-map.md).
 model MaintenanceTicket {
-  id             String              @id @default(cuid())
-  ticketNumber   String              @unique // e.g. MKZ-T2291
-  unitId         String
-  unit           Unit                @relation(fields: [unitId], references: [id])
-  reportedById   String
-  reportedBy     User                @relation("TicketReportedBy", fields: [reportedById], references: [id])
-  issue          String
-  category       String?
-  priority       MaintenancePriority @default(NORMAL)
-  status         MaintenanceStatus   @default(REPORTED)
-  technicianName String?
-  photoUrls      String[]
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
+  id              String               @id @default(cuid())
+  ticketNumber    String               @unique // e.g. MKZ-T2291
+  unitId          String
+  unit            Unit                 @relation(fields: [unitId], references: [id])
+  reportedById    String
+  reportedBy      User                 @relation("TicketReportedBy", fields: [reportedById], references: [id])
+  issue           String
+  category        MaintenanceCategory?
+  priority        MaintenancePriority  @default(NORMAL)
+  status          MaintenanceStatus    @default(REPORTED)
+  technicianId    String?
+  technician      Technician?          @relation(fields: [technicianId], references: [id])
+  resolutionNotes String?
+  resolvedAt      DateTime?
+  photoUrls       String[]
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  activities MaintenanceActivity[]
 
   @@map("maintenance_tickets")
+}
+
+/// A landlord's own roster of external contractors — not a Makazi login,
+/// just a reusable contact record so a technician isn't retyped on every
+/// ticket. Caretakers assigned to that landlord's properties can see and
+/// assign from it too (see PropertyAccessService-style scoping in
+/// TechniciansService), but only the landlord manages the roster itself.
+model Technician {
+  id         String               @id @default(cuid())
+  landlordId String
+  landlord   User                 @relation("TechnicianLandlord", fields: [landlordId], references: [id])
+  name       String
+  phone      String
+  specialty  MaintenanceCategory?
+  active     Boolean              @default(true)
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  tickets MaintenanceTicket[]
+
+  @@map("technicians")
+}
+
+/// Unified comment + audit trail for a ticket ("Comments" and "History" are
+/// the same underlying feed — system-generated entries for status/technician
+/// changes, user-authored entries for actual comments).
+model MaintenanceActivity {
+  id        String                  @id @default(cuid())
+  ticketId  String
+  ticket    MaintenanceTicket       @relation(fields: [ticketId], references: [id])
+  actorId   String
+  actor     User                    @relation(fields: [actorId], references: [id])
+  type      MaintenanceActivityType
+  body      String?
+  metadata  Json?
+  createdAt DateTime                @default(now())
+
+  @@map("maintenance_activities")
 }
 
 model Inspection {
@@ -252,6 +486,47 @@ model MoveOut {
   @@map("move_outs")
 }
 
+/// Per-user notifications (maintenance activity, caretaker invites, ...).
+/// Distinct from the Admin Portal's platform-wide broadcast log.
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  title     String
+  body      String?
+  metadata  Json?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+/// Per-user, per-category channel opt-ins for the notification fan-out (see
+/// NotificationsService.dispatch). In-app is never optional — only SMS/
+/// Email/WhatsApp are gated by this. Created lazily with sensible defaults
+/// on first read/write (see getOrCreatePreference), not at signup, so this
+/// table only has rows for users who've actually touched their settings or
+/// received a notification.
+model NotificationPreference {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id])
+  paymentsSms         Boolean  @default(true)
+  paymentsEmail       Boolean  @default(true)
+  paymentsWhatsapp    Boolean  @default(false)
+  maintenanceSms      Boolean  @default(true)
+  maintenanceEmail    Boolean  @default(true)
+  maintenanceWhatsapp Boolean  @default(false)
+  accountSms          Boolean  @default(true)
+  accountEmail        Boolean  @default(true)
+  accountWhatsapp     Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("notification_preferences")
+}
+
 /// Every mutating Admin Portal action must append here — compliance
 /// requirement, not just a UI log (07-interaction-spec.md, 10-implementation-notes.md).
 model AuditLogEntry {
@@ -265,4 +540,46 @@ model AuditLogEntry {
   createdAt  DateTime @default(now())
 
   @@map("audit_log_entries")
+}
+
+/// Filed by any authenticated user (Landlord/Caretaker/Tenant/Admin) via a
+/// generic "contact support" endpoint; triaged exclusively from the Admin
+/// Portal's Support Tickets section (assign agent, internal notes, escalate,
+/// resolve — resolving notifies the customer). Single mutable notes field
+/// rather than a full activity feed, matching the approved design prototype's
+/// one-textarea "Internal notes" (07-interaction-spec.md).
+model SupportTicket {
+  id            String              @id @default(cuid())
+  ticketNumber  String              @unique // e.g. TCK-48213
+  customerId    String
+  customer      User                @relation("SupportTicketCustomer", fields: [customerId], references: [id])
+  subject       String
+  message       String
+  status        SupportTicketStatus @default(OPEN)
+  agentId       String?
+  agent         User?               @relation("SupportTicketAgent", fields: [agentId], references: [id])
+  internalNotes String?
+  resolvedAt    DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@map("support_tickets")
+}
+
+/// Singleton row (id is always the literal string "singleton") holding
+/// platform-wide config editable from Admin > Settings. Everything else the
+/// design prototype's Settings screen shows (SMS/WhatsApp/Daraja provider
+/// status, security policy, API keys, backups) is read-only and derived from
+/// which env vars are actually configured — see AdminSettingsService — not
+/// stored here, since Makazi has no live secret-rotation UI.
+model PlatformSettings {
+  id           String   @id @default("singleton")
+  platformName String   @default("Makazi")
+  supportEmail String?
+  supportPhone String?
+  updatedById  String?
+  updatedBy    User?    @relation("PlatformSettingsUpdatedBy", fields: [updatedById], references: [id])
+  updatedAt    DateTime @updatedAt
+
+  @@map("platform_settings")
 }
