@@ -11,6 +11,8 @@ import { WhatsAppCloudService } from "./whatsapp/whatsapp-cloud.service";
 import { WhatsAppSimulatorService } from "./whatsapp/whatsapp-simulator.service";
 import { STORAGE_GATEWAY } from "./storage/storage-gateway.types";
 import { S3StorageService } from "./storage/s3-storage.service";
+import { LocalDiskStorageService } from "./storage/local-disk-storage.service";
+import { LocalStorageController } from "./storage/local-storage.controller";
 import { MAPS_GATEWAY } from "./maps/maps-gateway.types";
 import { GoogleMapsService } from "./maps/google-maps.service";
 import { MapsSimulatorService } from "./maps/maps-simulator.service";
@@ -27,6 +29,7 @@ import { MapsSimulatorService } from "./maps/maps-simulator.service";
  */
 @Global()
 @Module({
+  controllers: [LocalStorageController],
   providers: [
     AfricasTalkingSmsService,
     SmsSimulatorService,
@@ -35,6 +38,7 @@ import { MapsSimulatorService } from "./maps/maps-simulator.service";
     WhatsAppCloudService,
     WhatsAppSimulatorService,
     S3StorageService,
+    LocalDiskStorageService,
     GoogleMapsService,
     MapsSimulatorService,
     {
@@ -57,7 +61,9 @@ import { MapsSimulatorService } from "./maps/maps-simulator.service";
     },
     {
       provide: STORAGE_GATEWAY,
-      useExisting: S3StorageService,
+      useFactory: (real: S3StorageService, local: LocalDiskStorageService, config: ConfigService) =>
+        config.get<string>("S3_BUCKET") ? real : local,
+      inject: [S3StorageService, LocalDiskStorageService, ConfigService],
     },
     {
       provide: MAPS_GATEWAY,

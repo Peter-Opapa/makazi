@@ -14,22 +14,35 @@ import type { PresignedUpload, StorageGateway } from "./storage-gateway.types";
  */
 @Injectable()
 export class S3StorageService implements StorageGateway {
-  private readonly client: S3Client;
-  private readonly bucket: string;
-  private readonly publicUrlBase: string;
+  private _client?: S3Client;
 
-  constructor(private readonly config: ConfigService) {
-    this.bucket = this.config.getOrThrow<string>("S3_BUCKET");
-    this.publicUrlBase = this.config.getOrThrow<string>("S3_PUBLIC_URL_BASE").replace(/\/+$/, "");
-    this.client = new S3Client({
-      region: this.config.get<string>("S3_REGION", "auto"),
-      endpoint: this.config.get<string>("S3_ENDPOINT"),
-      forcePathStyle: this.config.get<string>("S3_FORCE_PATH_STYLE") === "true",
-      credentials: {
-        accessKeyId: this.config.getOrThrow<string>("S3_ACCESS_KEY_ID"),
-        secretAccessKey: this.config.getOrThrow<string>("S3_SECRET_ACCESS_KEY"),
-      },
-    });
+  // Lazy — this provider is always instantiated (see IntegrationsModule's
+  // STORAGE_GATEWAY factory), even when LocalDiskStorageService is the one
+  // actually selected, so reading these eagerly in the constructor would
+  // crash the app on boot whenever S3 isn't configured.
+  constructor(private readonly config: ConfigService) {}
+
+  private get bucket(): string {
+    return this.config.getOrThrow<string>("S3_BUCKET");
+  }
+
+  private get publicUrlBase(): string {
+    return this.config.getOrThrow<string>("S3_PUBLIC_URL_BASE").replace(/\/+$/, "");
+  }
+
+  private get client(): S3Client {
+    if (!this._client) {
+      this._client = new S3Client({
+        region: this.config.get<string>("S3_REGION", "auto"),
+        endpoint: this.config.get<string>("S3_ENDPOINT"),
+        forcePathStyle: this.config.get<string>("S3_FORCE_PATH_STYLE") === "true",
+        credentials: {
+          accessKeyId: this.config.getOrThrow<string>("S3_ACCESS_KEY_ID"),
+          secretAccessKey: this.config.getOrThrow<string>("S3_SECRET_ACCESS_KEY"),
+        },
+      });
+    }
+    return this._client;
   }
 
   async createPresignedUploadUrl(keyPrefix: string, contentType: string): Promise<PresignedUpload> {
