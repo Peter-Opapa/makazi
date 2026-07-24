@@ -1,8 +1,16 @@
+"use client";
+
+import { SignUp } from "@clerk/nextjs";
+import { clerkAppearance } from "@/lib/clerk-appearance";
+
 export default function RegisterPage() {
   return (
-    <div className="p-6">
-      <h1 className="font-display text-2xl font-bold text-foreground">Register</h1>
-      <p className="text-muted-foreground mt-2">Name / email / phone capture.</p>
+    <div>
+      <p className="text-[13px] text-[var(--stone)] mb-5">
+        Set up your Makazi account to start managing your properties. Caretakers and tenants join Makazi through an
+        invitation from their landlord, not by signing up here.
+      </p>
+      <SignUp routing="hash" fallbackRedirectUrl="/finish-profile" appearance={clerkAppearance} />
     </div>
   );
 }

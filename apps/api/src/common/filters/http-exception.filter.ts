@@ -11,8 +11,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    // exception.getResponse() for `new SomeHttpException("a string")` returns
+    // the whole {statusCode, message, error} body, not just the message —
+    // unwrap it so callers always get a plain string or string[] (the shape
+    // apiFetch on the frontend expects), never a nested object.
+    const rawResponse = exception instanceof HttpException ? exception.getResponse() : "Internal server error";
     const message =
-      exception instanceof HttpException ? exception.getResponse() : "Internal server error";
+      typeof rawResponse === "string"
+        ? rawResponse
+        : ((rawResponse as { message?: string | string[] })?.message ?? "Internal server error");
 
     if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(exception instanceof Error ? exception.stack : exception);

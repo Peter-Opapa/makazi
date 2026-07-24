@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Schibsted_Grotesk, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import { ClerkTokenBridge } from "@/components/providers/clerk-token-bridge";
 import "./globals.css";
 
 const fontDisplay = Schibsted_Grotesk({
@@ -35,7 +38,13 @@ export default function RootLayout({
       lang="en"
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-body">{children}</body>
+      <body className="min-h-full flex flex-col font-body">
+        <ClerkProvider>
+          <ClerkTokenBridge />
+          {children}
+          <Toaster position="bottom-center" />
+        </ClerkProvider>
+      </body>
     </html>
   );
 }
