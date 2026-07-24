@@ -171,12 +171,11 @@ export const roleDashboardPath: Record<UserRole, string> = {
   [UserRole.ADMIN]: "/admin",
 };
 
-// ---------- Cross-screen draft — the role picked on the Sign In screen (UX only, never trusted for authorization) and Admin's own forgot-password flow ----------
+// ---------- Cross-screen draft — Admin's own forgot-password flow ----------
 
 const DRAFT_KEY = "makazi_auth_draft";
 
 export interface AuthDraft {
-  role?: UserRole;
   forgotEmail?: string;
   forgotCode?: string;
 }
