@@ -26,9 +26,10 @@ export class ClerkIdentityStrategy extends PassportStrategy(Strategy, "clerk-ide
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
     if (!token) throw new UnauthorizedException();
 
-    const claims = await verifyToken(token, { secretKey: this.config.getOrThrow<string>("CLERK_SECRET_KEY") }).catch(
-      () => null,
-    );
+    const claims = await verifyToken(token, {
+      secretKey: this.config.getOrThrow<string>("CLERK_SECRET_KEY"),
+      authorizedParties: [this.config.get<string>("WEB_APP_URL", "http://localhost:3000")],
+    }).catch(() => null);
     if (!claims) throw new UnauthorizedException("Invalid session");
 
     const clerkUser = await this.clerkClient.users.getUser(claims.sub);

@@ -5,7 +5,9 @@ import { clerkMiddleware } from "@clerk/nextjs/server";
 // defense-in-depth nicety on top of the per-page client-side guards every
 // dashboard layout already does + the NestJS API's own auth enforcement —
 // nothing here is the actual security boundary.
-export const proxy = clerkMiddleware();
+export const proxy = clerkMiddleware({
+  authorizedParties: [process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"],
+});
 
 export const config = {
   matcher: [
