@@ -5,6 +5,7 @@ import { AfricasTalkingSmsService } from "./sms/africastalking-sms.service";
 import { SmsSimulatorService } from "./sms/sms-simulator.service";
 import { EMAIL_GATEWAY } from "./email/email-gateway.types";
 import { SmtpEmailService } from "./email/smtp-email.service";
+import { BrevoEmailService } from "./email/brevo-email.service";
 import { EmailSimulatorService } from "./email/email-simulator.service";
 import { WHATSAPP_GATEWAY } from "./whatsapp/whatsapp-gateway.types";
 import { WhatsAppCloudService } from "./whatsapp/whatsapp-cloud.service";
@@ -34,6 +35,7 @@ import { MapsSimulatorService } from "./maps/maps-simulator.service";
     AfricasTalkingSmsService,
     SmsSimulatorService,
     SmtpEmailService,
+    BrevoEmailService,
     EmailSimulatorService,
     WhatsAppCloudService,
     WhatsAppSimulatorService,
@@ -49,9 +51,16 @@ import { MapsSimulatorService } from "./maps/maps-simulator.service";
     },
     {
       provide: EMAIL_GATEWAY,
-      useFactory: (real: SmtpEmailService, sim: EmailSimulatorService, config: ConfigService) =>
-        config.get<string>("SMTP_HOST") ? real : sim,
-      inject: [SmtpEmailService, EmailSimulatorService, ConfigService],
+      // Brevo's HTTPS API takes priority over raw SMTP — many hosts
+      // (Railway included) block outbound SMTP ports entirely, which no
+      // SMTP credentials can work around, but plain HTTPS is never blocked.
+      useFactory: (
+        brevo: BrevoEmailService,
+        smtp: SmtpEmailService,
+        sim: EmailSimulatorService,
+        config: ConfigService,
+      ) => (config.get<string>("BREVO_API_KEY") ? brevo : config.get<string>("SMTP_HOST") ? smtp : sim),
+      inject: [BrevoEmailService, SmtpEmailService, EmailSimulatorService, ConfigService],
     },
     {
       provide: WHATSAPP_GATEWAY,
