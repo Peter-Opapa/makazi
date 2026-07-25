@@ -7,6 +7,7 @@ import { IntegrationsModule } from "./integrations/integrations.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UsersModule } from "./modules/users/users.module";
 import { PropertiesModule } from "./modules/properties/properties.module";
+import { PaymentChannelsModule } from "./modules/payment-channels/payment-channels.module";
 import { UnitsModule } from "./modules/units/units.module";
 import { TenantsModule } from "./modules/tenants/tenants.module";
 import { CaretakersModule } from "./modules/caretakers/caretakers.module";
@@ -32,6 +33,7 @@ import { SetupModule } from "./modules/setup/setup.module";
     AuthModule,
     UsersModule,
     PropertiesModule,
+    PaymentChannelsModule,
     UnitsModule,
     TenantsModule,
     CaretakersModule,

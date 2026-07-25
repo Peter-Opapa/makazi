@@ -239,6 +239,7 @@ model User {
   registeredTenants       User[]                  @relation("TenantRegisteredBy")
   notifications           Notification[]
   technicians             Technician[]            @relation("TechnicianLandlord")
+  paymentChannelTemplates PaymentChannelTemplate[] @relation("LandlordPaymentChannelTemplates")
   maintenanceActivities   MaintenanceActivity[]
   notificationPreference  NotificationPreference?
   supportTicketsFiled     SupportTicket[]         @relation("SupportTicketCustomer")
@@ -308,6 +309,28 @@ model PaymentAccount {
   updatedAt         DateTime @updatedAt
 
   @@map("payment_accounts")
+}
+
+/// A landlord's saved payment channel details (till/paybill/bank), reusable as
+/// a starting point when setting up a property's PaymentAccount. Deliberately
+/// decoupled from Property/PaymentAccount — it's a personal address book, not
+/// itself part of live payment routing, so adding it carries no risk to
+/// existing STK-push behaviour.
+model PaymentChannelTemplate {
+  id                String   @id @default(cuid())
+  landlordId        String
+  landlord          User     @relation("LandlordPaymentChannelTemplates", fields: [landlordId], references: [id])
+  label             String
+  method            String // paybill | till | bank
+  payBillNumber     String?
+  tillNumber        String?
+  bankName          String?
+  bankAccountNumber String?
+  isDefault         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("payment_channel_templates")
 }
 
 model Unit {

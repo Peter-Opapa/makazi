@@ -4,8 +4,10 @@ import * as React from "react";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api";
 import { upsertPaymentAccount, type PaymentAccount } from "@/lib/properties";
+import { listPaymentChannelTemplates, type PaymentChannelTemplate } from "@/lib/payment-channels";
 import { FormButton } from "@/components/shared/form-button";
 import { InlineError } from "@/components/shared/inline-error";
+import { Select } from "@/components/shared/field";
 import { cn } from "@/lib/utils";
 
 const METHODS: { value: PaymentAccount["method"]; label: string }[] = [
@@ -87,11 +89,28 @@ export function PropertySettingsForm({
   const [bankAccountNumber, setBankAccountNumber] = React.useState(initial?.bankAccountNumber ?? "");
   const [error, setError] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
+  const [savedChannels, setSavedChannels] = React.useState<PaymentChannelTemplate[]>([]);
 
   React.useEffect(() => {
     setCurrent(initial);
     setEditing(!initial);
   }, [initial]);
+
+  React.useEffect(() => {
+    listPaymentChannelTemplates()
+      .then(setSavedChannels)
+      .catch(() => undefined);
+  }, []);
+
+  function applySavedChannel(channelId: string) {
+    const channel = savedChannels.find((c) => c.id === channelId);
+    if (!channel) return;
+    setMethod(channel.method);
+    setPayBillNumber(channel.payBillNumber ?? "");
+    setTillNumber(channel.tillNumber ?? "");
+    setBankName(channel.bankName ?? "");
+    setBankAccountNumber(channel.bankAccountNumber ?? "");
+  }
 
   function startEditing() {
     setMethod(current?.method ?? "paybill");
@@ -131,6 +150,21 @@ export function PropertySettingsForm({
         <CurrentPaymentSummary account={current} onChangeClick={startEditing} />
       ) : (
         <form onSubmit={handleSubmit}>
+          {savedChannels.length > 0 && (
+            <div className="mb-[18px]">
+              <label className="block text-[13px] font-semibold mb-[6px]">Fill from saved channel</label>
+              <Select defaultValue="" onChange={(e) => e.target.value && applySavedChannel(e.target.value)}>
+                <option value="">Choose a saved channel…</option>
+                {savedChannels.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                    {c.isDefault ? " (default)" : ""}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          )}
+
           <div className="flex gap-2 mb-[18px]">
             {METHODS.map((m) => (
               <button
