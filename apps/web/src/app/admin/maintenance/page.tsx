@@ -15,15 +15,20 @@ import { maintenancePriorityTone, maintenanceStatusLabel, maintenanceStatusTone 
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Modal } from "@/components/shared/modal";
 import { FormButton } from "@/components/shared/form-button";
+import { Field, Select } from "@/components/shared/field";
+import { DataTable } from "@/components/shared/data-table";
+import { EmptyState } from "@/components/shared/empty-state";
+import { SkeletonList } from "@/components/shared/skeletons";
 
 const STATUS_ORDER = Object.values(MaintenanceStatus);
 
 export default function AdminMaintenancePage() {
-  const [tickets, setTickets] = React.useState<AdminMaintenanceListItem[]>([]);
+  const [tickets, setTickets] = React.useState<AdminMaintenanceListItem[] | null>(null);
   const [counts, setCounts] = React.useState<Record<string, number> | null>(null);
   const [viewingId, setViewingId] = React.useState<string | null>(null);
 
   const refetch = React.useCallback(() => {
+    setTickets(null);
     listAdminMaintenance().then(setTickets);
     getAdminMaintenanceStatusCounts().then(setCounts);
   }, []);
@@ -45,33 +50,30 @@ export default function AdminMaintenancePage() {
         ))}
       </div>
 
-      <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
-        <div className="grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] px-4 py-3 bg-[var(--paper)] text-[11px] font-semibold text-[var(--stone)] uppercase tracking-wide">
-          <span>Issue</span>
-          <span>Property</span>
-          <span>Technician</span>
-          <span>Priority</span>
-          <span>Status</span>
-        </div>
-        {tickets.length === 0 && <div className="px-4 py-8 text-center text-sm text-[var(--stone)]">No maintenance tickets yet.</div>}
-        {tickets.map((t) => (
-          <div
-            key={t.id}
-            onClick={() => setViewingId(t.id)}
-            className="grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] px-4 py-3.5 border-t border-[var(--line)] items-center text-[12.5px] cursor-pointer hover:bg-[var(--paper)]"
-          >
-            <span className="font-semibold">{t.issue}</span>
-            <span className="text-[var(--stone)]">{t.property}</span>
-            <span className="text-[var(--stone)]">{t.technician}</span>
-            <span>
-              <StatusBadge tone={maintenancePriorityTone(t.priority)}>{t.priority}</StatusBadge>
-            </span>
-            <span>
-              <StatusBadge tone={maintenanceStatusTone(t.status)}>{maintenanceStatusLabel(t.status)}</StatusBadge>
-            </span>
-          </div>
-        ))}
-      </div>
+      {!tickets && <SkeletonList rows={6} />}
+
+      {tickets && tickets.length === 0 && <EmptyState title="No maintenance tickets yet" description="Reported issues across all properties will appear here." />}
+
+      {tickets && tickets.length > 0 && (
+        <DataTable
+          rows={tickets}
+          rowKey={(t) => t.id}
+          onRowClick={(t) => setViewingId(t.id)}
+          columns={[
+            { key: "issue", header: "Issue", sortValue: (t) => t.issue.toLowerCase(), render: (t) => <span className="font-semibold">{t.issue}</span> },
+            { key: "property", header: "Property", sortValue: (t) => t.property.toLowerCase(), render: (t) => <span className="text-[var(--stone)]">{t.property}</span> },
+            { key: "technician", header: "Technician", render: (t) => <span className="text-[var(--stone)]">{t.technician}</span> },
+            { key: "priority", header: "Priority", sortValue: (t) => t.priority, render: (t) => <StatusBadge tone={maintenancePriorityTone(t.priority)}>{t.priority}</StatusBadge> },
+            {
+              key: "status",
+              header: "Status",
+              align: "right",
+              sortValue: (t) => t.status,
+              render: (t) => <StatusBadge tone={maintenanceStatusTone(t.status)}>{maintenanceStatusLabel(t.status)}</StatusBadge>,
+            },
+          ]}
+        />
+      )}
 
       {viewingId && (
         <TicketModal ticketId={viewingId} onOpenChange={(open) => !open && setViewingId(null)} onChanged={refetch} />
@@ -146,25 +148,20 @@ function TicketModal({
 
       {message && <p className="text-[12.5px] text-[var(--success)] mb-3">{message}</p>}
 
-      <div className="mb-[14px]">
-        <label className="block text-[12.5px] font-semibold mb-[6px]">Reassign technician</label>
+      <Field label="Reassign technician" required className="mb-[14px]">
         {detail.eligibleTechnicians.length === 0 ? (
           <p className="text-[12.5px] text-[var(--stone)]">No technicians on this property&apos;s roster yet.</p>
         ) : (
-          <select
-            value={selectedTech}
-            onChange={(e) => setSelectedTech(e.target.value)}
-            className="w-full px-3 py-2.5 border-[1.5px] border-[var(--line-2)] rounded-[9px] text-sm"
-          >
+          <Select value={selectedTech} onChange={(e) => setSelectedTech(e.target.value)}>
             {detail.eligibleTechnicians.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.name}
                 {t.specialty ? ` — ${t.specialty}` : ""}
               </option>
             ))}
-          </select>
+          </Select>
         )}
-      </div>
+      </Field>
 
       <div className="flex gap-2.5">
         <FormButton variant="outline" disabled={busy} onClick={handleEscalate}>

@@ -18,6 +18,10 @@ import {
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Modal } from "@/components/shared/modal";
 import { FormButton } from "@/components/shared/form-button";
+import { Field, Select, Textarea } from "@/components/shared/field";
+import { DataTable } from "@/components/shared/data-table";
+import { EmptyState } from "@/components/shared/empty-state";
+import { SkeletonList } from "@/components/shared/skeletons";
 
 function statusTone(status: SupportTicketStatus): "success" | "warning" | "error" | "neutral" {
   if (status === SupportTicketStatus.RESOLVED) return "success";
@@ -34,11 +38,12 @@ function statusLabel(status: SupportTicketStatus): string {
 }
 
 export default function AdminSupportPage() {
-  const [tickets, setTickets] = React.useState<AdminSupportTicketListItem[]>([]);
+  const [tickets, setTickets] = React.useState<AdminSupportTicketListItem[] | null>(null);
   const [counts, setCounts] = React.useState<{ open: number; escalated: number; resolvedToday: number } | null>(null);
   const [viewingId, setViewingId] = React.useState<string | null>(null);
 
   const refetch = React.useCallback(() => {
+    setTickets(null);
     listAdminSupportTickets().then(setTickets);
     getAdminSupportStatusCounts().then(setCounts);
   }, []);
@@ -66,31 +71,30 @@ export default function AdminSupportPage() {
         </div>
       </div>
 
-      <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
-        <div className="grid grid-cols-[1fr_1.6fr_1fr_1fr_1fr] px-4 py-3 bg-[var(--paper)] text-[11px] font-semibold text-[var(--stone)] uppercase tracking-wide">
-          <span>Ticket</span>
-          <span>Subject</span>
-          <span>Customer</span>
-          <span>Agent</span>
-          <span>Status</span>
-        </div>
-        {tickets.length === 0 && <div className="px-4 py-8 text-center text-sm text-[var(--stone)]">No support tickets yet.</div>}
-        {tickets.map((t) => (
-          <div
-            key={t.id}
-            onClick={() => setViewingId(t.id)}
-            className="grid grid-cols-[1fr_1.6fr_1fr_1fr_1fr] px-4 py-3.5 border-t border-[var(--line)] items-center text-[12.5px] cursor-pointer hover:bg-[var(--paper)]"
-          >
-            <span className="font-mono text-[var(--stone)]">{t.ticketNumber}</span>
-            <span className="font-semibold">{t.subject}</span>
-            <span>{t.customer}</span>
-            <span className="text-[var(--stone)]">{t.agent}</span>
-            <span>
-              <StatusBadge tone={statusTone(t.status)}>{statusLabel(t.status)}</StatusBadge>
-            </span>
-          </div>
-        ))}
-      </div>
+      {!tickets && <SkeletonList rows={6} />}
+
+      {tickets && tickets.length === 0 && <EmptyState title="No support tickets yet" description="Requests from landlords, caretakers and tenants will appear here." />}
+
+      {tickets && tickets.length > 0 && (
+        <DataTable
+          rows={tickets}
+          rowKey={(t) => t.id}
+          onRowClick={(t) => setViewingId(t.id)}
+          columns={[
+            { key: "ticket", header: "Ticket", sortValue: (t) => t.ticketNumber, render: (t) => <span className="font-mono text-[var(--stone)]">{t.ticketNumber}</span> },
+            { key: "subject", header: "Subject", sortValue: (t) => t.subject.toLowerCase(), render: (t) => <span className="font-semibold">{t.subject}</span> },
+            { key: "customer", header: "Customer", sortValue: (t) => t.customer.toLowerCase(), render: (t) => <span>{t.customer}</span> },
+            { key: "agent", header: "Agent", render: (t) => <span className="text-[var(--stone)]">{t.agent}</span> },
+            {
+              key: "status",
+              header: "Status",
+              align: "right",
+              sortValue: (t) => t.status,
+              render: (t) => <StatusBadge tone={statusTone(t.status)}>{statusLabel(t.status)}</StatusBadge>,
+            },
+          ]}
+        />
+      )}
 
       {viewingId && (
         <TicketModal ticketId={viewingId} onOpenChange={(open) => !open && setViewingId(null)} onChanged={refetch} />
@@ -186,34 +190,26 @@ function TicketModal({
 
       {message && <p className="text-[12.5px] text-[var(--success)] mb-3">{message}</p>}
 
-      <div className="mb-[14px]">
-        <label className="block text-[12.5px] font-semibold mb-[6px]">Assign agent</label>
-        <select
-          value={agentId}
-          onChange={(e) => handleAssign(e.target.value)}
-          disabled={busy}
-          className="w-full px-3 py-2.5 border-[1.5px] border-[var(--line-2)] rounded-[9px] text-sm"
-        >
+      <Field label="Assign agent" required className="mb-[14px]">
+        <Select value={agentId} onChange={(e) => handleAssign(e.target.value)} disabled={busy}>
           <option value="">Unassigned</option>
           {staff.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
             </option>
           ))}
-        </select>
-      </div>
+        </Select>
+      </Field>
 
-      <div className="mb-[14px]">
-        <label className="block text-[12.5px] font-semibold mb-[6px]">Internal notes</label>
-        <textarea
+      <Field label="Internal notes" required className="mb-[14px]">
+        <Textarea
           rows={3}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           onBlur={handleSaveNotes}
           placeholder="Notes visible to staff only"
-          className="w-full px-3 py-2.5 border-[1.5px] border-[var(--line-2)] rounded-[9px] text-sm resize-y"
         />
-      </div>
+      </Field>
 
       <div className="flex gap-2.5">
         <FormButton variant="outline" disabled={busy || detail.status === SupportTicketStatus.RESOLVED} onClick={handleEscalate}>
