@@ -139,20 +139,10 @@ export default function CaretakerOverviewPage() {
         </div>
       )}
 
-      <div className="grid gap-[14px] mb-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-        <KpiCard label="Assigned Properties" value={String(properties.length)} />
-        <KpiCard label="Vacant Units" value={String(vacantUnits)} />
-        <KpiCard
-          label="Open Tickets"
-          value={String(openTickets.length)}
-          valueColor={openTickets.length > 0 ? "var(--warning)" : undefined}
-        />
-        <KpiCard label="Tenants" value={String(tenantsCount)} />
-      </div>
-
-      <div className="border border-[var(--line)] rounded-2xl bg-white p-5">
+      {/* Work first: what the caretaker needs to do today, priority-sorted, before the summary metrics. */}
+      <div className="border border-[var(--line)] rounded-2xl bg-white p-5 mb-5">
         <div className="flex justify-between items-center mb-3">
-          <span className="font-semibold text-sm">Assigned tasks</span>
+          <span className="font-semibold text-sm">Today&apos;s work</span>
           <Link href="/caretaker/maintenance" className="text-xs font-semibold text-[var(--green)]">
             View all
           </Link>
@@ -181,6 +171,17 @@ export default function CaretakerOverviewPage() {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="grid gap-[14px]" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+        <KpiCard label="Assigned Properties" value={String(properties.length)} />
+        <KpiCard label="Vacant Units" value={String(vacantUnits)} />
+        <KpiCard
+          label="Open Tickets"
+          value={String(openTickets.length)}
+          valueColor={openTickets.length > 0 ? "var(--warning)" : undefined}
+        />
+        <KpiCard label="Tenants" value={String(tenantsCount)} />
       </div>
     </div>
   );

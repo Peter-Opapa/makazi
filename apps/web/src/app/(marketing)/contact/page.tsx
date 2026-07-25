@@ -9,14 +9,42 @@ const FAQS = [
   { q: "I have a question that isn't answered here.", a: "Email, call or WhatsApp us directly using the details above — we read and answer every message ourselves." },
 ];
 
+// Web3Forms access keys are public by design (they ship in the client bundle),
+// so this is safe to expose. Overridable via env for a different inbox.
+const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY ?? "601750f1-8290-41ae-96a4-8f39d36496ab";
+
 export default function ContactPage() {
   const [submitted, setSubmitted] = React.useState(false);
   const [name, setName] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitted(true);
+    setError(null);
+    setSubmitting(true);
+    try {
+      const form = e.currentTarget;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: "New Makazi demo request",
+          from_name: "Makazi website",
+          ...data,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message ?? "Request failed");
+      setSubmitted(true);
+    } catch {
+      setError("We couldn't send your message just now. Please try again, or reach us directly using the details on the right.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -57,6 +85,7 @@ export default function ContactPage() {
                       <label className="mb-1.5 block text-[13px] font-semibold">Full name</label>
                       <input
                         type="text"
+                        name="name"
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -66,29 +95,39 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <label className="mb-1.5 block text-[13px] font-semibold">Email</label>
-                      <input type="email" required placeholder="you@example.com" className="w-full rounded-[10px] border-[1.5px] border-[var(--line-2)] px-3.5 py-3" />
+                      <input type="email" name="email" required placeholder="you@example.com" className="w-full rounded-[10px] border-[1.5px] border-[var(--line-2)] px-3.5 py-3" />
                     </div>
                   </div>
                   <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className="mb-1.5 block text-[13px] font-semibold">Phone number</label>
-                      <input type="tel" placeholder="+254 7XX XXX XXX" className="w-full rounded-[10px] border-[1.5px] border-[var(--line-2)] px-3.5 py-3" />
+                      <input type="tel" name="phone" placeholder="+254 7XX XXX XXX" className="w-full rounded-[10px] border-[1.5px] border-[var(--line-2)] px-3.5 py-3" />
                     </div>
                     <div>
                       <label className="mb-1.5 block text-[13px] font-semibold">Number of units</label>
-                      <input type="text" placeholder="e.g. 42" className="w-full rounded-[10px] border-[1.5px] border-[var(--line-2)] px-3.5 py-3" />
+                      <input type="text" name="units" placeholder="e.g. 42" className="w-full rounded-[10px] border-[1.5px] border-[var(--line-2)] px-3.5 py-3" />
                     </div>
                   </div>
                   <div className="mb-6">
                     <label className="mb-1.5 block text-[13px] font-semibold">Tell us about your portfolio</label>
                     <textarea
+                      name="message"
                       rows={4}
                       placeholder="Number of properties, current tools, biggest headache..."
                       className="w-full resize-y rounded-[10px] border-[1.5px] border-[var(--line-2)] px-3.5 py-3"
                     />
                   </div>
-                  <button type="submit" className="w-full rounded-[10px] bg-[var(--green)] py-4 text-[15px] font-semibold text-white hover:bg-[var(--green-deep)]">
-                    Book a Demo
+                  {error && (
+                    <p className="mb-4 rounded-[10px] border border-[var(--error)] bg-[var(--error-bg)] px-3.5 py-3 text-[13px] text-[var(--error)]">
+                      {error}
+                    </p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full rounded-[10px] bg-[var(--green)] py-4 text-[15px] font-semibold text-white transition-colors hover:bg-[var(--green-deep)] disabled:opacity-70"
+                  >
+                    {submitting ? "Sending…" : "Book a Demo"}
                   </button>
                 </form>
               </>
