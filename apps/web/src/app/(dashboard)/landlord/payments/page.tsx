@@ -4,6 +4,7 @@ import * as React from "react";
 import { PaymentStatus } from "@makazi/shared-types";
 import { listLedger, listUnmatchedPayments, type PaymentLedgerItem, type UnmatchedPayment } from "@/lib/payments";
 import { listProperties, type PropertyListItem } from "@/lib/properties";
+import { getPaymentsReport, type PaymentsReport } from "@/lib/reports";
 import { StatusBadge, type StatusTone } from "@/components/shared/status-badge";
 import { FormButton } from "@/components/shared/form-button";
 import { ResolveUnmatchedPaymentModal } from "@/components/dashboard/resolve-unmatched-payment-modal";
@@ -19,6 +20,23 @@ const STATUS_TABS: { key: PaymentStatus | "all"; label: string }[] = [
   { key: PaymentStatus.PAID, label: "Paid" },
   { key: PaymentStatus.FAILED, label: "Failed" },
 ];
+
+function countFor(tab: PaymentStatus | "all", byStatus: PaymentsReport["byStatus"] | null): number | null {
+  if (!byStatus) return null;
+  if (tab === "all") return byStatus.pending + byStatus.late + byStatus.paid + byStatus.failed;
+  switch (tab) {
+    case PaymentStatus.PENDING:
+      return byStatus.pending;
+    case PaymentStatus.LATE:
+      return byStatus.late;
+    case PaymentStatus.PAID:
+      return byStatus.paid;
+    case PaymentStatus.FAILED:
+      return byStatus.failed;
+    default:
+      return null;
+  }
+}
 
 function fmtKES(amount: string) {
   return `KES ${Number(amount).toLocaleString("en-KE")}`;
@@ -42,15 +60,18 @@ export default function LandlordPaymentsPage() {
   const [status, setStatus] = React.useState<PaymentStatus | "all">("all");
   const [ledger, setLedger] = React.useState<PaymentLedgerItem[] | null>(null);
   const [unmatched, setUnmatched] = React.useState<UnmatchedPayment[]>([]);
+  const [byStatus, setByStatus] = React.useState<PaymentsReport["byStatus"] | null>(null);
   const [resolvingPayment, setResolvingPayment] = React.useState<UnmatchedPayment | null>(null);
 
   const refetch = React.useCallback(async () => {
-    const [ledgerRes, unmatchedRes] = await Promise.all([
+    const [ledgerRes, unmatchedRes, reportRes] = await Promise.all([
       listLedger({ propertyId: propertyId || undefined, status: status === "all" ? undefined : status }),
       listUnmatchedPayments(propertyId || undefined),
+      getPaymentsReport({ propertyId: propertyId || undefined }),
     ]);
     setLedger(ledgerRes);
     setUnmatched(unmatchedRes);
+    setByStatus(reportRes.byStatus);
   }, [propertyId, status]);
 
   React.useEffect(() => {
@@ -98,17 +119,29 @@ export default function LandlordPaymentsPage() {
         </div>
       )}
 
-      <div className="flex gap-2 mb-5">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setStatus(tab.key)}
-            className="rounded-full px-3 py-[6px] text-xs font-semibold border-[1.5px] border-[var(--line-2)]"
-            style={status === tab.key ? { background: "var(--ink)", color: "#fff", borderColor: "var(--ink)" } : undefined}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="flex gap-2 mb-5 flex-wrap">
+        {STATUS_TABS.map((tab) => {
+          const count = countFor(tab.key, byStatus);
+          const active = status === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setStatus(tab.key)}
+              className="rounded-full px-3 py-[6px] text-xs font-semibold border-[1.5px] border-[var(--line-2)]"
+              style={active ? { background: "var(--ink)", color: "#fff", borderColor: "var(--ink)" } : undefined}
+            >
+              {tab.label}
+              {count !== null && (
+                <span
+                  className="ml-[6px] font-mono"
+                  style={{ color: active ? "rgba(255,255,255,0.75)" : "var(--stone)" }}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {!ledger && <SkeletonList rows={6} />}

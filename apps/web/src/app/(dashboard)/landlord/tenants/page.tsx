@@ -14,6 +14,7 @@ import { SearchInput } from "@/components/shared/search-input";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { FormButton } from "@/components/shared/form-button";
 import { RegisterTenantModal } from "@/components/dashboard/register-tenant-modal";
+import { BulkImportTenantsModal } from "@/components/dashboard/bulk-import-tenants-modal";
 import { EditContactModal } from "@/components/dashboard/edit-contact-modal";
 import { ExitRequestsSection } from "@/components/dashboard/exit-requests-section";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -27,6 +28,7 @@ export default function LandlordTenantsPage() {
   const [registerOpen, setRegisterOpen] = React.useState(false);
   const [editTenant, setEditTenant] = React.useState<TenantListItem | null>(null);
   const [cancelTenant, setCancelTenant] = React.useState<TenantListItem | null>(null);
+  const [bulkImportOpen, setBulkImportOpen] = React.useState(false);
 
   const refetch = React.useCallback(async () => {
     const res = await listTenants(search || undefined);
@@ -57,9 +59,14 @@ export default function LandlordTenantsPage() {
             Units tab.
           </p>
         </div>
-        <FormButton fullWidth={false} onClick={() => setRegisterOpen(true)} className="px-4">
-          Register tenant
-        </FormButton>
+        <div className="flex gap-2">
+          <FormButton variant="outline" fullWidth={false} onClick={() => setBulkImportOpen(true)} className="px-4">
+            Bulk import
+          </FormButton>
+          <FormButton fullWidth={false} onClick={() => setRegisterOpen(true)} className="px-4">
+            Register tenant
+          </FormButton>
+        </div>
       </div>
 
       <ExitRequestsSection propertyHrefBase="/landlord/properties" />
@@ -150,6 +157,8 @@ export default function LandlordTenantsPage() {
       )}
 
       <RegisterTenantModal open={registerOpen} onOpenChange={setRegisterOpen} onRegistered={refetch} />
+
+      <BulkImportTenantsModal open={bulkImportOpen} onOpenChange={setBulkImportOpen} onImported={refetch} />
 
       {editTenant && (
         <EditContactModal

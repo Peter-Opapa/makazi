@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, HttpException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { randomInt } from "crypto";
 import { CaretakerInviteStatus, NotificationType, TenancyStatus, UnitStatus, UserRole } from "@makazi/shared-types";
 import { Prisma } from "../../../generated/prisma";
@@ -7,6 +7,7 @@ import { PropertyAccessService, type ActingUser } from "../../common/services/pr
 import { InvitationEmailService } from "../invitations/invitation-email.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { RegisterTenantDto } from "./dto/register-tenant.dto";
+import { BulkRegisterTenantsDto } from "./dto/bulk-register-tenants.dto";
 import { UpdateTenantContactDto } from "./dto/update-tenant-contact.dto";
 import { RequestExitDto } from "./dto/request-exit.dto";
 
@@ -65,6 +66,48 @@ export class TenantsService {
     }
 
     return { tenant: this.sanitize(user), tenantCode, reused: false };
+  }
+
+  /**
+   * Registers many tenants in one pass (CSV import) by replaying registerTenant
+   * per row — same validation, same reuse-by-email rule, one row's failure
+   * doesn't stop the rest. Deliberately registration-only: assigning a tenant
+   * to a unit involves rent/deposit terms a bulk operation shouldn't guess at,
+   * so that stays a one-by-one action on the unit itself.
+   */
+  async bulkRegister(actorId: string, dto: BulkRegisterTenantsDto) {
+    const results: { row: number; name: string; status: "created" | "reused" | "error"; message: string }[] = [];
+
+    for (let i = 0; i < dto.rows.length; i++) {
+      const row = dto.rows[i];
+      const name = `${row.firstName} ${row.lastName}`;
+      try {
+        const result = await this.registerTenant(actorId, row);
+        results.push({
+          row: i + 1,
+          name,
+          status: result.reused ? "reused" : "created",
+          message: result.reused ? "Already existed — linked the existing tenant profile." : "Registered.",
+        });
+      } catch (err) {
+        const message =
+          err instanceof HttpException
+            ? (() => {
+                const body = err.getResponse();
+                const m = typeof body === "object" && body !== null ? (body as { message?: unknown }).message : body;
+                return Array.isArray(m) ? m.join(", ") : String(m ?? err.message);
+              })()
+            : "Failed to register.";
+        results.push({ row: i + 1, name, status: "error", message });
+      }
+    }
+
+    return {
+      results,
+      created: results.filter((r) => r.status === "created").length,
+      reused: results.filter((r) => r.status === "reused").length,
+      failed: results.filter((r) => r.status === "error").length,
+    };
   }
 
   /** Resends the claim-invitation email for a tenant who hasn't claimed their account yet. */

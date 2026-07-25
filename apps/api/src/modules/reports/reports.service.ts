@@ -25,61 +25,72 @@ export class ReportsService {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
 
-    const [properties, units, tenants, recentPaymentRows, recentTicketRows, monthRevenue, lateRows] = await Promise.all([
-      this.prisma.property.findMany({
-        where: { id: { in: propertyIds } },
-        select: { id: true, name: true, location: true, county: true },
-        orderBy: { createdAt: "desc" },
-      }),
-      this.prisma.unit.findMany({
-        where: { propertyId: { in: propertyIds } },
-        select: { propertyId: true, status: true },
-      }),
-      // Same scope as TenantsService.findMany: assigned to an accessible
-      // property, or registered by this landlord but not yet assigned.
-      this.prisma.user.findMany({
-        where: {
-          role: UserRole.TENANT,
-          OR: [
-            { tenancies: { some: { unit: { propertyId: { in: propertyIds } } } } },
-            { registeredById: user.id, tenancies: { none: {} } },
-          ],
-        },
-        select: { createdAt: true },
-      }),
-      this.prisma.payment.findMany({
-        where: { tenancy: { unit: { propertyId: { in: propertyIds } } } },
-        orderBy: { createdAt: "desc" },
-        take: 4,
-        include: {
-          tenancy: {
-            select: { tenant: { select: { firstName: true, lastName: true } }, unit: { select: { code: true } } },
+    const [properties, units, tenants, recentPaymentRows, recentTicketRows, monthRevenue, lastMonthRevenue, lateRows] =
+      await Promise.all([
+        this.prisma.property.findMany({
+          where: { id: { in: propertyIds } },
+          select: { id: true, name: true, location: true, county: true },
+          orderBy: { createdAt: "desc" },
+        }),
+        this.prisma.unit.findMany({
+          where: { propertyId: { in: propertyIds } },
+          select: { propertyId: true, status: true },
+        }),
+        // Same scope as TenantsService.findMany: assigned to an accessible
+        // property, or registered by this landlord but not yet assigned.
+        this.prisma.user.findMany({
+          where: {
+            role: UserRole.TENANT,
+            OR: [
+              { tenancies: { some: { unit: { propertyId: { in: propertyIds } } } } },
+              { registeredById: user.id, tenancies: { none: {} } },
+            ],
           },
-        },
-      }),
-      this.prisma.maintenanceTicket.findMany({
-        where: { unit: { propertyId: { in: propertyIds } } },
-        orderBy: { createdAt: "desc" },
-        take: 4,
-        include: {
-          reportedBy: { select: { firstName: true, lastName: true } },
-          unit: { select: { code: true } },
-        },
-      }),
-      this.prisma.payment.aggregate({
-        where: {
-          tenancy: { unit: { propertyId: { in: propertyIds } } },
-          status: PaymentStatus.PAID,
-          paidAt: { gte: monthStart, lte: monthEnd },
-        },
-        _sum: { amount: true },
-      }),
-      this.prisma.payment.findMany({
-        where: { tenancy: { unit: { propertyId: { in: propertyIds } } }, status: PaymentStatus.LATE },
-        select: { amount: true, tenancyId: true },
-      }),
-    ]);
+          select: { createdAt: true },
+        }),
+        this.prisma.payment.findMany({
+          where: { tenancy: { unit: { propertyId: { in: propertyIds } } } },
+          orderBy: { createdAt: "desc" },
+          take: 4,
+          include: {
+            tenancy: {
+              select: { tenant: { select: { firstName: true, lastName: true } }, unit: { select: { code: true } } },
+            },
+          },
+        }),
+        this.prisma.maintenanceTicket.findMany({
+          where: { unit: { propertyId: { in: propertyIds } } },
+          orderBy: { createdAt: "desc" },
+          take: 4,
+          include: {
+            reportedBy: { select: { firstName: true, lastName: true } },
+            unit: { select: { code: true } },
+          },
+        }),
+        this.prisma.payment.aggregate({
+          where: {
+            tenancy: { unit: { propertyId: { in: propertyIds } } },
+            status: PaymentStatus.PAID,
+            paidAt: { gte: monthStart, lte: monthEnd },
+          },
+          _sum: { amount: true },
+        }),
+        this.prisma.payment.aggregate({
+          where: {
+            tenancy: { unit: { propertyId: { in: propertyIds } } },
+            status: PaymentStatus.PAID,
+            paidAt: { gte: lastMonthStart, lte: lastMonthEnd },
+          },
+          _sum: { amount: true },
+        }),
+        this.prisma.payment.findMany({
+          where: { tenancy: { unit: { propertyId: { in: propertyIds } } }, status: PaymentStatus.LATE },
+          select: { amount: true, tenancyId: true },
+        }),
+      ]);
 
     const totalUnits = units.length;
     const occupied = units.filter((u) => u.status === UnitStatus.OCCUPIED).length;
@@ -101,9 +112,16 @@ export class ReportsService {
     const overdueTenancyIds = new Set(lateRows.map((p) => p.tenancyId));
     const outstandingRentKES = lateRows.reduce((sum, p) => sum + Number(p.amount), 0);
 
+    const revenueKES = Number(monthRevenue._sum.amount ?? 0);
+    const lastMonthRevenueKES = Number(lastMonthRevenue._sum.amount ?? 0);
+    // No baseline to compare against (last month was zero) - a % delta would be
+    // meaningless (or infinite), so surface no comparison rather than a bogus number.
+    const revenueDeltaPct = lastMonthRevenueKES > 0 ? Math.round(((revenueKES - lastMonthRevenueKES) / lastMonthRevenueKES) * 100) : null;
+
     return {
       stats: {
-        revenueKES: Number(monthRevenue._sum.amount ?? 0),
+        revenueKES,
+        revenueDeltaPct,
         revenueSub: "This month",
         occupancyPct: totalUnits > 0 ? Math.round((occupied / totalUnits) * 100) : 0,
         occupancySub: `${occupied} of ${totalUnits} units`,

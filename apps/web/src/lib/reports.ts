@@ -29,6 +29,7 @@ export interface DashboardMaintenanceItem {
 export interface DashboardSummary {
   stats: {
     revenueKES: number;
+    revenueDeltaPct: number | null;
     revenueSub: string;
     occupancyPct: number;
     occupancySub: string;

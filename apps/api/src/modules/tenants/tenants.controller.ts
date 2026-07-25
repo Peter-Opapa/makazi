@@ -6,6 +6,7 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { CurrentUser, type AuthenticatedUser } from "../../common/decorators/current-user.decorator";
 import { TenantsService } from "./tenants.service";
 import { RegisterTenantDto } from "./dto/register-tenant.dto";
+import { BulkRegisterTenantsDto } from "./dto/bulk-register-tenants.dto";
 import { UpdateTenantContactDto } from "./dto/update-tenant-contact.dto";
 
 // Landlord/Caretaker: tenancy directory for properties they have access to.
@@ -18,6 +19,11 @@ export class TenantsController {
   @Post()
   register(@CurrentUser() user: AuthenticatedUser, @Body() dto: RegisterTenantDto) {
     return this.tenantsService.registerTenant(user.id, dto);
+  }
+
+  @Post("bulk-import")
+  bulkRegister(@CurrentUser() user: AuthenticatedUser, @Body() dto: BulkRegisterTenantsDto) {
+    return this.tenantsService.bulkRegister(user.id, dto);
   }
 
   @Get()

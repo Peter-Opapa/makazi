@@ -40,6 +40,28 @@ export function registerTenant(input: RegisterTenantInput) {
   });
 }
 
+export interface BulkImportRowResult {
+  row: number;
+  name: string;
+  status: "created" | "reused" | "error";
+  message: string;
+}
+
+export interface BulkImportResult {
+  results: BulkImportRowResult[];
+  created: number;
+  reused: number;
+  failed: number;
+}
+
+/** Registration-only bulk import (CSV parsed client-side) — assigning a unit stays a one-by-one action since it involves rent/deposit terms. */
+export function bulkRegisterTenants(rows: RegisterTenantInput[]) {
+  return apiFetch<BulkImportResult>("/tenants/bulk-import", {
+    method: "POST",
+    body: JSON.stringify({ rows }),
+  });
+}
+
 export function listTenants(search?: string) {
   const qs = search ? `?search=${encodeURIComponent(search)}` : "";
   return apiFetch<TenantListItem[]>(`/tenants${qs}`);
