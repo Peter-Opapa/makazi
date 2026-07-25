@@ -15,6 +15,10 @@ import {
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Modal } from "@/components/shared/modal";
 import { FormButton } from "@/components/shared/form-button";
+import { SearchInput } from "@/components/shared/search-input";
+import { DataTable } from "@/components/shared/data-table";
+import { EmptyState } from "@/components/shared/empty-state";
+import { SkeletonList } from "@/components/shared/skeletons";
 
 const TABS: { key: UserRole; label: string }[] = [
   { key: UserRole.LANDLORD, label: "Landlords" },
@@ -30,10 +34,11 @@ function fmtDate(iso: string) {
 export default function AdminUsersPage() {
   const [tab, setTab] = React.useState<UserRole>(UserRole.LANDLORD);
   const [search, setSearch] = React.useState("");
-  const [users, setUsers] = React.useState<AdminUserListItem[]>([]);
+  const [users, setUsers] = React.useState<AdminUserListItem[] | null>(null);
   const [viewingId, setViewingId] = React.useState<string | null>(null);
 
   const refetch = React.useCallback(() => {
+    setUsers(null);
     listAdminUsers({ role: tab, search: search || undefined }).then(setUsers);
   }, [tab, search]);
 
@@ -63,43 +68,64 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      <input
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search name, email, phone…"
-        className="w-full max-w-[380px] px-3.5 py-2.5 border border-[var(--line)] rounded-[9px] text-sm mb-4"
-      />
-
-      <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
-        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] px-4 py-3 bg-[var(--paper)] text-[11px] font-semibold text-[var(--stone)] uppercase tracking-wide">
-          <span>Name</span>
-          <span>Status</span>
-          <span>Verified</span>
-          <span>Joined</span>
-        </div>
-        {users.length === 0 && <div className="px-4 py-8 text-center text-sm text-[var(--stone)]">No users found.</div>}
-        {users.map((u) => (
-          <div
-            key={u.id}
-            onClick={() => setViewingId(u.id)}
-            className="grid grid-cols-[1.5fr_1fr_1fr_1fr] px-4 py-3.5 border-t border-[var(--line)] items-center text-[13px] cursor-pointer hover:bg-[var(--paper)]"
-          >
-            <div>
-              <div className="font-semibold">{u.name}</div>
-              <div className="text-xs text-[var(--stone)]">{u.email ?? u.phone ?? "—"}</div>
-            </div>
-            <span>
-              <StatusBadge tone={u.status === "active" ? "success" : "error"}>
-                {u.status === "active" ? "Active" : "Suspended"}
-              </StatusBadge>
-            </span>
-            <span>
-              <StatusBadge tone={u.verified ? "success" : "warning"}>{u.verified ? "Verified" : "Unverified"}</StatusBadge>
-            </span>
-            <span className="font-mono text-xs text-[var(--stone)]">{fmtDate(u.joined)}</span>
-          </div>
-        ))}
+      <div className="max-w-[380px] mb-4">
+        <SearchInput value={search} onChange={setSearch} placeholder="Search name, email, phone…" />
       </div>
+
+      {!users && <SkeletonList rows={6} />}
+
+      {users && users.length === 0 && (
+        <EmptyState
+          title="No users found"
+          description={search ? "No users match your search." : "No users in this category yet."}
+        />
+      )}
+
+      {users && users.length > 0 && (
+        <DataTable
+          rows={users}
+          rowKey={(u) => u.id}
+          onRowClick={(u) => setViewingId(u.id)}
+          columns={[
+            {
+              key: "name",
+              header: "Name",
+              sortValue: (u) => u.name.toLowerCase(),
+              render: (u) => (
+                <div>
+                  <div className="font-semibold">{u.name}</div>
+                  <div className="text-xs text-[var(--stone)]">{u.email ?? u.phone ?? "—"}</div>
+                </div>
+              ),
+            },
+            {
+              key: "status",
+              header: "Status",
+              sortValue: (u) => u.status,
+              render: (u) => (
+                <StatusBadge tone={u.status === "active" ? "success" : "error"}>
+                  {u.status === "active" ? "Active" : "Suspended"}
+                </StatusBadge>
+              ),
+            },
+            {
+              key: "verified",
+              header: "Verified",
+              sortValue: (u) => (u.verified ? 1 : 0),
+              render: (u) => (
+                <StatusBadge tone={u.verified ? "success" : "warning"}>{u.verified ? "Verified" : "Unverified"}</StatusBadge>
+              ),
+            },
+            {
+              key: "joined",
+              header: "Joined",
+              align: "right",
+              sortValue: (u) => new Date(u.joined).getTime(),
+              render: (u) => <span className="font-mono text-xs text-[var(--stone)]">{fmtDate(u.joined)}</span>,
+            },
+          ]}
+        />
+      )}
 
       {viewingId && (
         <UserDetailModal
