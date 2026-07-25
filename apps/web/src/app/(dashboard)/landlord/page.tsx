@@ -10,6 +10,7 @@ import { OccupancySummary } from "@/components/dashboard/occupancy-summary";
 import { RecentPayments } from "@/components/dashboard/recent-payments";
 import { RecentMaintenance } from "@/components/dashboard/recent-maintenance";
 import { getDashboardSummary, type DashboardSummary } from "@/lib/reports";
+import { SkeletonKpiRow, SkeletonCard } from "@/components/shared/skeletons";
 import { formatKES, getGreeting } from "@/lib/format";
 
 export default function LandlordOverviewPage() {
@@ -31,6 +32,16 @@ export default function LandlordOverviewPage() {
       <p className="text-sm text-[var(--stone)] mb-6">{todayLabel}</p>
 
       <SetupProgressTracker />
+
+      {!summary && (
+        <>
+          <SkeletonKpiRow count={6} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <SkeletonCard lines={4} />
+            <SkeletonCard lines={4} />
+          </div>
+        </>
+      )}
 
       {summary && (
         <>

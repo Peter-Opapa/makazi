@@ -13,6 +13,7 @@ import { listProperties, type PropertyListItem } from "@/lib/properties";
 import { listMaintenanceTickets, type MaintenanceTicket } from "@/lib/maintenance";
 import { listTenants } from "@/lib/tenants";
 import { maintenanceStatusLabel, maintenanceStatusTone, maintenancePriorityTone, getGreeting } from "@/lib/format";
+import { SkeletonKpiRow, SkeletonList } from "@/components/shared/skeletons";
 
 const OPEN_STATUSES = new Set<MaintenanceStatus>([
   MaintenanceStatus.REPORTED,
@@ -80,10 +81,20 @@ export default function CaretakerOverviewPage() {
     [tickets],
   );
 
-  if (initialLoad) return null;
+  const todayLabel = new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long" });
+
+  if (initialLoad) {
+    return (
+      <div>
+        <h1 className="font-display font-bold text-[26px] tracking-[-0.02em] mb-1">{getGreeting(user.firstName)}</h1>
+        <p className="text-sm text-[var(--stone)] mb-6">{todayLabel}</p>
+        <SkeletonKpiRow count={4} />
+        <SkeletonList rows={5} />
+      </div>
+    );
+  }
 
   const vacantUnits = properties.reduce((sum, p) => sum + p.occupancy.vacant, 0);
-  const todayLabel = new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long" });
 
   return (
     <div>

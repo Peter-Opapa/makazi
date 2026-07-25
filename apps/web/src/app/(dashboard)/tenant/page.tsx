@@ -14,6 +14,8 @@ import { listMaintenanceTickets, type MaintenanceTicket } from "@/lib/maintenanc
 import { listMyTenancies, acceptTenancy, declineTenancy, type MyTenancy } from "@/lib/tenants";
 import { ApiError } from "@/lib/api";
 import { maintenanceStatusLabel, maintenanceStatusTone, formatKES, getGreeting } from "@/lib/format";
+import { SkeletonKpiRow, SkeletonList } from "@/components/shared/skeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ActivityItem =
   | { kind: "payment"; date: string; data: PaymentHistoryItem }
@@ -76,9 +78,19 @@ export default function TenantOverviewPage() {
     }
   }
 
-  if (initialLoad) return null;
-
   const todayLabel = new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long" });
+
+  if (initialLoad) {
+    return (
+      <div>
+        <h1 className="font-display font-bold text-[26px] tracking-[-0.02em] mb-1">{getGreeting(user.firstName)}</h1>
+        <p className="text-sm text-[var(--stone)] mb-6">{todayLabel}</p>
+        <Skeleton className="h-[132px] w-full rounded-2xl mb-5" />
+        <SkeletonKpiRow count={3} />
+        <SkeletonList rows={4} />
+      </div>
+    );
+  }
   const isOverdue = due?.status === "LATE";
   const pendingInvites = tenancies.filter((t) => t.status === TenancyStatus.PENDING);
   const hasActiveTenancy = tenancies.some((t) => t.status === TenancyStatus.ACTIVE);

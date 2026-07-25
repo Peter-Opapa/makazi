@@ -17,6 +17,8 @@ import { RegisterTenantModal } from "@/components/dashboard/register-tenant-moda
 import { EditContactModal } from "@/components/dashboard/edit-contact-modal";
 import { ExitRequestsSection } from "@/components/dashboard/exit-requests-section";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { EmptyState } from "@/components/shared/empty-state";
+import { SkeletonList } from "@/components/shared/skeletons";
 
 export default function LandlordTenantsPage() {
   const [search, setSearch] = React.useState("");
@@ -65,29 +67,26 @@ export default function LandlordTenantsPage() {
         <SearchInput value={search} onChange={setSearch} placeholder="Name, phone or email…" />
       </div>
 
+      {!tenants && <SkeletonList rows={5} />}
+
       {tenants && tenants.length === 0 && (
-        <div className="border-[1.5px] border-dashed border-[var(--line-2)] rounded-2xl py-16 px-5 text-center">
-          <svg
-            width="30"
-            height="30"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="var(--line-2)"
-            strokeWidth={1.6}
-            className="mx-auto mb-3"
-          >
-            <circle cx="12" cy="9" r="4" />
-            <path d="M4 21a8 8 0 0 1 16 0" />
-          </svg>
-          <p className="text-sm text-[var(--stone)] mb-4">
-            {search ? "No tenants match your search." : "No tenants yet."}
-          </p>
-          {!search && (
-            <FormButton fullWidth={false} onClick={() => setRegisterOpen(true)} className="px-5">
-              Register your first tenant
-            </FormButton>
-          )}
-        </div>
+        <EmptyState
+          icon={
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}>
+              <circle cx="12" cy="9" r="4" />
+              <path d="M4 21a8 8 0 0 1 16 0" />
+            </svg>
+          }
+          title={search ? "No tenants match your search." : "No tenants yet."}
+          description={search ? undefined : "Register a tenant, then assign them to a unit from a property's Units tab."}
+          action={
+            !search ? (
+              <FormButton fullWidth={false} onClick={() => setRegisterOpen(true)} className="px-5">
+                Register your first tenant
+              </FormButton>
+            ) : undefined
+          }
+        />
       )}
 
       {tenants && tenants.length > 0 && (

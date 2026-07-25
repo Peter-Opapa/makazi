@@ -17,6 +17,8 @@ import { InviteCaretakerModal } from "@/components/dashboard/invite-caretaker-mo
 import { EditContactModal } from "@/components/dashboard/edit-contact-modal";
 import { CaretakerDetailModal } from "@/components/dashboard/caretaker-detail-modal";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { EmptyState } from "@/components/shared/empty-state";
+import { SkeletonList } from "@/components/shared/skeletons";
 
 const STATUS_LABEL: Record<CaretakerInviteStatus, string> = {
   [CaretakerInviteStatus.PENDING]: "Pending",
@@ -80,17 +82,29 @@ export default function CaretakersPage() {
         </FormButton>
       </div>
 
+      {!rows && <SkeletonList rows={4} />}
+
       {rows && rows.length === 0 && (
-        <div className="text-center py-16 border border-dashed border-[var(--line-2)] rounded-[16px]">
-          <p className="text-sm text-[var(--stone)] mb-4">
-            {properties.length === 0 ? "Add a property first, then invite a caretaker to help manage it." : "No caretakers invited yet."}
-          </p>
-          {properties.length > 0 && (
-            <FormButton fullWidth={false} className="px-5" onClick={() => setInviteOpen(true)}>
-              Invite your first caretaker
-            </FormButton>
-          )}
-        </div>
+        <EmptyState
+          icon={
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}>
+              <path d="M14.7 3.3a4 4 0 0 0-5.4 5.4L3 15l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z" />
+            </svg>
+          }
+          title={properties.length === 0 ? "Add a property first" : "No caretakers invited yet"}
+          description={
+            properties.length === 0
+              ? "Once you have a property, you can invite a caretaker to help manage it."
+              : "Invite a caretaker to help manage day-to-day tasks on your properties."
+          }
+          action={
+            properties.length > 0 ? (
+              <FormButton fullWidth={false} className="px-5" onClick={() => setInviteOpen(true)}>
+                Invite your first caretaker
+              </FormButton>
+            ) : undefined
+          }
+        />
       )}
 
       {rows && rows.length > 0 && (
