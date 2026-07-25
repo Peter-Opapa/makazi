@@ -7,6 +7,7 @@ import { ApiError } from "@/lib/api";
 import { Modal } from "@/components/shared/modal";
 import { FormButton } from "@/components/shared/form-button";
 import { InlineError } from "@/components/shared/inline-error";
+import { Field, Textarea } from "@/components/shared/field";
 
 /**
  * Account deletion isn't self-service — it's handled by the team so tenancies,
@@ -74,15 +75,15 @@ export function DeleteAccountSection() {
               assist — your account stays active until then.
             </p>
             {error && <InlineError>{error}</InlineError>}
-            <label className="block text-[13px] font-semibold mb-[6px]">Reason</label>
-            <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              rows={3}
-              maxLength={500}
-              placeholder="Let us know why you're leaving"
-              className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px] mb-5"
-            />
+            <Field label="Reason" required className="mb-5">
+              <Textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                rows={3}
+                maxLength={500}
+                placeholder="Let us know why you're leaving"
+              />
+            </Field>
             <div className="flex gap-[10px]">
               <FormButton variant="outline" onClick={() => setOpen(false)} disabled={submitting}>
                 Cancel

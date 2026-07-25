@@ -1,0 +1,30 @@
+﻿TENANT IMPORT TEMPLATE — Makazi Manager
+Generated: 2026-07-25
+
+INSTRUCTIONS:
+1. Fill in tenant details below the "--- START HERE ---" line.
+2. DO NOT modify or delete the column headers.
+3. Property and Unit must match EXACTLY as shown in the reference below.
+4. Leave unused rows blank — they will be ignored.
+5. Save as .csv and upload via the Bulk Import feature.
+
+--- PROPERTY & UNIT REFERENCE (copy-paste from here) ---
+Property Name,Unit Label,Unit Type,Monthly Rent (KES)
+"Makazi Heights","(no units yet)","apartment",""
+"Makazi Heights","(no units yet)","apartment",""
+
+--- START HERE: FILL IN TENANT DATA BELOW ---
+Full Name,Phone (2547XXXXXXXX),Email,ID Number,Emergency Contact,Emergency Phone,Property Name,Unit Label,Rent Amount (KES),Deposit (KES),Rent Due Day (1-28),Lease Start (YYYY-MM-DD)
+
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+
+--- END OF TEMPLATE ---

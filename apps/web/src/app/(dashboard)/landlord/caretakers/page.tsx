@@ -19,6 +19,7 @@ import { CaretakerDetailModal } from "@/components/dashboard/caretaker-detail-mo
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SkeletonList } from "@/components/shared/skeletons";
+import { DataTable } from "@/components/shared/data-table";
 
 const STATUS_LABEL: Record<CaretakerInviteStatus, string> = {
   [CaretakerInviteStatus.PENDING]: "Pending",
@@ -108,58 +109,77 @@ export default function CaretakersPage() {
       )}
 
       {rows && rows.length > 0 && (
-        <div className="border border-[var(--line)] rounded-[14px] overflow-hidden">
-          {rows.map((row) => (
-            <div
-              key={row.id}
-              className="flex items-center justify-between px-5 py-4 border-b border-[var(--line)] last:border-b-0"
-            >
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setDetailCaretakerId(row.caretakerId)}
-                  className="font-semibold text-[14px] text-left hover:text-[var(--green)]"
-                >
-                  {row.caretaker.firstName} {row.caretaker.lastName}
-                </button>
-                <div className="text-[13px] text-[var(--stone)]">
-                  {row.propertyName} · {row.caretaker.phone ?? row.caretaker.email ?? "No contact on file"}
+        <DataTable
+          rows={rows}
+          rowKey={(row) => row.id}
+          columns={[
+            {
+              key: "caretaker",
+              header: "Caretaker",
+              sortValue: (row) => `${row.caretaker.firstName} ${row.caretaker.lastName}`.toLowerCase(),
+              render: (row) => (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setDetailCaretakerId(row.caretakerId)}
+                    className="font-semibold text-[13px] text-left hover:text-[var(--green)]"
+                  >
+                    {row.caretaker.firstName} {row.caretaker.lastName}
+                  </button>
+                  <div className="text-xs text-[var(--stone)]">
+                    {row.propertyName} · {row.caretaker.phone ?? row.caretaker.email ?? "No contact on file"}
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4">
+              ),
+            },
+            {
+              key: "status",
+              header: "Status",
+              sortValue: (row) => STATUS_LABEL[row.inviteStatus],
+              render: (row) => (
                 <span className="text-[12px] font-semibold" style={{ color: STATUS_COLOR[row.inviteStatus] }}>
                   {STATUS_LABEL[row.inviteStatus]}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setDetailCaretakerId(row.caretakerId)}
-                  className="text-[13px] font-semibold text-[var(--green)]"
-                >
-                  Details
-                </button>
-                {row.inviteStatus === CaretakerInviteStatus.PENDING && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => handleResend(row.caretakerId)}
-                      className="text-[13px] font-semibold text-[var(--green)]"
-                    >
-                      Resend invite
-                    </button>
-                    <button type="button" onClick={() => setEditRow(row)} className="text-[13px] font-semibold text-[var(--stone)]">
-                      Edit
-                    </button>
-                  </>
-                )}
-                {row.inviteStatus !== CaretakerInviteStatus.DECLINED && (
-                  <button type="button" onClick={() => setRevokeRow(row)} className="text-[13px] font-semibold text-[var(--error)]">
-                    Revoke
+              ),
+            },
+            {
+              key: "actions",
+              header: "Actions",
+              align: "right",
+              hideLabelOnMobile: true,
+              render: (row) => (
+                <div className="flex items-center gap-4 justify-end flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setDetailCaretakerId(row.caretakerId)}
+                    className="text-[13px] font-semibold text-[var(--green)]"
+                  >
+                    Details
                   </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+                  {row.inviteStatus === CaretakerInviteStatus.PENDING && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleResend(row.caretakerId)}
+                        className="text-[13px] font-semibold text-[var(--green)]"
+                      >
+                        Resend invite
+                      </button>
+                      <button type="button" onClick={() => setEditRow(row)} className="text-[13px] font-semibold text-[var(--stone)]">
+                        Edit
+                      </button>
+                    </>
+                  )}
+                  {row.inviteStatus !== CaretakerInviteStatus.DECLINED && (
+                    <button type="button" onClick={() => setRevokeRow(row)} className="text-[13px] font-semibold text-[var(--error)]">
+                      Revoke
+                    </button>
+                  )}
+                </div>
+              ),
+            },
+          ]}
+        />
       )}
 
       <InviteCaretakerModal

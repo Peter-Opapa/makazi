@@ -9,6 +9,7 @@ import { ApiError } from "@/lib/api";
 import { FormButton } from "@/components/shared/form-button";
 import { Modal } from "@/components/shared/modal";
 import { InlineError } from "@/components/shared/inline-error";
+import { Field, Textarea } from "@/components/shared/field";
 
 const LEASE_STATUS_LABEL: Record<TenancyStatus, string> = {
   [TenancyStatus.PENDING]: "Pending acceptance",
@@ -134,15 +135,15 @@ export default function LeasePage() {
           take you through the move-out and deposit process.
         </p>
         {exitError && <InlineError>{exitError}</InlineError>}
-        <label className="block text-[13px] font-semibold mb-[6px]">Reason (optional)</label>
-        <textarea
-          value={exitReason}
-          onChange={(e) => setExitReason(e.target.value)}
-          rows={3}
-          maxLength={500}
-          placeholder="e.g. relocating for work"
-          className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px] mb-5"
-        />
+        <Field label="Reason" className="mb-5">
+          <Textarea
+            value={exitReason}
+            onChange={(e) => setExitReason(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="e.g. relocating for work"
+          />
+        </Field>
         <div className="flex gap-[10px]">
           <FormButton variant="outline" onClick={() => setExitOpen(false)} disabled={submittingExit}>
             Cancel
