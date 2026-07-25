@@ -28,19 +28,23 @@ export function CaretakerDetailModal({
   onOpenChange: (open: boolean) => void;
 }) {
   const [detail, setDetail] = React.useState<CaretakerDetail | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (open) {
       setDetail(null);
+      setError(null);
       getCaretakerDetail(caretakerId)
         .then(setDetail)
-        .catch(() => onOpenChange(false));
+        .catch(() => setError("We couldn't load this caretaker's details. Please try again."));
     }
-  }, [open, caretakerId, onOpenChange]);
+  }, [open, caretakerId]);
 
   return (
     <Modal open={open} onOpenChange={onOpenChange} maxWidth={460}>
-      {!detail ? (
+      {error ? (
+        <p className="text-[13px] text-[var(--stone)] py-6 text-center">{error}</p>
+      ) : !detail ? (
         <p className="text-[13px] text-[var(--stone)] py-6 text-center">Loading…</p>
       ) : (
         <div>

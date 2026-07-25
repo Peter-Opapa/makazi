@@ -116,6 +116,13 @@ export default function CaretakersPage() {
                 <span className="text-[12px] font-semibold" style={{ color: STATUS_COLOR[row.inviteStatus] }}>
                   {STATUS_LABEL[row.inviteStatus]}
                 </span>
+                <button
+                  type="button"
+                  onClick={() => setDetailCaretakerId(row.caretakerId)}
+                  className="text-[13px] font-semibold text-[var(--green)]"
+                >
+                  Details
+                </button>
                 {row.inviteStatus === CaretakerInviteStatus.PENDING && (
                   <>
                     <button
