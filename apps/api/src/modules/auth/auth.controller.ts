@@ -11,6 +11,8 @@ import { CompleteClerkProfileDto } from "./dto/complete-clerk-profile.dto";
 import { UpdateMeDto } from "./dto/update-me.dto";
 import { PresignMePhotoDto } from "./dto/presign-me-photo.dto";
 import { ConfirmMePhotoDto } from "./dto/confirm-me-photo.dto";
+import { PresignMeLogoDto } from "./dto/presign-me-logo.dto";
+import { ConfirmMeLogoDto } from "./dto/confirm-me-logo.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { ClerkIdentityGuard } from "../../common/guards/clerk-identity.guard";
 import { CurrentUser, type AuthenticatedUser } from "../../common/decorators/current-user.decorator";
@@ -114,5 +116,17 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   confirmMePhoto(@CurrentUser() user: AuthenticatedUser, @Body() dto: ConfirmMePhotoDto) {
     return this.authService.confirmMePhoto(user.id, dto);
+  }
+
+  @Post("me/logo/presign")
+  @UseGuards(JwtAuthGuard)
+  presignMeLogo(@CurrentUser() user: AuthenticatedUser, @Body() dto: PresignMeLogoDto) {
+    return this.authService.presignMeLogo(user, dto);
+  }
+
+  @Post("me/logo")
+  @UseGuards(JwtAuthGuard)
+  confirmMeLogo(@CurrentUser() user: AuthenticatedUser, @Body() dto: ConfirmMeLogoDto) {
+    return this.authService.confirmMeLogo(user, dto);
   }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { createClerkClient, type ClerkClient } from "@clerk/backend";
@@ -18,6 +18,8 @@ import { CompleteClerkProfileDto } from "./dto/complete-clerk-profile.dto";
 import { UpdateMeDto } from "./dto/update-me.dto";
 import { PresignMePhotoDto } from "./dto/presign-me-photo.dto";
 import { ConfirmMePhotoDto } from "./dto/confirm-me-photo.dto";
+import { PresignMeLogoDto } from "./dto/presign-me-logo.dto";
+import { ConfirmMeLogoDto } from "./dto/confirm-me-logo.dto";
 import { NotificationsService } from "../notifications/notifications.service";
 import { STORAGE_GATEWAY, type StorageGateway } from "../../integrations/storage/storage-gateway.types";
 import type { ClerkIdentity } from "../../common/decorators/current-clerk-identity.decorator";
@@ -36,6 +38,7 @@ interface SanitizableUser {
   emailVerifiedAt: Date | null;
   nationalId: string | null;
   profilePhotoUrl: string | null;
+  companyLogoUrl: string | null;
   emergencyContactName: string | null;
   emergencyContactPhone: string | null;
 }
@@ -391,6 +394,23 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
+  /** Company branding logo — landlord-only, shown on tenant-facing communications. */
+  async presignMeLogo(user: { id: string; role: string }, dto: PresignMeLogoDto) {
+    if (user.role !== UserRole.LANDLORD) throw new ForbiddenException("Only landlords can set a company logo.");
+    return this.storage.createPresignedUploadUrl(`users/${user.id}/logo`, dto.contentType);
+  }
+
+  async confirmMeLogo(user: { id: string; role: string }, dto: ConfirmMeLogoDto) {
+    if (user.role !== UserRole.LANDLORD) throw new ForbiddenException("Only landlords can set a company logo.");
+    const existing = await this.prisma.user.findUnique({ where: { id: user.id } });
+    const url = this.storage.publicUrlFor(dto.key);
+    const updated = await this.prisma.user.update({ where: { id: user.id }, data: { companyLogoUrl: url } });
+    if (existing?.companyLogoUrl) {
+      await this.storage.deleteObjectByUrl(existing.companyLogoUrl).catch(() => undefined);
+    }
+    return this.sanitizeUser(updated);
+  }
+
   private generateOtp() {
     return randomInt(0, 1_000_000).toString().padStart(6, "0");
   }
@@ -411,6 +431,7 @@ export class AuthService {
       emailVerifiedAt: user.emailVerifiedAt,
       nationalId: user.nationalId,
       profilePhotoUrl: user.profilePhotoUrl,
+      companyLogoUrl: user.companyLogoUrl,
       emergencyContactName: user.emergencyContactName,
       emergencyContactPhone: user.emergencyContactPhone,
     };

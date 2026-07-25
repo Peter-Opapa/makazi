@@ -224,6 +224,8 @@ model User {
   /// stays null indefinitely.
   nationalId             String?       @unique
   profilePhotoUrl        String?
+  /// Landlord-only branding logo, shown on tenant-facing communications (invites, receipts). Reuses the profile-photo presign/confirm pattern under a separate storage key.
+  companyLogoUrl         String?
   emergencyContactName   String?
   emergencyContactPhone  String?
   createdAt              DateTime      @default(now())

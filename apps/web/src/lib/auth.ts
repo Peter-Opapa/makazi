@@ -12,6 +12,7 @@ export interface AuthUser {
   emailVerifiedAt: string | null;
   nationalId: string | null;
   profilePhotoUrl: string | null;
+  companyLogoUrl: string | null;
   emergencyContactName: string | null;
   emergencyContactPhone: string | null;
 }
@@ -47,6 +48,18 @@ export function presignMePhoto(input: { contentType: string }) {
 
 export function confirmMePhoto(input: { key: string }) {
   return apiFetch<AuthUser>("/auth/me/photo", { method: "POST", body: JSON.stringify(input) });
+}
+
+/** Landlord-only company branding logo, shown on tenant-facing communications. */
+export function presignMeLogo(input: { contentType: string }) {
+  return apiFetch<{ uploadUrl: string; key: string; publicUrl: string }>("/auth/me/logo/presign", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export function confirmMeLogo(input: { key: string }) {
+  return apiFetch<AuthUser>("/auth/me/logo", { method: "POST", body: JSON.stringify(input) });
 }
 
 /** Re-reads the live Clerk identity and mirrors its email into Makazi's own record — call after the user manages their email via Clerk's own account UI. */

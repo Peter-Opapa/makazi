@@ -4,7 +4,15 @@ import * as React from "react";
 import { toast } from "sonner";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { UserRole } from "@makazi/shared-types";
-import { updateMe, presignMePhoto, confirmMePhoto, syncEmailFromClerk, type AuthUser } from "@/lib/auth";
+import {
+  updateMe,
+  presignMePhoto,
+  confirmMePhoto,
+  presignMeLogo,
+  confirmMeLogo,
+  syncEmailFromClerk,
+  type AuthUser,
+} from "@/lib/auth";
 import { ApiError } from "@/lib/api";
 import { FormButton } from "@/components/shared/form-button";
 import { InlineError } from "@/components/shared/inline-error";
@@ -31,6 +39,8 @@ export function ProfileForm({ user, role, onUpdated }: { user: AuthUser; role: U
   const [emergencyContactPhone, setEmergencyContactPhone] = React.useState(user.emergencyContactPhone ?? "");
   const [photoFile, setPhotoFile] = React.useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = React.useState<string | null>(user.profilePhotoUrl);
+  const [logoFile, setLogoFile] = React.useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = React.useState<string | null>(user.companyLogoUrl);
   const [error, setError] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
 
@@ -54,6 +64,13 @@ export function ProfileForm({ user, role, onUpdated }: { user: AuthUser; role: U
     setPhotoPreview(URL.createObjectURL(file));
   }
 
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -64,6 +81,12 @@ export function ProfileForm({ user, role, onUpdated }: { user: AuthUser; role: U
         const res = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": photoFile.type }, body: photoFile });
         if (!res.ok) throw new Error("Photo upload failed");
         await confirmMePhoto({ key });
+      }
+      if (logoFile) {
+        const { uploadUrl, key } = await presignMeLogo({ contentType: logoFile.type });
+        const res = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": logoFile.type }, body: logoFile });
+        if (!res.ok) throw new Error("Logo upload failed");
+        await confirmMeLogo({ key });
       }
       const updated = await updateMe({
         firstName,
@@ -79,6 +102,7 @@ export function ProfileForm({ user, role, onUpdated }: { user: AuthUser; role: U
       });
       onUpdated(updated);
       setPhotoFile(null);
+      setLogoFile(null);
       toast("Profile updated.");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
@@ -108,6 +132,29 @@ export function ProfileForm({ user, role, onUpdated }: { user: AuthUser; role: U
             <p className="text-xs text-[var(--stone)] mt-1">JPG, PNG, WebP or GIF.</p>
           </div>
         </div>
+
+        {role === UserRole.LANDLORD && (
+          <div className="flex items-center gap-4 mb-[22px]">
+            <div
+              className="w-16 h-16 rounded-[10px] bg-[var(--paper)] border border-[var(--line)] flex items-center justify-center shrink-0 overflow-hidden bg-cover bg-center"
+              style={logoPreview ? { backgroundImage: `url(${logoPreview})` } : undefined}
+            >
+              {!logoPreview && (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--stone)" strokeWidth={1.6}>
+                  <rect x="3" y="7" width="18" height="13" rx="2" />
+                  <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+              )}
+            </div>
+            <div>
+              <label className="inline-block text-[13px] font-semibold text-[var(--green)] cursor-pointer">
+                {logoPreview ? "Change company logo" : "Add company logo"}
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleLogoChange} className="hidden" />
+              </label>
+              <p className="text-xs text-[var(--stone)] mt-1">Shown on invites and receipts to your tenants. JPG, PNG, WebP or GIF.</p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-[14px] mb-[14px]">
           <Field label="First name" required>
