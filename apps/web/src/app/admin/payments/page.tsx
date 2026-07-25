@@ -17,6 +17,10 @@ import { formatKES } from "@/lib/format";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Modal } from "@/components/shared/modal";
 import { FormButton } from "@/components/shared/form-button";
+import { Field, Input } from "@/components/shared/field";
+import { DataTable } from "@/components/shared/data-table";
+import { EmptyState } from "@/components/shared/empty-state";
+import { SkeletonList } from "@/components/shared/skeletons";
 
 type Tab = "successful" | "failed" | "pending" | "reconciliation";
 
@@ -39,15 +43,17 @@ function fmtTime(iso: string) {
 
 export default function AdminPaymentsPage() {
   const [tab, setTab] = React.useState<Tab>("successful");
-  const [payments, setPayments] = React.useState<AdminPaymentListItem[]>([]);
-  const [unmatched, setUnmatched] = React.useState<AdminUnmatchedPayment[]>([]);
+  const [payments, setPayments] = React.useState<AdminPaymentListItem[] | null>(null);
+  const [unmatched, setUnmatched] = React.useState<AdminUnmatchedPayment[] | null>(null);
   const [viewingId, setViewingId] = React.useState<string | null>(null);
   const [resolvingId, setResolvingId] = React.useState<string | null>(null);
 
   const refetch = React.useCallback(() => {
     if (tab === "reconciliation") {
+      setUnmatched(null);
       listAdminUnmatchedPayments().then(setUnmatched);
     } else {
+      setPayments(null);
       const status = tab === "successful" ? PaymentStatus.PAID : tab === "failed" ? PaymentStatus.FAILED : PaymentStatus.PENDING;
       listAdminPayments({ status }).then(setPayments);
     }
@@ -77,55 +83,54 @@ export default function AdminPaymentsPage() {
       </div>
 
       {tab === "reconciliation" ? (
-        <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
-          <div className="grid grid-cols-[1fr_1.2fr_1fr_1fr_1fr] px-4 py-3 bg-[var(--paper)] text-[11px] font-semibold text-[var(--stone)] uppercase tracking-wide">
-            <span>Time</span>
-            <span>Payer</span>
-            <span>Amount</span>
-            <span>Reference</span>
-            <span></span>
-          </div>
-          {unmatched.length === 0 && (
-            <div className="px-4 py-8 text-center text-sm text-[var(--stone)]">No unmatched payments — reconciliation queue is clear.</div>
+        <>
+          {!unmatched && <SkeletonList rows={5} />}
+          {unmatched && unmatched.length === 0 && (
+            <EmptyState title="Reconciliation queue is clear" description="No unmatched payments to assign right now." />
           )}
-          {unmatched.map((u) => (
-            <div key={u.id} className="grid grid-cols-[1fr_1.2fr_1fr_1fr_1fr] px-4 py-3.5 border-t border-[var(--line)] items-center text-[12.5px]">
-              <span className="font-mono text-[var(--stone)]">{fmtTime(u.time)}</span>
-              <span>{u.payerPhone}</span>
-              <span className="font-mono font-semibold">{formatKES(u.amount)}</span>
-              <span className="font-mono text-[var(--stone)]">{u.accountReference}</span>
-              <button onClick={() => setResolvingId(u.id)} className="text-xs font-semibold text-[var(--green-deep)] text-left">
-                Resolve →
-              </button>
-            </div>
-          ))}
-        </div>
+          {unmatched && unmatched.length > 0 && (
+            <DataTable
+              rows={unmatched}
+              rowKey={(u) => u.id}
+              columns={[
+                { key: "time", header: "Time", sortValue: (u) => new Date(u.time).getTime(), render: (u) => <span className="font-mono text-[var(--stone)]">{fmtTime(u.time)}</span> },
+                { key: "payer", header: "Payer", sortValue: (u) => u.payerPhone, render: (u) => <span>{u.payerPhone}</span> },
+                { key: "amount", header: "Amount", align: "right", sortValue: (u) => u.amount, render: (u) => <span className="font-mono font-semibold">{formatKES(u.amount)}</span> },
+                { key: "reference", header: "Reference", render: (u) => <span className="font-mono text-[var(--stone)]">{u.accountReference}</span> },
+                {
+                  key: "actions",
+                  header: "Actions",
+                  align: "right",
+                  hideLabelOnMobile: true,
+                  render: (u) => (
+                    <button onClick={() => setResolvingId(u.id)} className="text-xs font-semibold text-[var(--green-deep)]">
+                      Resolve →
+                    </button>
+                  ),
+                },
+              ]}
+            />
+          )}
+        </>
       ) : (
-        <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
-          <div className="grid grid-cols-[1fr_1.3fr_1fr_1fr_1fr] px-4 py-3 bg-[var(--paper)] text-[11px] font-semibold text-[var(--stone)] uppercase tracking-wide">
-            <span>Time</span>
-            <span>Tenant / Property</span>
-            <span>Amount</span>
-            <span>Channel</span>
-            <span>Reference</span>
-          </div>
-          {payments.length === 0 && <div className="px-4 py-8 text-center text-sm text-[var(--stone)]">No payments in this status.</div>}
-          {payments.map((p) => (
-            <div
-              key={p.id}
-              onClick={() => setViewingId(p.id)}
-              className="grid grid-cols-[1fr_1.3fr_1fr_1fr_1fr] px-4 py-3.5 border-t border-[var(--line)] items-center text-[12.5px] cursor-pointer hover:bg-[var(--paper)]"
-            >
-              <span className="font-mono text-[var(--stone)]">{fmtTime(p.time)}</span>
-              <span>
-                {p.tenant} · {p.property}
-              </span>
-              <span className="font-mono font-semibold">{formatKES(p.amount)}</span>
-              <span className="text-[var(--stone)]">{p.channel}</span>
-              <span className="font-mono text-[var(--stone)]">{p.reference ?? "—"}</span>
-            </div>
-          ))}
-        </div>
+        <>
+          {!payments && <SkeletonList rows={6} />}
+          {payments && payments.length === 0 && <EmptyState title="No payments in this status" />}
+          {payments && payments.length > 0 && (
+            <DataTable
+              rows={payments}
+              rowKey={(p) => p.id}
+              onRowClick={(p) => setViewingId(p.id)}
+              columns={[
+                { key: "time", header: "Time", sortValue: (p) => new Date(p.time).getTime(), render: (p) => <span className="font-mono text-[var(--stone)]">{fmtTime(p.time)}</span> },
+                { key: "tenant", header: "Tenant / Property", sortValue: (p) => p.tenant.toLowerCase(), render: (p) => <span>{p.tenant} · {p.property}</span> },
+                { key: "amount", header: "Amount", align: "right", sortValue: (p) => p.amount, render: (p) => <span className="font-mono font-semibold">{formatKES(p.amount)}</span> },
+                { key: "channel", header: "Channel", sortValue: (p) => p.channel, render: (p) => <span className="text-[var(--stone)]">{p.channel}</span> },
+                { key: "reference", header: "Reference", render: (p) => <span className="font-mono text-[var(--stone)]">{p.reference ?? "—"}</span> },
+              ]}
+            />
+          )}
+        </>
       )}
 
       {viewingId && <PaymentDetailModal paymentId={viewingId} onOpenChange={(open) => !open && setViewingId(null)} />}
@@ -218,13 +223,9 @@ function ResolveModal({
       <h3 className="font-display font-bold text-xl mb-[6px]">Resolve payment</h3>
       <p className="text-[13px] text-[var(--stone)] mb-5">Assign this unmatched payment to the right tenant.</p>
 
-      <label className="block text-[13px] font-semibold mb-[6px]">Tenant</label>
-      <input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Name or phone"
-        className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px] mb-2"
-      />
+      <Field label="Tenant" required className="mb-2">
+        <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Name or phone" />
+      </Field>
       {selected ? (
         <div className="flex justify-between items-center border border-[var(--green)] bg-[var(--green-soft)] rounded-[9px] px-3 py-[10px] mb-5">
           <span className="text-[13px] font-semibold">

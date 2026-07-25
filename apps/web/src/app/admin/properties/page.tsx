@@ -3,19 +3,25 @@
 import * as React from "react";
 import { getAdminPropertyDetail, listAdminProperties, type AdminPropertyDetail, type AdminPropertyListItem } from "@/lib/admin";
 import { Modal } from "@/components/shared/modal";
+import { SearchInput } from "@/components/shared/search-input";
+import { Select } from "@/components/shared/field";
+import { DataTable } from "@/components/shared/data-table";
+import { EmptyState } from "@/components/shared/empty-state";
+import { SkeletonList } from "@/components/shared/skeletons";
 
 export default function AdminPropertiesPage() {
-  const [properties, setProperties] = React.useState<AdminPropertyListItem[]>([]);
+  const [properties, setProperties] = React.useState<AdminPropertyListItem[] | null>(null);
   const [county, setCounty] = React.useState("");
   const [search, setSearch] = React.useState("");
   const [viewingId, setViewingId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    setProperties(null);
     listAdminProperties({ county: county || undefined, search: search || undefined }).then(setProperties);
   }, [county, search]);
 
   const counties = React.useMemo(() => {
-    const set = new Set(properties.map((p) => p.county).filter((c): c is string => !!c));
+    const set = new Set((properties ?? []).map((p) => p.county).filter((c): c is string => !!c));
     return [...set].sort();
   }, [properties]);
 
@@ -24,49 +30,39 @@ export default function AdminPropertiesPage() {
       <h1 className="font-display font-bold text-2xl tracking-[-0.02em] mb-[18px]">Properties</h1>
 
       <div className="flex gap-2 mb-4 flex-wrap">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name…"
-          className="px-3.5 py-2.5 border border-[var(--line)] rounded-[9px] text-sm bg-white"
-        />
-        <select
-          value={county}
-          onChange={(e) => setCounty(e.target.value)}
-          className="px-3 py-2.5 border border-[var(--line)] rounded-[9px] text-sm bg-white"
-        >
+        <div className="w-[240px]">
+          <SearchInput value={search} onChange={setSearch} placeholder="Search by name…" />
+        </div>
+        <Select value={county} onChange={(e) => setCounty(e.target.value)} className="w-auto">
           <option value="">All counties</option>
           {counties.map((c) => (
             <option key={c} value={c}>
               {c}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
-      <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
-        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] px-4 py-3 bg-[var(--paper)] text-[11px] font-semibold text-[var(--stone)] uppercase tracking-wide">
-          <span>Property</span>
-          <span>County</span>
-          <span>Landlord</span>
-          <span>Units</span>
-          <span>Occupancy</span>
-        </div>
-        {properties.length === 0 && <div className="px-4 py-8 text-center text-sm text-[var(--stone)]">No properties found.</div>}
-        {properties.map((p) => (
-          <div
-            key={p.id}
-            onClick={() => setViewingId(p.id)}
-            className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] px-4 py-3.5 border-t border-[var(--line)] items-center text-[13px] cursor-pointer hover:bg-[var(--paper)]"
-          >
-            <span className="font-semibold">{p.name}</span>
-            <span className="text-[var(--stone)]">{p.county ?? "—"}</span>
-            <span className="text-[var(--stone)]">{p.landlord}</span>
-            <span className="font-mono">{p.units}</span>
-            <span className="font-mono">{p.occupancyPct}%</span>
-          </div>
-        ))}
-      </div>
+      {!properties && <SkeletonList rows={6} />}
+
+      {properties && properties.length === 0 && (
+        <EmptyState title="No properties found" description={search || county ? "No properties match your filters." : undefined} />
+      )}
+
+      {properties && properties.length > 0 && (
+        <DataTable
+          rows={properties}
+          rowKey={(p) => p.id}
+          onRowClick={(p) => setViewingId(p.id)}
+          columns={[
+            { key: "name", header: "Property", sortValue: (p) => p.name.toLowerCase(), render: (p) => <span className="font-semibold">{p.name}</span> },
+            { key: "county", header: "County", sortValue: (p) => p.county ?? "", render: (p) => <span className="text-[var(--stone)]">{p.county ?? "—"}</span> },
+            { key: "landlord", header: "Landlord", sortValue: (p) => p.landlord.toLowerCase(), render: (p) => <span className="text-[var(--stone)]">{p.landlord}</span> },
+            { key: "units", header: "Units", align: "right", sortValue: (p) => p.units, render: (p) => <span className="font-mono">{p.units}</span> },
+            { key: "occupancy", header: "Occupancy", align: "right", sortValue: (p) => p.occupancyPct, render: (p) => <span className="font-mono">{p.occupancyPct}%</span> },
+          ]}
+        />
+      )}
 
       {viewingId && <PropertyDetailModal propertyId={viewingId} onOpenChange={(open) => !open && setViewingId(null)} />}
     </div>
