@@ -8,6 +8,7 @@ import { updateMe, presignMePhoto, confirmMePhoto, syncEmailFromClerk, type Auth
 import { ApiError } from "@/lib/api";
 import { FormButton } from "@/components/shared/form-button";
 import { InlineError } from "@/components/shared/inline-error";
+import { Field, Input } from "@/components/shared/field";
 import { DeleteAccountSection } from "@/components/dashboard/delete-account-section";
 
 /**
@@ -109,75 +110,30 @@ export function ProfileForm({ user, role, onUpdated }: { user: AuthUser; role: U
         </div>
 
         <div className="grid grid-cols-2 gap-[14px] mb-[14px]">
-          <div>
-            <label className="block text-[13px] font-semibold mb-[6px]">First name</label>
-            <input
-              type="text"
-              required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-            />
-          </div>
-          <div>
-            <label className="block text-[13px] font-semibold mb-[6px]">Last name</label>
-            <input
-              type="text"
-              required
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-            />
-          </div>
+          <Field label="First name" required>
+            <Input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+          </Field>
+          <Field label="Last name" required>
+            <Input type="text" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
+          </Field>
         </div>
 
-        <div className="mb-[14px]">
-          <label className="block text-[13px] font-semibold mb-[6px]">Phone</label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+254 7XX XXX XXX"
-            className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-          />
-        </div>
+        <Field label="Phone" required className="mb-[14px]">
+          <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+254 7XX XXX XXX" />
+        </Field>
 
-        <div className="mb-[14px]">
-          <label className="block text-[13px] font-semibold mb-[6px]">
-            National ID <span className="text-[var(--stone)] font-normal">(optional)</span>
-          </label>
-          <input
-            type="text"
-            value={nationalId}
-            onChange={(e) => setNationalId(e.target.value)}
-            className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-          />
-        </div>
+        <Field label="National ID" className="mb-[14px]">
+          <Input type="text" value={nationalId} onChange={(e) => setNationalId(e.target.value)} />
+        </Field>
 
         {role === UserRole.TENANT && (
           <div className="grid grid-cols-2 gap-[14px] mb-[14px]">
-            <div>
-              <label className="block text-[13px] font-semibold mb-[6px]">
-                Emergency contact name <span className="text-[var(--stone)] font-normal">(optional)</span>
-              </label>
-              <input
-                type="text"
-                value={emergencyContactName}
-                onChange={(e) => setEmergencyContactName(e.target.value)}
-                className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-              />
-            </div>
-            <div>
-              <label className="block text-[13px] font-semibold mb-[6px]">
-                Emergency contact phone <span className="text-[var(--stone)] font-normal">(optional)</span>
-              </label>
-              <input
-                type="tel"
-                value={emergencyContactPhone}
-                onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-              />
-            </div>
+            <Field label="Emergency contact name">
+              <Input type="text" value={emergencyContactName} onChange={(e) => setEmergencyContactName(e.target.value)} />
+            </Field>
+            <Field label="Emergency contact phone">
+              <Input type="tel" value={emergencyContactPhone} onChange={(e) => setEmergencyContactPhone(e.target.value)} />
+            </Field>
           </div>
         )}
 
