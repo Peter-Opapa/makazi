@@ -19,6 +19,7 @@ import { ExitRequestsSection } from "@/components/dashboard/exit-requests-sectio
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SkeletonList } from "@/components/shared/skeletons";
+import { DataTable } from "@/components/shared/data-table";
 
 export default function LandlordTenantsPage() {
   const [search, setSearch] = React.useState("");
@@ -90,51 +91,62 @@ export default function LandlordTenantsPage() {
       )}
 
       {tenants && tenants.length > 0 && (
-        <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
-          {tenants.map((t, i) => {
-            const activeTenancy = t.tenancies[0];
-            return (
-              <div
-                key={t.id}
-                className="flex items-center justify-between px-4 py-[13px] gap-3 flex-wrap"
-                style={i > 0 ? { borderTop: "1px solid var(--line)" } : undefined}
-              >
+        <DataTable
+          rows={tenants}
+          rowKey={(t) => t.id}
+          columns={[
+            {
+              key: "tenant",
+              header: "Tenant",
+              sortValue: (t) => `${t.firstName} ${t.lastName}`.toLowerCase(),
+              render: (t) => (
                 <div className="min-w-0">
-                  <div className="text-[13px] font-semibold truncate">
+                  <div className="font-semibold truncate">
                     {t.firstName} {t.lastName}
                   </div>
                   <div className="text-xs text-[var(--stone)] truncate">{t.phone ?? t.email ?? "—"}</div>
                 </div>
-                <div className="flex items-center gap-3">
-                  {activeTenancy ? (
-                    <StatusBadge tone="success">
-                      {activeTenancy.unit.property.name} · {activeTenancy.unit.code}
-                    </StatusBadge>
-                  ) : (
-                    <StatusBadge tone="neutral">Unassigned</StatusBadge>
-                  )}
-                  {!t.claimed && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => handleResend(t.id)}
-                        className="text-[13px] font-semibold text-[var(--green)]"
-                      >
-                        Resend invite
-                      </button>
-                      <button type="button" onClick={() => setEditTenant(t)} className="text-[13px] font-semibold text-[var(--stone)]">
-                        Edit
-                      </button>
-                      <button type="button" onClick={() => setCancelTenant(t)} className="text-[13px] font-semibold text-[var(--error)]">
-                        Cancel
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              ),
+            },
+            {
+              key: "unit",
+              header: "Unit",
+              sortValue: (t) => t.tenancies[0]?.unit.code ?? "",
+              render: (t) => {
+                const activeTenancy = t.tenancies[0];
+                return activeTenancy ? (
+                  <StatusBadge tone="success">
+                    {activeTenancy.unit.property.name} · {activeTenancy.unit.code}
+                  </StatusBadge>
+                ) : (
+                  <StatusBadge tone="neutral">Unassigned</StatusBadge>
+                );
+              },
+            },
+            {
+              key: "actions",
+              header: "Actions",
+              align: "right",
+              hideLabelOnMobile: true,
+              render: (t) =>
+                t.claimed ? (
+                  <span className="text-xs text-[var(--stone)]">Joined</span>
+                ) : (
+                  <div className="flex items-center gap-3 justify-end flex-wrap">
+                    <button type="button" onClick={() => handleResend(t.id)} className="text-[13px] font-semibold text-[var(--green)]">
+                      Resend invite
+                    </button>
+                    <button type="button" onClick={() => setEditTenant(t)} className="text-[13px] font-semibold text-[var(--stone)]">
+                      Edit
+                    </button>
+                    <button type="button" onClick={() => setCancelTenant(t)} className="text-[13px] font-semibold text-[var(--error)]">
+                      Cancel
+                    </button>
+                  </div>
+                ),
+            },
+          ]}
+        />
       )}
 
       <RegisterTenantModal open={registerOpen} onOpenChange={setRegisterOpen} onRegistered={refetch} />

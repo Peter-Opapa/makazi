@@ -9,6 +9,7 @@ import { RegisterTenantModal } from "@/components/dashboard/register-tenant-moda
 import { ExitRequestsSection } from "@/components/dashboard/exit-requests-section";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SkeletonList } from "@/components/shared/skeletons";
+import { DataTable } from "@/components/shared/data-table";
 
 export default function CaretakerTenantsPage() {
   const [search, setSearch] = React.useState("");
@@ -63,32 +64,41 @@ export default function CaretakerTenantsPage() {
       )}
 
       {tenants && tenants.length > 0 && (
-        <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
-          {tenants.map((t, i) => {
-            const activeTenancy = t.tenancies[0];
-            return (
-              <div
-                key={t.id}
-                className="flex items-center justify-between px-4 py-[13px] gap-3 flex-wrap"
-                style={i > 0 ? { borderTop: "1px solid var(--line)" } : undefined}
-              >
+        <DataTable
+          rows={tenants}
+          rowKey={(t) => t.id}
+          columns={[
+            {
+              key: "tenant",
+              header: "Tenant",
+              sortValue: (t) => `${t.firstName} ${t.lastName}`.toLowerCase(),
+              render: (t) => (
                 <div className="min-w-0">
-                  <div className="text-[13px] font-semibold truncate">
+                  <div className="font-semibold truncate">
                     {t.firstName} {t.lastName}
                   </div>
                   <div className="text-xs text-[var(--stone)] truncate">{t.phone ?? t.email ?? "—"}</div>
                 </div>
-                {activeTenancy ? (
+              ),
+            },
+            {
+              key: "unit",
+              header: "Unit",
+              align: "right",
+              sortValue: (t) => t.tenancies[0]?.unit.code ?? "",
+              render: (t) => {
+                const activeTenancy = t.tenancies[0];
+                return activeTenancy ? (
                   <StatusBadge tone="success">
                     {activeTenancy.unit.property.name} · {activeTenancy.unit.code}
                   </StatusBadge>
                 ) : (
                   <StatusBadge tone="neutral">Unassigned</StatusBadge>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                );
+              },
+            },
+          ]}
+        />
       )}
 
       <RegisterTenantModal open={registerOpen} onOpenChange={setRegisterOpen} onRegistered={refetch} />
