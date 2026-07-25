@@ -7,6 +7,10 @@ import { listProperties, type PropertyListItem } from "@/lib/properties";
 import { StatusBadge, type StatusTone } from "@/components/shared/status-badge";
 import { FormButton } from "@/components/shared/form-button";
 import { ResolveUnmatchedPaymentModal } from "@/components/dashboard/resolve-unmatched-payment-modal";
+import { Select } from "@/components/shared/field";
+import { DataTable } from "@/components/shared/data-table";
+import { EmptyState } from "@/components/shared/empty-state";
+import { SkeletonList } from "@/components/shared/skeletons";
 
 const STATUS_TABS: { key: PaymentStatus | "all"; label: string }[] = [
   { key: "all", label: "All" },
@@ -61,18 +65,14 @@ export default function LandlordPaymentsPage() {
     <div>
       <div className="flex justify-between items-center mb-5 flex-wrap gap-3">
         <h1 className="font-display font-bold text-2xl tracking-[-0.02em]">Payments</h1>
-        <select
-          value={propertyId}
-          onChange={(e) => setPropertyId(e.target.value)}
-          className="border border-[var(--line)] rounded-[9px] px-3 py-[9px] text-[13px] bg-[var(--paper)]"
-        >
+        <Select value={propertyId} onChange={(e) => setPropertyId(e.target.value)} className="w-auto">
           <option value="">All properties</option>
           {properties.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
       {unmatched.length > 0 && (
@@ -111,37 +111,52 @@ export default function LandlordPaymentsPage() {
         ))}
       </div>
 
-      {ledger && ledger.length === 0 && (
-        <div className="border-[1.5px] border-dashed border-[var(--line-2)] rounded-2xl py-16 px-5 text-center">
-          <p className="text-sm text-[var(--stone)]">No payments match this filter.</p>
-        </div>
-      )}
+      {!ledger && <SkeletonList rows={6} />}
+
+      {ledger && ledger.length === 0 && <EmptyState title="No payments match this filter" />}
 
       {ledger && ledger.length > 0 && (
-        <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
-          {ledger.map((p, i) => (
-            <div
-              key={p.id}
-              className="flex items-center justify-between px-4 py-[13px] gap-3 flex-wrap"
-              style={i > 0 ? { borderTop: "1px solid var(--line)" } : undefined}
-            >
-              <div className="min-w-0">
-                <div className="text-[13px] font-semibold truncate">
-                  {p.tenancy.tenant.firstName} {p.tenancy.tenant.lastName}
+        <DataTable
+          rows={ledger}
+          rowKey={(p) => p.id}
+          columns={[
+            {
+              key: "tenant",
+              header: "Tenant",
+              sortValue: (p) => `${p.tenancy.tenant.firstName} ${p.tenancy.tenant.lastName}`.toLowerCase(),
+              render: (p) => (
+                <div className="min-w-0">
+                  <div className="font-semibold truncate">
+                    {p.tenancy.tenant.firstName} {p.tenancy.tenant.lastName}
+                  </div>
+                  <div className="text-xs text-[var(--stone)] truncate">
+                    {p.tenancy.unit.property.name} · <span className="font-mono">{p.tenancy.unit.code}</span>
+                    {p.dueDate ? ` · due ${new Date(p.dueDate).toLocaleDateString("en-KE", { day: "numeric", month: "short" })}` : ""}
+                  </div>
                 </div>
-                <div className="text-xs text-[var(--stone)] truncate">
-                  {p.tenancy.unit.property.name} · <span className="font-mono">{p.tenancy.unit.code}</span>
-                  {p.dueDate ? ` · due ${new Date(p.dueDate).toLocaleDateString("en-KE", { day: "numeric", month: "short" })}` : ""}
-                </div>
-              </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <span className="font-mono text-[13px] font-semibold">{fmtKES(p.amount)}</span>
-                <StatusBadge tone="neutral">{p.channel.replace("_", " ")}</StatusBadge>
-                <StatusBadge tone={statusTone(p.status)}>{p.status}</StatusBadge>
-              </div>
-            </div>
-          ))}
-        </div>
+              ),
+            },
+            {
+              key: "amount",
+              header: "Amount",
+              align: "right",
+              sortValue: (p) => Number(p.amount),
+              render: (p) => <span className="font-mono text-[13px] font-semibold">{fmtKES(p.amount)}</span>,
+            },
+            {
+              key: "channel",
+              header: "Channel",
+              render: (p) => <StatusBadge tone="neutral">{p.channel.replace("_", " ")}</StatusBadge>,
+            },
+            {
+              key: "status",
+              header: "Status",
+              align: "right",
+              sortValue: (p) => p.status,
+              render: (p) => <StatusBadge tone={statusTone(p.status)}>{p.status}</StatusBadge>,
+            },
+          ]}
+        />
       )}
 
       {resolvingPayment && (
