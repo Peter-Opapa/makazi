@@ -9,6 +9,7 @@ import { PropertySummary } from "@/components/dashboard/property-summary";
 import { OccupancySummary } from "@/components/dashboard/occupancy-summary";
 import { RecentPayments } from "@/components/dashboard/recent-payments";
 import { RecentMaintenance } from "@/components/dashboard/recent-maintenance";
+import { LandlordAttention } from "@/components/dashboard/landlord-attention";
 import { getDashboardSummary, type DashboardSummary } from "@/lib/reports";
 import { SkeletonKpiRow, SkeletonCard } from "@/components/shared/skeletons";
 import { formatKES, getGreeting } from "@/lib/format";
@@ -45,6 +46,8 @@ export default function LandlordOverviewPage() {
 
       {summary && (
         <>
+          <LandlordAttention outstandingRentKES={summary.stats.outstandingRentKES} vacantUnits={summary.stats.vacantUnits} />
+
           <div className="grid gap-[14px] mb-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
             <KpiCard label="Revenue" value={formatKES(summary.stats.revenueKES)} sub={summary.stats.revenueSub} />
             <KpiCard label="Occupancy" value={`${summary.stats.occupancyPct}%`} sub={summary.stats.occupancySub} />
