@@ -6,6 +6,7 @@ import { registerTenant, type RegisterTenantResult } from "@/lib/tenants";
 import { Modal } from "@/components/shared/modal";
 import { FormButton } from "@/components/shared/form-button";
 import { InlineError } from "@/components/shared/inline-error";
+import { Field, Input } from "@/components/shared/field";
 
 export function RegisterTenantModal({
   open,
@@ -102,50 +103,20 @@ export function RegisterTenantModal({
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 gap-[14px] mb-[14px]">
-          <div>
-            <label className="block text-[13px] font-semibold mb-[6px]">First name</label>
-            <input
-              type="text"
-              required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-            />
-          </div>
-          <div>
-            <label className="block text-[13px] font-semibold mb-[6px]">Last name</label>
-            <input
-              type="text"
-              required
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-            />
-          </div>
+          <Field label="First name" required>
+            <Input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+          </Field>
+          <Field label="Last name" required>
+            <Input type="text" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
+          </Field>
         </div>
         <div className="grid grid-cols-2 gap-[14px] mb-[22px]">
-          <div>
-            <label className="block text-[13px] font-semibold mb-[6px]">Phone</label>
-            <input
-              type="tel"
-              required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+254 7XX XXX XXX"
-              className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-            />
-          </div>
-          <div>
-            <label className="block text-[13px] font-semibold mb-[6px]">
-              Email <span className="text-[var(--stone)] font-normal">(optional)</span>
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-            />
-          </div>
+          <Field label="Phone" required>
+            <Input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+254 7XX XXX XXX" />
+          </Field>
+          <Field label="Email">
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </Field>
         </div>
 
         <FormButton type="submit" disabled={submitting}>

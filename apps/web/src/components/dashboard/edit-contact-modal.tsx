@@ -5,6 +5,7 @@ import { ApiError } from "@/lib/api";
 import { Modal } from "@/components/shared/modal";
 import { FormButton } from "@/components/shared/form-button";
 import { InlineError } from "@/components/shared/inline-error";
+import { Field, Input } from "@/components/shared/field";
 
 /** Shared by the Caretakers and Tenants pages — same shape (email/phone), only editable before the person claims their invite. */
 export function EditContactModal({
@@ -60,27 +61,12 @@ export function EditContactModal({
       </p>
       {error && <InlineError>{error}</InlineError>}
       <form onSubmit={handleSubmit}>
-        <div className="mb-[14px]">
-          <label className="block text-[13px] font-semibold mb-[6px]">Phone</label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+254 7XX XXX XXX"
-            className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-          />
-        </div>
-        <div className="mb-[22px]">
-          <label className="block text-[13px] font-semibold mb-[6px]">
-            Email <span className="text-[var(--stone)] font-normal">(optional)</span>
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-[13px] py-[11px] border-[1.5px] border-[var(--line-2)] rounded-[9px]"
-          />
-        </div>
+        <Field label="Phone" required className="mb-[14px]">
+          <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+254 7XX XXX XXX" />
+        </Field>
+        <Field label="Email" className="mb-[22px]">
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </Field>
         <FormButton type="submit" disabled={submitting}>
           {submitting ? "Saving…" : "Save changes"}
         </FormButton>
