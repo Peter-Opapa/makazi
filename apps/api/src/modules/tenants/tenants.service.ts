@@ -1,12 +1,14 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { randomInt } from "crypto";
-import { UnitStatus, UserRole } from "@makazi/shared-types";
+import { CaretakerInviteStatus, NotificationType, TenancyStatus, UnitStatus, UserRole } from "@makazi/shared-types";
 import { Prisma } from "../../../generated/prisma";
 import { PrismaService } from "../../prisma/prisma.service";
 import { PropertyAccessService, type ActingUser } from "../../common/services/property-access.service";
 import { InvitationEmailService } from "../invitations/invitation-email.service";
+import { NotificationsService } from "../notifications/notifications.service";
 import { RegisterTenantDto } from "./dto/register-tenant.dto";
 import { UpdateTenantContactDto } from "./dto/update-tenant-contact.dto";
+import { RequestExitDto } from "./dto/request-exit.dto";
 
 const TENANT_CODE_CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no O/0/I/1
 
@@ -18,6 +20,7 @@ export class TenantsService {
     private readonly prisma: PrismaService,
     private readonly access: PropertyAccessService,
     private readonly invitationEmail: InvitationEmailService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   /**
@@ -29,9 +32,19 @@ export class TenantsService {
    * file (otherwise the landlord/caretaker relays it directly).
    */
   async registerTenant(actorId: string, dto: RegisterTenantDto) {
+    // A tenant can rent from several landlords at once. If this email already
+    // belongs to a tenant, reuse that profile instead of blocking — the
+    // landlord can then assign them a unit, which (for a landlord new to them)
+    // creates a PENDING tenancy the tenant must accept. Only a non-tenant
+    // collision is a genuine conflict.
     if (dto.email) {
       const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
-      if (existing) throw new ConflictException("Email already registered");
+      if (existing) {
+        if (existing.role !== UserRole.TENANT) {
+          throw new ConflictException("This email is already associated with a different Makazi account.");
+        }
+        return { tenant: this.sanitize(existing), tenantCode: existing.tenantCodeClaimedAt ? null : existing.tenantCode, reused: true };
+      }
     }
 
     const tenantCode = await this.generateTenantCode();
@@ -51,7 +64,7 @@ export class TenantsService {
       await this.sendInvite(user.id, dto.email, dto.firstName, tenantCode, null);
     }
 
-    return { tenant: this.sanitize(user), tenantCode };
+    return { tenant: this.sanitize(user), tenantCode, reused: false };
   }
 
   /** Resends the claim-invitation email for a tenant who hasn't claimed their account yet. */
@@ -64,7 +77,7 @@ export class TenantsService {
     const authorized =
       tenant.registeredById === actor.id ||
       (await this.prisma.tenancy.findFirst({
-        where: { tenantId: tenant.id, active: true, unit: { propertyId: { in: await this.access.accessiblePropertyIds(actor) } } },
+        where: { tenantId: tenant.id, unit: { propertyId: { in: await this.access.accessiblePropertyIds(actor) } } },
       }));
     if (!authorized) throw new NotFoundException("Tenant not found");
 
@@ -103,7 +116,7 @@ export class TenantsService {
       },
       include: {
         tenancies: {
-          where: { active: true },
+          where: { status: { in: [TenancyStatus.PENDING, TenancyStatus.ACTIVE] } },
           include: { unit: { include: { property: { select: { id: true, name: true } } } } },
         },
       },
@@ -127,13 +140,15 @@ export class TenantsService {
     const authorized =
       tenant.registeredById === actor.id ||
       (await this.prisma.tenancy.findFirst({
-        where: { tenantId: tenant.id, active: true, unit: { propertyId: { in: await this.access.accessiblePropertyIds(actor) } } },
+        where: { tenantId: tenant.id, unit: { propertyId: { in: await this.access.accessiblePropertyIds(actor) } } },
       }));
     if (!authorized) throw new NotFoundException("Tenant not found");
 
     await this.prisma.$transaction(async (tx) => {
-      const activeTenancies = await tx.tenancy.findMany({ where: { tenantId: tenant.id, active: true } });
-      for (const tenancy of activeTenancies) {
+      const heldUnits = await tx.tenancy.findMany({
+        where: { tenantId: tenant.id, status: { in: [TenancyStatus.PENDING, TenancyStatus.ACTIVE] } },
+      });
+      for (const tenancy of heldUnits) {
         await tx.unit.update({ where: { id: tenancy.unitId }, data: { status: UnitStatus.VACANT } });
       }
       await tx.tenancy.deleteMany({ where: { tenantId: tenant.id } });
@@ -155,7 +170,7 @@ export class TenantsService {
     const authorized =
       tenant.registeredById === actor.id ||
       (await this.prisma.tenancy.findFirst({
-        where: { tenantId: tenant.id, active: true, unit: { propertyId: { in: await this.access.accessiblePropertyIds(actor) } } },
+        where: { tenantId: tenant.id, unit: { propertyId: { in: await this.access.accessiblePropertyIds(actor) } } },
       }));
     if (!authorized) throw new NotFoundException("Tenant not found");
 
@@ -193,7 +208,7 @@ export class TenantsService {
 
   async getInviteContext(tenantId: string) {
     const tenancy = await this.prisma.tenancy.findFirst({
-      where: { tenantId, active: true },
+      where: { tenantId, status: { in: [TenancyStatus.PENDING, TenancyStatus.ACTIVE] } },
       orderBy: { createdAt: "desc" },
       include: { unit: { include: { property: true } } },
     });
@@ -203,6 +218,126 @@ export class TenantsService {
       unitCode: tenancy.unit.code,
       rentAmount: tenancy.rentAmount.toString(),
     };
+  }
+
+  // ---------- Tenant-facing tenancy actions (accept/decline a pending invite, request to leave) ----------
+
+  /** Every tenancy this tenant holds — powers their dashboard, including the limited-access state (no ACTIVE row) and pending-invite banner. */
+  async listMyTenancies(tenantId: string) {
+    const tenancies = await this.prisma.tenancy.findMany({
+      where: { tenantId },
+      include: {
+        unit: { include: { property: { include: { landlord: { select: { firstName: true, lastName: true } } } } } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return tenancies.map((t) => ({
+      id: t.id,
+      status: t.status,
+      rentAmount: t.rentAmount.toString(),
+      leaseStart: t.leaseStart,
+      leaseEnd: t.leaseEnd,
+      exitRequestedAt: t.exitRequestedAt,
+      unit: { id: t.unit.id, code: t.unit.code },
+      property: { id: t.unit.property.id, name: t.unit.property.name },
+      landlordName: `${t.unit.property.landlord.firstName} ${t.unit.property.landlord.lastName}`,
+    }));
+  }
+
+  /** Tenant accepts a PENDING tenancy from a landlord new to them — activates it and occupies the unit. */
+  async acceptTenancy(tenantId: string, tenancyId: string) {
+    const tenancy = await this.prisma.tenancy.findFirst({
+      where: { id: tenancyId, tenantId },
+      include: { tenant: true, unit: { include: { property: true } } },
+    });
+    if (!tenancy) throw new NotFoundException("Invitation not found");
+    if (tenancy.status !== TenancyStatus.PENDING) throw new BadRequestException("This invitation is no longer pending.");
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.tenancy.update({ where: { id: tenancyId }, data: { status: TenancyStatus.ACTIVE } });
+      await tx.unit.update({ where: { id: tenancy.unitId }, data: { status: UnitStatus.OCCUPIED } });
+    });
+
+    await this.notifications.create(
+      tenancy.unit.property.landlordId,
+      NotificationType.TENANCY_ACCEPTED,
+      `${tenancy.tenant.firstName} ${tenancy.tenant.lastName} accepted the tenancy for ${tenancy.unit.property.name}, unit ${tenancy.unit.code}`,
+    );
+    return { status: TenancyStatus.ACTIVE };
+  }
+
+  /** Tenant declines a PENDING tenancy — removes it and frees the unit back to vacant. */
+  async declineTenancy(tenantId: string, tenancyId: string) {
+    const tenancy = await this.prisma.tenancy.findFirst({
+      where: { id: tenancyId, tenantId },
+      include: { tenant: true, unit: { include: { property: true } } },
+    });
+    if (!tenancy) throw new NotFoundException("Invitation not found");
+    if (tenancy.status !== TenancyStatus.PENDING) throw new BadRequestException("This invitation is no longer pending.");
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.tenancy.delete({ where: { id: tenancyId } });
+      await tx.unit.update({ where: { id: tenancy.unitId }, data: { status: UnitStatus.VACANT } });
+    });
+
+    await this.notifications.create(
+      tenancy.unit.property.landlordId,
+      NotificationType.GENERAL,
+      `${tenancy.tenant.firstName} ${tenancy.tenant.lastName} declined the tenancy for ${tenancy.unit.property.name}, unit ${tenancy.unit.code}`,
+    );
+    return { declined: true };
+  }
+
+  /** Tenant asks to end an ACTIVE tenancy — flags it and notifies the landlord + any caretaker, who finalise it via move-out. */
+  async requestExit(tenantId: string, tenancyId: string, dto: RequestExitDto) {
+    const tenancy = await this.prisma.tenancy.findFirst({
+      where: { id: tenancyId, tenantId, status: TenancyStatus.ACTIVE },
+      include: { tenant: true, unit: { include: { property: true } } },
+    });
+    if (!tenancy) throw new NotFoundException("Active tenancy not found");
+    if (tenancy.exitRequestedAt) throw new BadRequestException("You've already requested to leave this unit.");
+
+    await this.prisma.tenancy.update({
+      where: { id: tenancyId },
+      data: { exitRequestedAt: new Date(), exitReason: dto.reason },
+    });
+
+    const caretakers = await this.prisma.caretakerAssignment.findMany({
+      where: { propertyId: tenancy.unit.propertyId, inviteStatus: CaretakerInviteStatus.ACCEPTED },
+      select: { caretakerId: true },
+    });
+    const recipientIds = [tenancy.unit.property.landlordId, ...caretakers.map((c) => c.caretakerId)];
+    const title = `${tenancy.tenant.firstName} ${tenancy.tenant.lastName} asked to leave ${tenancy.unit.property.name}, unit ${tenancy.unit.code}`;
+    for (const recipientId of recipientIds) {
+      await this.notifications.create(recipientId, NotificationType.TENANT_EXIT_REQUEST, title, dto.reason, {
+        tenancyId: tenancy.id,
+        unitId: tenancy.unitId,
+      });
+    }
+    return { requested: true };
+  }
+
+  /** Landlord/caretaker view of tenants who've asked to leave — each links to the unit's move-out flow to finalise. */
+  async listExitRequests(actor: ActingUser) {
+    const propertyIds = await this.access.accessiblePropertyIds(actor);
+    if (propertyIds.length === 0) return [];
+    const tenancies = await this.prisma.tenancy.findMany({
+      where: { status: TenancyStatus.ACTIVE, exitRequestedAt: { not: null }, unit: { propertyId: { in: propertyIds } } },
+      include: {
+        tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } },
+        unit: { include: { property: { select: { id: true, name: true } } } },
+      },
+      orderBy: { exitRequestedAt: "asc" },
+    });
+    return tenancies.map((t) => ({
+      tenancyId: t.id,
+      unitId: t.unitId,
+      unitCode: t.unit.code,
+      property: t.unit.property,
+      tenant: t.tenant,
+      exitRequestedAt: t.exitRequestedAt,
+      exitReason: t.exitReason,
+    }));
   }
 
   private async generateTenantCode(): Promise<string> {

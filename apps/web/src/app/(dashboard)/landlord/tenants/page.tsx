@@ -15,6 +15,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { FormButton } from "@/components/shared/form-button";
 import { RegisterTenantModal } from "@/components/dashboard/register-tenant-modal";
 import { EditContactModal } from "@/components/dashboard/edit-contact-modal";
+import { ExitRequestsSection } from "@/components/dashboard/exit-requests-section";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 export default function LandlordTenantsPage() {
@@ -57,6 +58,8 @@ export default function LandlordTenantsPage() {
           Register tenant
         </FormButton>
       </div>
+
+      <ExitRequestsSection propertyHrefBase="/landlord/properties" />
 
       <div className="mb-5">
         <SearchInput value={search} onChange={setSearch} placeholder="Name, phone or email…" />

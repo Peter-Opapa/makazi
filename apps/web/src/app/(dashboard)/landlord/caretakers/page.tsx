@@ -15,6 +15,7 @@ import { ApiError } from "@/lib/api";
 import { FormButton } from "@/components/shared/form-button";
 import { InviteCaretakerModal } from "@/components/dashboard/invite-caretaker-modal";
 import { EditContactModal } from "@/components/dashboard/edit-contact-modal";
+import { CaretakerDetailModal } from "@/components/dashboard/caretaker-detail-modal";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 const STATUS_LABEL: Record<CaretakerInviteStatus, string> = {
@@ -39,6 +40,7 @@ export default function CaretakersPage() {
   const [inviteOpen, setInviteOpen] = React.useState(false);
   const [editRow, setEditRow] = React.useState<Row | null>(null);
   const [revokeRow, setRevokeRow] = React.useState<Row | null>(null);
+  const [detailCaretakerId, setDetailCaretakerId] = React.useState<string | null>(null);
 
   const refetch = React.useCallback(async () => {
     const result = await listProperties({ page: 1, pageSize: 100 });
@@ -99,9 +101,13 @@ export default function CaretakersPage() {
               className="flex items-center justify-between px-5 py-4 border-b border-[var(--line)] last:border-b-0"
             >
               <div>
-                <div className="font-semibold text-[14px]">
+                <button
+                  type="button"
+                  onClick={() => setDetailCaretakerId(row.caretakerId)}
+                  className="font-semibold text-[14px] text-left hover:text-[var(--green)]"
+                >
                   {row.caretaker.firstName} {row.caretaker.lastName}
-                </div>
+                </button>
                 <div className="text-[13px] text-[var(--stone)]">
                   {row.propertyName} · {row.caretaker.phone ?? row.caretaker.email ?? "No contact on file"}
                 </div>
@@ -151,6 +157,14 @@ export default function CaretakersPage() {
           currentPhone={editRow.caretaker.phone}
           onSubmit={(input) => updateCaretakerContact(editRow.caretakerId, input)}
           onUpdated={() => refetch()}
+        />
+      )}
+
+      {detailCaretakerId && (
+        <CaretakerDetailModal
+          caretakerId={detailCaretakerId}
+          open={Boolean(detailCaretakerId)}
+          onOpenChange={(open) => !open && setDetailCaretakerId(null)}
         />
       )}
 

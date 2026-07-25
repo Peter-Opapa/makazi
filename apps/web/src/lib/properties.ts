@@ -1,4 +1,4 @@
-import { PropertyType, UnitStatus } from "@makazi/shared-types";
+import { PropertyType, TenancyStatus, UnitStatus } from "@makazi/shared-types";
 import { apiFetch } from "./api";
 
 export interface PropertyPhoto {
@@ -212,7 +212,7 @@ export interface Tenancy {
   leaseEnd: string | null;
   depositAmount: string | null;
   rentAmount: string;
-  active: boolean;
+  status: TenancyStatus;
   tenant: { id: string; firstName: string; lastName: string; phone: string | null; email: string | null };
 }
 

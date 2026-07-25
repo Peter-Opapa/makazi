@@ -8,6 +8,7 @@ import { updateMe, presignMePhoto, confirmMePhoto, syncEmailFromClerk, type Auth
 import { ApiError } from "@/lib/api";
 import { FormButton } from "@/components/shared/form-button";
 import { InlineError } from "@/components/shared/inline-error";
+import { DeleteAccountSection } from "@/components/dashboard/delete-account-section";
 
 /**
  * Shared profile editor for Landlord/Caretaker/Tenant. Name/phone/photo/
@@ -206,6 +207,8 @@ export function ProfileForm({ user, role, onUpdated }: { user: AuthUser; role: U
           {submitting ? "Saving…" : "Save changes"}
         </FormButton>
       </form>
+
+      <DeleteAccountSection />
     </div>
   );
 }

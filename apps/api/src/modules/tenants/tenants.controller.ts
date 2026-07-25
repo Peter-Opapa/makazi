@@ -25,6 +25,11 @@ export class TenantsController {
     return this.tenantsService.findMany(user, search);
   }
 
+  @Get("exit-requests")
+  listExitRequests(@CurrentUser() user: AuthenticatedUser) {
+    return this.tenantsService.listExitRequests(user);
+  }
+
   @Post(":id/resend-invite")
   resendInvite(@CurrentUser() user: AuthenticatedUser, @Param("id") id: string) {
     return this.tenantsService.resendInvite(user, id);

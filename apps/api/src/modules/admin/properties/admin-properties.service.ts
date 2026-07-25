@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { CaretakerInviteStatus, MaintenanceStatus, UnitStatus } from "@makazi/shared-types";
+import { CaretakerInviteStatus, MaintenanceStatus, TenancyStatus, UnitStatus } from "@makazi/shared-types";
 import { PrismaService } from "../../../prisma/prisma.service";
 
 @Injectable()
@@ -54,7 +54,7 @@ export class AdminPropertiesService {
     const occupied = property.units.filter((u) => u.status === UnitStatus.OCCUPIED).length;
 
     const [tenantCount, maintenanceTotal, maintenanceOpen] = await Promise.all([
-      this.prisma.tenancy.count({ where: { unitId: { in: unitIds }, active: true } }),
+      this.prisma.tenancy.count({ where: { unitId: { in: unitIds }, status: TenancyStatus.ACTIVE } }),
       this.prisma.maintenanceTicket.count({ where: { unitId: { in: unitIds } } }),
       this.prisma.maintenanceTicket.count({
         where: {

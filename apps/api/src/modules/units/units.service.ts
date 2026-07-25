@@ -1,10 +1,11 @@
 import { ConflictException, Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { InspectionType, UnitStatus, UserRole } from "@makazi/shared-types";
+import { InspectionType, NotificationType, TenancyStatus, UnitStatus, UserRole } from "@makazi/shared-types";
 import { Prisma } from "../../../generated/prisma";
 import { PrismaService } from "../../prisma/prisma.service";
 import { STORAGE_GATEWAY, type StorageGateway } from "../../integrations/storage/storage-gateway.types";
 import { PropertyAccessService, type ActingUser } from "../../common/services/property-access.service";
 import { InvitationEmailService } from "../invitations/invitation-email.service";
+import { NotificationsService } from "../notifications/notifications.service";
 import { CreateUnitDto } from "./dto/create-unit.dto";
 import { UpdateUnitDto } from "./dto/update-unit.dto";
 import { QueryUnitsDto } from "./dto/query-units.dto";
@@ -16,9 +17,12 @@ import { MoveOutDamageDto } from "./dto/move-out-damage.dto";
 import { MoveOutDepositDto } from "./dto/move-out-deposit.dto";
 
 const UNIT_ORDER: Prisma.UnitOrderByWithRelationInput[] = [{ floor: "asc" }, { code: "asc" }];
-const ACTIVE_TENANCY_INCLUDE = {
+// Current occupant for a unit: the ACTIVE tenant, or a PENDING one awaiting
+// their acceptance (unit shows RESERVED in that case). At most one such row
+// exists per unit — assignTenant blocks a second while one is outstanding.
+const CURRENT_TENANCY_INCLUDE = {
   tenancies: {
-    where: { active: true },
+    where: { status: { in: [TenancyStatus.PENDING, TenancyStatus.ACTIVE] } },
     include: { tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } } },
   },
 } satisfies Prisma.UnitInclude;
@@ -34,6 +38,7 @@ export class UnitsService {
     @Inject(STORAGE_GATEWAY) private readonly s3: StorageGateway,
     private readonly access: PropertyAccessService,
     private readonly invitationEmail: InvitationEmailService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async findAllForProperty(user: ActingUser, propertyId: string, query: QueryUnitsDto) {
@@ -45,7 +50,7 @@ export class UnitsService {
         ...(query.floor !== undefined ? { floor: query.floor } : {}),
       },
       orderBy: UNIT_ORDER,
-      include: ACTIVE_TENANCY_INCLUDE,
+      include: CURRENT_TENANCY_INCLUDE,
     });
   }
 
@@ -103,9 +108,11 @@ export class UnitsService {
 
   async remove(user: ActingUser, unitId: string) {
     const unit = await this.access.assertUnitAccess(user, unitId);
-    const activeTenancy = await this.prisma.tenancy.findFirst({ where: { unitId: unit.id, active: true } });
-    if (activeTenancy) {
-      throw new ConflictException("Cannot delete a unit with an active tenancy");
+    const occupant = await this.prisma.tenancy.findFirst({
+      where: { unitId: unit.id, status: { in: [TenancyStatus.PENDING, TenancyStatus.ACTIVE] } },
+    });
+    if (occupant) {
+      throw new ConflictException("Cannot delete a unit with a tenant assigned");
     }
     await this.prisma.unit.delete({ where: { id: unit.id } });
     return { message: "Unit deleted" };
@@ -115,9 +122,15 @@ export class UnitsService {
 
   async assignTenant(user: ActingUser, unitId: string, dto: AssignTenantDto) {
     const unit = await this.access.assertUnitAccess(user, unitId);
+    const property = await this.prisma.property.findUniqueOrThrow({
+      where: { id: unit.propertyId },
+      select: { name: true, landlordId: true },
+    });
 
-    const existingActive = await this.prisma.tenancy.findFirst({ where: { unitId: unit.id, active: true } });
-    if (existingActive) throw new ConflictException("This unit already has an active tenant");
+    const existingOccupant = await this.prisma.tenancy.findFirst({
+      where: { unitId: unit.id, status: { in: [TenancyStatus.PENDING, TenancyStatus.ACTIVE] } },
+    });
+    if (existingOccupant) throw new ConflictException("This unit already has a tenant assigned");
 
     const tenant = await this.prisma.user.findUnique({ where: { id: dto.existingTenantId } });
     if (!tenant || tenant.role !== UserRole.TENANT) throw new NotFoundException("Tenant not found");
@@ -128,15 +141,37 @@ export class UnitsService {
     // completely unrelated tenant (e.g. one only visible to them because
     // they separately manage a different landlord's property) into their
     // own unit. Same scoping rule as TenantsService.resendInvite.
+    const accessiblePropertyIds = await this.access.accessiblePropertyIds(user);
     const tenantAuthorized =
       tenant.registeredById === user.id ||
       (await this.prisma.tenancy.findFirst({
-        where: { tenantId: tenant.id, active: true, unit: { propertyId: { in: await this.access.accessiblePropertyIds(user) } } },
+        where: { tenantId: tenant.id, unit: { propertyId: { in: accessiblePropertyIds } } },
       }));
     if (!tenantAuthorized) throw new NotFoundException("Tenant not found");
 
-    const tenantHasOtherActiveTenancy = await this.prisma.tenancy.findFirst({ where: { tenantId: tenant.id, active: true } });
-    if (tenantHasOtherActiveTenancy) throw new ConflictException("This tenant already has an active tenancy elsewhere");
+    // A tenant may hold several tenancies at once (multiple units, same or
+    // different landlords) — there is deliberately no "already has a tenancy
+    // elsewhere" block. Whether this new tenancy needs the tenant's explicit
+    // acceptance depends on whether they've dealt with THIS property's
+    // landlord before:
+    //   - Not claimed their account yet -> the tenantCode invitation itself
+    //     is their acceptance of the registering landlord, so start ACTIVE.
+    //   - Claimed, and has any prior tenancy (accepted or ended) on a
+    //     property this same landlord owns -> known relationship, start ACTIVE.
+    //   - Claimed, but this landlord is new to them -> start PENDING; they get
+    //     an in-app + email invite and must accept before it becomes ACTIVE.
+    const knownLandlord =
+      !tenant.tenantCodeClaimedAt ||
+      Boolean(
+        await this.prisma.tenancy.findFirst({
+          where: {
+            tenantId: tenant.id,
+            status: { in: [TenancyStatus.ACTIVE, TenancyStatus.ENDED] },
+            unit: { property: { landlordId: property.landlordId } },
+          },
+        }),
+      );
+    const status = knownLandlord ? TenancyStatus.ACTIVE : TenancyStatus.PENDING;
 
     const tenancy = await this.prisma.$transaction(async (tx) => {
       const created = await tx.tenancy.create({
@@ -147,23 +182,37 @@ export class UnitsService {
           leaseEnd: dto.leaseEnd ? new Date(dto.leaseEnd) : undefined,
           rentAmount: dto.rentAmount,
           depositAmount: dto.depositAmount,
+          status,
         },
         include: { tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } } },
       });
-      await tx.unit.update({ where: { id: unit.id }, data: { status: UnitStatus.OCCUPIED } });
+      await tx.unit.update({
+        where: { id: unit.id },
+        data: { status: status === TenancyStatus.ACTIVE ? UnitStatus.OCCUPIED : UnitStatus.RESERVED },
+      });
       return created;
     });
 
-    // Now that a unit/rent context exists, (re-)send the invite with it —
-    // handles both "register then assign later" and "assign right away".
-    // Best-effort: an SMTP hiccup must never fail an already-committed assignment.
-    if (tenant.email && !tenant.tenantCodeClaimedAt) {
-      const property = await this.prisma.property.findUnique({ where: { id: unit.propertyId }, select: { name: true } });
+    if (status === TenancyStatus.PENDING) {
+      // Claimed tenant, new landlord — they already have an account, so reach
+      // them through the normal notification fan-out (in-app + email per prefs)
+      // rather than the tenantCode claim link.
+      await this.notifications.create(
+        tenant.id,
+        NotificationType.TENANCY_INVITE,
+        `You've been invited to ${property.name}, unit ${unit.code}`,
+        `Rent ${dto.rentAmount}. Accept from your dashboard to activate this tenancy.`,
+        { tenancyId: tenancy.id, unitId: unit.id },
+      );
+    } else if (tenant.email && !tenant.tenantCodeClaimedAt) {
+      // Unclaimed tenant — (re-)send the tenantCode invite now that a unit/rent
+      // context exists. Best-effort: a mail hiccup must never fail an
+      // already-committed assignment.
       this.invitationEmail
         .sendTenantInvite(
           tenant.email,
           tenant.firstName,
-          { propertyName: property?.name ?? "", unitCode: unit.code, rentAmount: dto.rentAmount.toString() },
+          { propertyName: property.name, unitCode: unit.code, rentAmount: dto.rentAmount.toString() },
           tenant.tenantCode!,
         )
         .then(() => this.prisma.user.update({ where: { id: tenant.id }, data: { tenantCodeInvitedAt: new Date() } }))
@@ -284,14 +333,14 @@ export class UnitsService {
         where: { id: moveOut.id },
         data: { step: "vacant", completedAt: new Date() },
       });
-      await tx.tenancy.update({ where: { id: moveOut.tenancyId }, data: { active: false } });
+      await tx.tenancy.update({ where: { id: moveOut.tenancyId }, data: { status: TenancyStatus.ENDED } });
       await tx.unit.update({ where: { id: unit.id }, data: { status: UnitStatus.VACANT } });
       return updated;
     });
   }
 
   private async getActiveTenancyOrThrow(unitId: string) {
-    const tenancy = await this.prisma.tenancy.findFirst({ where: { unitId, active: true } });
+    const tenancy = await this.prisma.tenancy.findFirst({ where: { unitId, status: TenancyStatus.ACTIVE } });
     if (!tenancy) throw new NotFoundException("This unit has no active tenancy");
     return tenancy;
   }

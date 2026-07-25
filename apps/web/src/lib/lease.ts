@@ -1,3 +1,4 @@
+import { TenancyStatus } from "@makazi/shared-types";
 import { apiFetch } from "./api";
 
 export interface CurrentLease {
@@ -8,7 +9,8 @@ export interface CurrentLease {
   leaseEnd: string | null;
   depositAmount: string | null;
   rentAmount: string;
-  active: boolean;
+  status: TenancyStatus;
+  exitRequestedAt: string | null;
   leaseDocumentUrl: string | null;
   unit: {
     id: string;

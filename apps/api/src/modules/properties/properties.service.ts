@@ -1,5 +1,5 @@
 import { ConflictException, Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { UserRole } from "@makazi/shared-types";
+import { TenancyStatus, UserRole } from "@makazi/shared-types";
 import { Prisma, UnitStatus } from "../../../generated/prisma";
 import { PrismaService } from "../../prisma/prisma.service";
 import { STORAGE_GATEWAY, type StorageGateway } from "../../integrations/storage/storage-gateway.types";
@@ -84,7 +84,7 @@ export class PropertiesService {
           orderBy: [{ floor: "asc" }, { code: "asc" }],
           include: {
             tenancies: {
-              where: { active: true },
+              where: { status: { in: [TenancyStatus.PENDING, TenancyStatus.ACTIVE] } },
               include: { tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } } },
             },
           },

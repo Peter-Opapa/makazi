@@ -91,6 +91,12 @@ export enum CaretakerInviteStatus {
   DECLINED = "DECLINED",
 }
 
+export enum TenancyStatus {
+  PENDING = "PENDING",
+  ACTIVE = "ACTIVE",
+  ENDED = "ENDED",
+}
+
 export enum PropertyType {
   APARTMENT_BLOCK = "APARTMENT_BLOCK",
   BUNGALOWS = "BUNGALOWS",
@@ -108,6 +114,9 @@ export enum NotificationType {
   MAINTENANCE_COMMENT = "MAINTENANCE_COMMENT",
   TECHNICIAN_ASSIGNED = "TECHNICIAN_ASSIGNED",
   PAYMENT_ALERT = "PAYMENT_ALERT",
+  TENANCY_INVITE = "TENANCY_INVITE",
+  TENANCY_ACCEPTED = "TENANCY_ACCEPTED",
+  TENANT_EXIT_REQUEST = "TENANT_EXIT_REQUEST",
   GENERAL = "GENERAL",
 }
 
@@ -161,5 +170,8 @@ export const NOTIFICATION_TYPE_CATEGORY: Record<NotificationType, NotificationCa
   [NotificationType.PAYMENT_SUCCEEDED]: NotificationCategory.PAYMENTS,
   [NotificationType.PAYMENT_FAILED]: NotificationCategory.PAYMENTS,
   [NotificationType.PAYMENT_ALERT]: NotificationCategory.PAYMENTS,
+  [NotificationType.TENANCY_INVITE]: NotificationCategory.ACCOUNT,
+  [NotificationType.TENANCY_ACCEPTED]: NotificationCategory.ACCOUNT,
+  [NotificationType.TENANT_EXIT_REQUEST]: NotificationCategory.ACCOUNT,
   [NotificationType.GENERAL]: NotificationCategory.ACCOUNT,
 };

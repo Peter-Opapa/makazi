@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { TenancyStatus } from "@makazi/shared-types";
 import { PrismaService } from "../../prisma/prisma.service";
 import { STORAGE_GATEWAY, type StorageGateway } from "../../integrations/storage/storage-gateway.types";
 
@@ -15,7 +16,7 @@ export class LeaseService {
 
   async getCurrentLease(tenantId: string) {
     const tenancy = await this.prisma.tenancy.findFirst({
-      where: { tenantId, active: true },
+      where: { tenantId, status: TenancyStatus.ACTIVE },
       include: LEASE_INCLUDE,
     });
     if (!tenancy) throw new NotFoundException("No active lease found");
@@ -43,7 +44,7 @@ export class LeaseService {
 
   private async getActiveTenancyWithTenant(tenantId: string) {
     const tenancy = await this.prisma.tenancy.findFirst({
-      where: { tenantId, active: true },
+      where: { tenantId, status: TenancyStatus.ACTIVE },
       include: { ...LEASE_INCLUDE, tenant: { select: { firstName: true, lastName: true } } },
     });
     if (!tenancy) throw new NotFoundException("No active lease found");

@@ -11,7 +11,7 @@ import { BulkGenerateUnitsModal } from "@/components/dashboard/bulk-generate-uni
 import { AssignTenantModal } from "@/components/dashboard/assign-tenant-modal";
 import { MoveOutWizard } from "@/components/dashboard/move-out-wizard";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { UnitStatus } from "@makazi/shared-types";
+import { TenancyStatus, UnitStatus } from "@makazi/shared-types";
 import { cn } from "@/lib/utils";
 
 function statusTone(status: UnitStatus): "success" | "warning" | "error" | "neutral" {
@@ -117,7 +117,9 @@ export function UnitsSection({
               <div className="text-xs font-semibold text-[var(--stone)] uppercase tracking-wide mb-2">{floorLabel}</div>
               <div className="border border-[var(--line)] rounded-[14px] overflow-hidden bg-white">
                 {floorUnits.map((unit, i) => {
-                  const tenant = unit.tenancies[0]?.tenant;
+                  const occupant = unit.tenancies[0];
+                  const tenant = occupant?.tenant;
+                  const isPending = occupant?.status === TenancyStatus.PENDING;
                   return (
                     <div
                       key={unit.id}
@@ -129,6 +131,7 @@ export function UnitsSection({
                         {tenant ? (
                           <span className="text-[13px] font-medium truncate block">
                             {tenant.firstName} {tenant.lastName}
+                            {isPending && <span className="text-[var(--stone)] font-normal"> · awaiting acceptance</span>}
                           </span>
                         ) : (
                           <span className="font-mono text-[13px] text-[var(--stone)]">
@@ -145,10 +148,10 @@ export function UnitsSection({
                           onClick={() => setMovingOutUnit(unit)}
                           className="px-[10px] py-[6px] text-xs"
                         >
-                          Move out
+                          Move out & reassign
                         </FormButton>
                       )}
-                      {(unit.status === UnitStatus.VACANT || unit.status === UnitStatus.RESERVED) && (
+                      {unit.status === UnitStatus.VACANT && (
                         <FormButton fullWidth={false} onClick={() => setAssigningUnit(unit)} className="px-[10px] py-[6px] text-xs">
                           Assign tenant
                         </FormButton>

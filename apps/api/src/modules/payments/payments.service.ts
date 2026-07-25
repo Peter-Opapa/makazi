@@ -1,5 +1,5 @@
 import { ConflictException, Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { CaretakerInviteStatus, NotificationType, PaymentChannel, PaymentStatus } from "@makazi/shared-types";
+import { CaretakerInviteStatus, NotificationType, PaymentChannel, PaymentStatus, TenancyStatus } from "@makazi/shared-types";
 import { Prisma } from "../../../generated/prisma";
 import { PrismaService } from "../../prisma/prisma.service";
 import { STORAGE_GATEWAY, type StorageGateway } from "../../integrations/storage/storage-gateway.types";
@@ -434,13 +434,13 @@ export class PaymentsService {
 
     const unit = await this.prisma.unit.findFirst({
       where: { propertyId, code: { equals: normalized, mode: "insensitive" } },
-      include: { tenancies: { where: { active: true }, take: 1 } },
+      include: { tenancies: { where: { status: TenancyStatus.ACTIVE }, take: 1 } },
     });
     if (unit?.tenancies[0]) return unit.tenancies[0];
 
     const tenant = await this.prisma.user.findFirst({ where: { tenantCode: normalized.toUpperCase() } });
     if (tenant) {
-      const tenancy = await this.prisma.tenancy.findFirst({ where: { tenantId: tenant.id, active: true, unit: { propertyId } } });
+      const tenancy = await this.prisma.tenancy.findFirst({ where: { tenantId: tenant.id, status: TenancyStatus.ACTIVE, unit: { propertyId } } });
       if (tenancy) return tenancy;
     }
     return null;
@@ -520,7 +520,7 @@ export class PaymentsService {
 
   private async getActiveTenancyOrThrow(tenantId: string): Promise<TenancyWithDestination & { tenantId: string }> {
     const tenancy = await this.prisma.tenancy.findFirst({
-      where: { tenantId, active: true },
+      where: { tenantId, status: TenancyStatus.ACTIVE },
       include: TENANCY_WITH_DESTINATION_INCLUDE,
     });
     if (!tenancy) throw new NotFoundException("No active lease found");

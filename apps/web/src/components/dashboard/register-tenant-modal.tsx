@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ApiError } from "@/lib/api";
-import { registerTenant } from "@/lib/tenants";
+import { registerTenant, type RegisterTenantResult } from "@/lib/tenants";
 import { Modal } from "@/components/shared/modal";
 import { FormButton } from "@/components/shared/form-button";
 import { InlineError } from "@/components/shared/inline-error";
@@ -22,7 +22,7 @@ export function RegisterTenantModal({
   const [email, setEmail] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
-  const [generatedCode, setGeneratedCode] = React.useState<string | null>(null);
+  const [result, setResult] = React.useState<RegisterTenantResult | null>(null);
 
   React.useEffect(() => {
     if (open) {
@@ -31,7 +31,7 @@ export function RegisterTenantModal({
       setPhone("");
       setEmail("");
       setError(null);
-      setGeneratedCode(null);
+      setResult(null);
     }
   }, [open]);
 
@@ -40,8 +40,7 @@ export function RegisterTenantModal({
     setError(null);
     setSubmitting(true);
     try {
-      const { tenantCode } = await registerTenant({ firstName, lastName, phone, email: email || undefined });
-      setGeneratedCode(tenantCode);
+      setResult(await registerTenant({ firstName, lastName, phone, email: email || undefined }));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
     } finally {
@@ -54,7 +53,7 @@ export function RegisterTenantModal({
     onOpenChange(false);
   }
 
-  if (generatedCode) {
+  if (result) {
     return (
       <Modal open={open} onOpenChange={onOpenChange} maxWidth={420}>
         <div className="text-center py-2">
@@ -63,14 +62,29 @@ export function RegisterTenantModal({
               <path d="M4 12l5 5L20 6" />
             </svg>
           </div>
-          <h3 className="font-display font-bold text-xl mb-2">Tenant registered</h3>
-          <p className="text-[13px] text-[var(--stone)] mb-5">
-            {firstName} isn&apos;t assigned to a unit yet — do that from a property&apos;s Units tab. Share this code with
-            them so they can set up their own login — it won&apos;t be shown again.
-          </p>
-          <div className="font-mono text-2xl font-bold tracking-wide bg-[var(--paper)] border border-[var(--line)] rounded-[12px] py-4 mb-6">
-            {generatedCode}
-          </div>
+          <h3 className="font-display font-bold text-xl mb-2">
+            {result.reused ? "Existing tenant found" : "Tenant registered"}
+          </h3>
+          {result.reused ? (
+            <p className="text-[13px] text-[var(--stone)] mb-6">
+              {firstName} already has a Makazi account. Assign them to a unit from a property&apos;s Units tab — they&apos;ll
+              get an invite to accept the new tenancy.
+            </p>
+          ) : result.tenantCode ? (
+            <>
+              <p className="text-[13px] text-[var(--stone)] mb-5">
+                {firstName} isn&apos;t assigned to a unit yet — do that from a property&apos;s Units tab. Share this code with
+                them so they can set up their own login — it won&apos;t be shown again.
+              </p>
+              <div className="font-mono text-2xl font-bold tracking-wide bg-[var(--paper)] border border-[var(--line)] rounded-[12px] py-4 mb-6">
+                {result.tenantCode}
+              </div>
+            </>
+          ) : (
+            <p className="text-[13px] text-[var(--stone)] mb-6">
+              {firstName} isn&apos;t assigned to a unit yet — do that from a property&apos;s Units tab.
+            </p>
+          )}
           <FormButton onClick={handleDone}>Done</FormButton>
         </div>
       </Modal>

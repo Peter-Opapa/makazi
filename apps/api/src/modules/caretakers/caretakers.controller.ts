@@ -32,6 +32,12 @@ export class CaretakersController {
   }
 
   @Roles(UserRole.LANDLORD)
+  @Get("caretakers/:caretakerId")
+  getDetail(@CurrentUser() user: AuthenticatedUser, @Param("caretakerId") caretakerId: string) {
+    return this.caretakersService.getDetail(user.id, caretakerId);
+  }
+
+  @Roles(UserRole.LANDLORD)
   @Post("caretaker-invites/:caretakerId/resend")
   resendInvite(@CurrentUser() user: AuthenticatedUser, @Param("caretakerId") caretakerId: string) {
     return this.caretakersService.resendInvite(user.id, caretakerId);

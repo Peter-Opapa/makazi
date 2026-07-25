@@ -109,6 +109,18 @@ enum CaretakerInviteStatus {
   DECLINED
 }
 
+/// A tenant can hold several tenancies at once (multiple units, same or
+/// different landlords). PENDING = assigned by a landlord this tenant hasn't
+/// accepted before, awaiting their in-app acceptance; ACTIVE = current and
+/// accepted; ENDED = moved out (kept for history, never deleted). Replaces
+/// the old `active` boolean, which couldn't distinguish "awaiting acceptance"
+/// from "current".
+enum TenancyStatus {
+  PENDING
+  ACTIVE
+  ENDED
+}
+
 enum PropertyType {
   APARTMENT_BLOCK
   BUNGALOWS
@@ -129,6 +141,14 @@ enum NotificationType {
   /// they correctly fall under the "payments" preference category instead
   /// of the "account" catch-all.
   PAYMENT_ALERT
+  /// A landlord (or their caretaker) assigned this tenant to a unit and the
+  /// tenant hasn't accepted this landlord before — see UnitsService.assignTenant.
+  TENANCY_INVITE
+  /// A tenant accepted a pending tenancy — notifies the property's landlord.
+  TENANCY_ACCEPTED
+  /// A tenant asked to end their tenancy — notifies the landlord and any
+  /// caretaker on that property, who approve it via the move-out flow.
+  TENANT_EXIT_REQUEST
   GENERAL
 }
 
@@ -315,15 +335,19 @@ model Tenancy {
   tenant           User      @relation(fields: [tenantId], references: [id])
   leaseStart       DateTime
   leaseEnd         DateTime?
-  depositAmount    Decimal?  @db.Decimal(12, 2)
-  rentAmount       Decimal   @db.Decimal(12, 2)
-  active           Boolean   @default(true)
+  depositAmount    Decimal?      @db.Decimal(12, 2)
+  rentAmount       Decimal       @db.Decimal(12, 2)
+  status           TenancyStatus @default(ACTIVE)
+  /// Set when the tenant asks to end this tenancy (see TenantsService.requestExit);
+  /// cleared/superseded once the landlord or caretaker takes them through move-out.
+  exitRequestedAt  DateTime?
+  exitReason       String?
   /// Generated lazily on first request (see LeaseService) — an HTML lease
   /// agreement rendered server-side and stored the same way as the Move-Out
   /// report. Not a general document vault, just this one document.
   leaseDocumentUrl String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   payments Payment[]
   moveOut  MoveOut?

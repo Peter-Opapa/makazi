@@ -6,6 +6,7 @@ import {
   MaintenancePriority,
   MaintenanceStatus,
   NotificationType,
+  TenancyStatus,
   UserRole,
 } from "@makazi/shared-types";
 import { Prisma } from "../../../generated/prisma";
@@ -76,7 +77,7 @@ export class MaintenanceService {
     let scope: Prisma.MaintenanceTicketWhereInput;
 
     if (user.role === UserRole.TENANT) {
-      scope = { unit: { tenancies: { some: { tenantId: user.id, active: true } } } };
+      scope = { unit: { tenancies: { some: { tenantId: user.id, status: TenancyStatus.ACTIVE } } } };
     } else {
       if (query.propertyId) {
         await this.access.assertAccess(user, query.propertyId);
@@ -283,7 +284,7 @@ export class MaintenanceService {
 
     if (user.role === UserRole.TENANT) {
       const tenancy = await this.prisma.tenancy.findFirst({
-        where: { unitId: unit.id, tenantId: user.id, active: true },
+        where: { unitId: unit.id, tenantId: user.id, status: TenancyStatus.ACTIVE },
       });
       if (!tenancy) throw new ForbiddenException("You can only report issues for your own unit");
     } else {

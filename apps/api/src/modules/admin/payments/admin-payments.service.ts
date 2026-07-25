@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { PaymentStatus } from "@makazi/shared-types";
+import { PaymentStatus, TenancyStatus } from "@makazi/shared-types";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { PaymentsService } from "../../payments/payments.service";
 import { AuditLogService } from "../../audit-log/audit-log.service";
@@ -105,7 +105,7 @@ export class AdminPaymentsService {
   async searchActiveTenancies(search: string) {
     const tenancies = await this.prisma.tenancy.findMany({
       where: {
-        active: true,
+        status: TenancyStatus.ACTIVE,
         tenant: {
           OR: [
             { firstName: { contains: search, mode: "insensitive" } },

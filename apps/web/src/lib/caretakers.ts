@@ -40,6 +40,28 @@ export function listCaretakersForProperty(propertyId: string) {
   return apiFetch<CaretakerAssignmentListItem[]>(`/properties/${propertyId}/caretakers`);
 }
 
+export interface CaretakerDetail {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  email: string | null;
+  joined: boolean;
+  createdAt: string;
+  assignments: {
+    id: string;
+    inviteStatus: CaretakerInviteStatus;
+    invitedAt: string;
+    acceptedAt: string | null;
+    property: { id: string; name: string; location: string; county: string | null };
+  }[];
+}
+
+/** Full profile of one caretaker: contact info, joined status, and every property of yours they help manage. */
+export function getCaretakerDetail(caretakerId: string) {
+  return apiFetch<CaretakerDetail>(`/caretakers/${caretakerId}`);
+}
+
 /** Resends an expired/lost invite link for a caretaker who hasn't joined Makazi yet. */
 export function resendCaretakerInvite(caretakerId: string) {
   return apiFetch<{ resent: boolean; inviteToken?: string }>(`/caretaker-invites/${caretakerId}/resend`, { method: "POST" });

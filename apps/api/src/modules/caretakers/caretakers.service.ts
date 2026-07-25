@@ -200,6 +200,40 @@ export class CaretakersService {
     });
   }
 
+  /** Full profile of one caretaker for the landlord: contact info, whether they've joined, and every property of this landlord's they help manage. */
+  async getDetail(landlordId: string, caretakerId: string) {
+    const caretaker = await this.prisma.user.findFirst({
+      where: { id: caretakerId, role: UserRole.CARETAKER },
+      select: { id: true, firstName: true, lastName: true, phone: true, email: true, clerkUserId: true, createdAt: true },
+    });
+    if (!caretaker) throw new NotFoundException("Caretaker not found");
+
+    const assignments = await this.prisma.caretakerAssignment.findMany({
+      where: { caretakerId, property: { landlordId } },
+      include: { property: { select: { id: true, name: true, location: true, county: true } } },
+      orderBy: { invitedAt: "desc" },
+    });
+    // Scope: only a landlord this caretaker actually works with can view them.
+    if (assignments.length === 0) throw new NotFoundException("Caretaker not found");
+
+    return {
+      id: caretaker.id,
+      firstName: caretaker.firstName,
+      lastName: caretaker.lastName,
+      phone: caretaker.phone,
+      email: caretaker.email,
+      joined: Boolean(caretaker.clerkUserId),
+      createdAt: caretaker.createdAt,
+      assignments: assignments.map((a) => ({
+        id: a.id,
+        inviteStatus: a.inviteStatus,
+        invitedAt: a.invitedAt,
+        acceptedAt: a.acceptedAt,
+        property: a.property,
+      })),
+    };
+  }
+
   listMyInvites(caretakerId: string) {
     return this.prisma.caretakerAssignment.findMany({
       where: { caretakerId, inviteStatus: CaretakerInviteStatus.PENDING },

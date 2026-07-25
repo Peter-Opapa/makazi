@@ -4,7 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import { createClerkClient, type ClerkClient } from "@clerk/backend";
 import * as bcrypt from "bcrypt";
 import { randomInt } from "crypto";
-import { CaretakerInviteStatus, NotificationType, UserRole } from "@makazi/shared-types";
+import { CaretakerInviteStatus, NotificationType, TenancyStatus, UserRole } from "@makazi/shared-types";
 import { PrismaService } from "../../prisma/prisma.service";
 import { EmailService } from "./email.service";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
@@ -133,7 +133,7 @@ export class AuthService {
   async verifyTenantCode(dto: VerifyTenantCodeDto) {
     const user = await this.getUnclaimedTenantByCode(dto.tenantCode);
     const tenancy = await this.prisma.tenancy.findFirst({
-      where: { tenantId: user.id, active: true },
+      where: { tenantId: user.id, status: { in: [TenancyStatus.PENDING, TenancyStatus.ACTIVE] } },
       orderBy: { createdAt: "desc" },
       include: { unit: { include: { property: true } } },
     });

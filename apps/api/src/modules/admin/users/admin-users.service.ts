@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { randomInt } from "crypto";
 import * as bcrypt from "bcrypt";
-import { UserRole } from "@makazi/shared-types";
+import { TenancyStatus, UserRole } from "@makazi/shared-types";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { EmailService } from "../../auth/email.service";
 import { AuditLogService } from "../../audit-log/audit-log.service";
@@ -69,7 +69,7 @@ export class AdminUsersService {
       this.prisma.supportTicket.count({ where: { customerId: id } }),
       user.role === UserRole.TENANT
         ? this.prisma.tenancy.findFirst({
-            where: { tenantId: id, active: true },
+            where: { tenantId: id, status: TenancyStatus.ACTIVE },
             include: { unit: { include: { property: true } } },
             orderBy: { createdAt: "desc" },
           })

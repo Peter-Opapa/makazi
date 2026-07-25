@@ -6,6 +6,7 @@ import { SearchInput } from "@/components/shared/search-input";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { FormButton } from "@/components/shared/form-button";
 import { RegisterTenantModal } from "@/components/dashboard/register-tenant-modal";
+import { ExitRequestsSection } from "@/components/dashboard/exit-requests-section";
 
 export default function CaretakerTenantsPage() {
   const [search, setSearch] = React.useState("");
@@ -30,6 +31,8 @@ export default function CaretakerTenantsPage() {
           Register tenant
         </FormButton>
       </div>
+
+      <ExitRequestsSection propertyHrefBase="/caretaker/properties" />
 
       <div className="mb-5">
         <SearchInput value={search} onChange={setSearch} placeholder="Name, phone or email…" />
