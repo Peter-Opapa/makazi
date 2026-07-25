@@ -13,6 +13,7 @@ export interface TenantListItem {
   lastName: string;
   phone: string | null;
   email: string | null;
+  claimed: boolean;
   tenancies: TenantUnitInfo[];
 }
 
@@ -39,4 +40,19 @@ export function listTenants(search?: string) {
 /** Resends the invitation email for a tenant who hasn't claimed their Makazi account yet. */
 export function resendTenantInvite(tenantId: string) {
   return apiFetch<{ resent: true }>(`/tenants/${tenantId}/resend-invite`, { method: "POST" });
+}
+
+export interface UpdateTenantContactInput {
+  email?: string;
+  phone?: string;
+}
+
+/** Fixes a typo'd email/phone — only works before the tenant claims their tenantCode. */
+export function updateTenantContact(tenantId: string, input: UpdateTenantContactInput) {
+  return apiFetch<TenantListItem>(`/tenants/${tenantId}`, { method: "PATCH", body: JSON.stringify(input) });
+}
+
+/** Deletes a tenant who hasn't claimed their tenantCode yet — frees any unit they were assigned to. */
+export function cancelPendingTenant(tenantId: string) {
+  return apiFetch<void>(`/tenants/${tenantId}`, { method: "DELETE" });
 }

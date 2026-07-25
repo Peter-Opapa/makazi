@@ -4,10 +4,18 @@ import * as React from "react";
 import { toast } from "sonner";
 import { CaretakerInviteStatus } from "@makazi/shared-types";
 import { listProperties } from "@/lib/properties";
-import { listCaretakersForProperty, resendCaretakerInvite, type CaretakerAssignmentListItem } from "@/lib/caretakers";
+import {
+  listCaretakersForProperty,
+  resendCaretakerInvite,
+  revokeCaretaker,
+  updateCaretakerContact,
+  type CaretakerAssignmentListItem,
+} from "@/lib/caretakers";
 import { ApiError } from "@/lib/api";
 import { FormButton } from "@/components/shared/form-button";
 import { InviteCaretakerModal } from "@/components/dashboard/invite-caretaker-modal";
+import { EditContactModal } from "@/components/dashboard/edit-contact-modal";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 const STATUS_LABEL: Record<CaretakerInviteStatus, string> = {
   [CaretakerInviteStatus.PENDING]: "Pending",
@@ -29,6 +37,8 @@ export default function CaretakersPage() {
   const [properties, setProperties] = React.useState<{ id: string; name: string }[]>([]);
   const [rows, setRows] = React.useState<Row[] | null>(null);
   const [inviteOpen, setInviteOpen] = React.useState(false);
+  const [editRow, setEditRow] = React.useState<Row | null>(null);
+  const [revokeRow, setRevokeRow] = React.useState<Row | null>(null);
 
   const refetch = React.useCallback(async () => {
     const result = await listProperties({ page: 1, pageSize: 100 });
@@ -101,12 +111,22 @@ export default function CaretakersPage() {
                   {STATUS_LABEL[row.inviteStatus]}
                 </span>
                 {row.inviteStatus === CaretakerInviteStatus.PENDING && (
-                  <button
-                    type="button"
-                    onClick={() => handleResend(row.caretakerId)}
-                    className="text-[13px] font-semibold text-[var(--green)]"
-                  >
-                    Resend invite
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleResend(row.caretakerId)}
+                      className="text-[13px] font-semibold text-[var(--green)]"
+                    >
+                      Resend invite
+                    </button>
+                    <button type="button" onClick={() => setEditRow(row)} className="text-[13px] font-semibold text-[var(--stone)]">
+                      Edit
+                    </button>
+                  </>
+                )}
+                {row.inviteStatus !== CaretakerInviteStatus.DECLINED && (
+                  <button type="button" onClick={() => setRevokeRow(row)} className="text-[13px] font-semibold text-[var(--error)]">
+                    Revoke
                   </button>
                 )}
               </div>
@@ -121,6 +141,33 @@ export default function CaretakersPage() {
         properties={properties}
         onInvited={() => refetch()}
       />
+
+      {editRow && (
+        <EditContactModal
+          open={Boolean(editRow)}
+          onOpenChange={(open) => !open && setEditRow(null)}
+          name={`${editRow.caretaker.firstName} ${editRow.caretaker.lastName}`}
+          currentEmail={editRow.caretaker.email}
+          currentPhone={editRow.caretaker.phone}
+          onSubmit={(input) => updateCaretakerContact(editRow.caretakerId, input)}
+          onUpdated={() => refetch()}
+        />
+      )}
+
+      {revokeRow && (
+        <ConfirmDialog
+          open={Boolean(revokeRow)}
+          onOpenChange={(open) => !open && setRevokeRow(null)}
+          title="Revoke access?"
+          description={`${revokeRow.caretaker.firstName} ${revokeRow.caretaker.lastName} will lose access to ${revokeRow.propertyName}. Any other properties they help manage are unaffected.`}
+          confirmLabel="Revoke access"
+          onConfirm={async () => {
+            await revokeCaretaker(revokeRow.propertyId, revokeRow.caretakerId);
+            toast("Access revoked.");
+            await refetch();
+          }}
+        />
+      )}
     </div>
   );
 }

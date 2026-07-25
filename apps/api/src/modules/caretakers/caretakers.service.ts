@@ -5,6 +5,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { InvitationEmailService } from "../invitations/invitation-email.service";
 import { InviteCaretakerDto } from "./dto/invite-caretaker.dto";
+import { UpdateCaretakerContactDto } from "./dto/update-caretaker-contact.dto";
 
 const INVITE_TOKEN_TTL_DAYS = 14;
 
@@ -230,6 +231,58 @@ export class CaretakersService {
     return this.prisma.caretakerAssignment.update({
       where: { id: assignmentId },
       data: { inviteStatus: CaretakerInviteStatus.DECLINED },
+    });
+  }
+
+  /** Removes a caretaker's access to one property — leaves any other properties they're assigned to untouched. */
+  async revoke(landlordId: string, propertyId: string, caretakerId: string) {
+    const property = await this.prisma.property.findFirst({ where: { id: propertyId, landlordId } });
+    if (!property) throw new NotFoundException("Property not found");
+
+    const assignment = await this.prisma.caretakerAssignment.findUnique({
+      where: { caretakerId_propertyId: { caretakerId, propertyId } },
+    });
+    if (!assignment) throw new NotFoundException("Assignment not found");
+
+    await this.prisma.caretakerAssignment.delete({ where: { id: assignment.id } });
+
+    if (assignment.inviteStatus === CaretakerInviteStatus.ACCEPTED) {
+      await this.notifications.create(
+        caretakerId,
+        NotificationType.GENERAL,
+        `Your access to ${property.name} has been revoked`,
+      );
+    }
+  }
+
+  /**
+   * Fixes a typo'd email/phone on a not-yet-claimed invite. Once claimed,
+   * the caretaker's contact info is tied to their own Clerk identity — a
+   * landlord editing it afterward would desync it from their actual login,
+   * so this is intentionally rejected once clerkUserId is set.
+   */
+  async updateContact(landlordId: string, caretakerId: string, dto: UpdateCaretakerContactDto) {
+    const caretaker = await this.prisma.user.findFirst({
+      where: { id: caretakerId, role: UserRole.CARETAKER, caretakerInvitedById: landlordId },
+    });
+    if (!caretaker) throw new NotFoundException("Caretaker not found");
+    if (caretaker.clerkUserId) {
+      throw new ConflictException("This caretaker has already joined Makazi and manages their own contact info.");
+    }
+
+    if (dto.email && dto.email !== caretaker.email) {
+      const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+      if (existing) throw new ConflictException("This email is already associated with a different Makazi account.");
+    }
+    if (dto.phone && dto.phone !== caretaker.phone) {
+      const existing = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
+      if (existing) throw new ConflictException("This phone number is already associated with a different Makazi account.");
+    }
+
+    return this.prisma.user.update({
+      where: { id: caretakerId },
+      data: { email: dto.email, phone: dto.phone },
+      select: { id: true, firstName: true, lastName: true, phone: true, email: true },
     });
   }
 

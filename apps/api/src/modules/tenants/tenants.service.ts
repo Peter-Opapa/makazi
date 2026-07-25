@@ -1,11 +1,12 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { randomInt } from "crypto";
-import { UserRole } from "@makazi/shared-types";
+import { UnitStatus, UserRole } from "@makazi/shared-types";
 import { Prisma } from "../../../generated/prisma";
 import { PrismaService } from "../../prisma/prisma.service";
 import { PropertyAccessService, type ActingUser } from "../../common/services/property-access.service";
 import { InvitationEmailService } from "../invitations/invitation-email.service";
 import { RegisterTenantDto } from "./dto/register-tenant.dto";
+import { UpdateTenantContactDto } from "./dto/update-tenant-contact.dto";
 
 const TENANT_CODE_CHARSET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no O/0/I/1
 
@@ -113,6 +114,67 @@ export class TenantsService {
     return tenants.map((t) => ({ ...this.sanitize(t), tenancies: t.tenancies }));
   }
 
+  /**
+   * Deletes a tenant who hasn't claimed their tenantCode yet — frees any
+   * unit they'd been assigned to back to VACANT in the same transaction.
+   * For a mistaken registration, or one that's no longer going ahead.
+   */
+  async cancelPendingRegistration(actor: ActingUser, tenantId: string) {
+    const tenant = await this.prisma.user.findFirst({ where: { id: tenantId, role: UserRole.TENANT } });
+    if (!tenant) throw new NotFoundException("Tenant not found");
+    if (tenant.tenantCodeClaimedAt) throw new BadRequestException("This tenant has already joined Makazi.");
+
+    const authorized =
+      tenant.registeredById === actor.id ||
+      (await this.prisma.tenancy.findFirst({
+        where: { tenantId: tenant.id, active: true, unit: { propertyId: { in: await this.access.accessiblePropertyIds(actor) } } },
+      }));
+    if (!authorized) throw new NotFoundException("Tenant not found");
+
+    await this.prisma.$transaction(async (tx) => {
+      const activeTenancies = await tx.tenancy.findMany({ where: { tenantId: tenant.id, active: true } });
+      for (const tenancy of activeTenancies) {
+        await tx.unit.update({ where: { id: tenancy.unitId }, data: { status: UnitStatus.VACANT } });
+      }
+      await tx.tenancy.deleteMany({ where: { tenantId: tenant.id } });
+      await tx.user.delete({ where: { id: tenant.id } });
+    });
+  }
+
+  /**
+   * Fixes a typo'd email/phone before the tenant claims their tenantCode.
+   * Once claimed, their contact info is tied to their own Clerk identity —
+   * a landlord/caretaker editing it afterward would desync it from their
+   * actual login, so this is rejected once tenantCodeClaimedAt is set.
+   */
+  async updateContact(actor: ActingUser, tenantId: string, dto: UpdateTenantContactDto) {
+    const tenant = await this.prisma.user.findFirst({ where: { id: tenantId, role: UserRole.TENANT } });
+    if (!tenant) throw new NotFoundException("Tenant not found");
+    if (tenant.tenantCodeClaimedAt) throw new ConflictException("This tenant has already joined Makazi and manages their own contact info.");
+
+    const authorized =
+      tenant.registeredById === actor.id ||
+      (await this.prisma.tenancy.findFirst({
+        where: { tenantId: tenant.id, active: true, unit: { propertyId: { in: await this.access.accessiblePropertyIds(actor) } } },
+      }));
+    if (!authorized) throw new NotFoundException("Tenant not found");
+
+    if (dto.email && dto.email !== tenant.email) {
+      const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+      if (existing) throw new ConflictException("This email is already associated with a different Makazi account.");
+    }
+    if (dto.phone && dto.phone !== tenant.phone) {
+      const existing = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
+      if (existing) throw new ConflictException("This phone number is already associated with a different Makazi account.");
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: tenantId },
+      data: { email: dto.email, phone: dto.phone },
+    });
+    return this.sanitize(updated);
+  }
+
   /** Best-effort — an SMTP hiccup must never fail tenant registration/assignment. */
   async sendInvite(
     tenantId: string,
@@ -153,7 +215,21 @@ export class TenantsService {
     throw new Error("Could not generate a unique tenant code");
   }
 
-  private sanitize(user: { id: string; firstName: string; lastName: string; phone: string | null; email: string | null }) {
-    return { id: user.id, firstName: user.firstName, lastName: user.lastName, phone: user.phone, email: user.email };
+  private sanitize(user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string | null;
+    email: string | null;
+    tenantCodeClaimedAt: Date | null;
+  }) {
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      email: user.email,
+      claimed: user.tenantCodeClaimedAt !== null,
+    };
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { UserRole } from "@makazi/shared-types";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
@@ -6,6 +6,7 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { CurrentUser, type AuthenticatedUser } from "../../common/decorators/current-user.decorator";
 import { TenantsService } from "./tenants.service";
 import { RegisterTenantDto } from "./dto/register-tenant.dto";
+import { UpdateTenantContactDto } from "./dto/update-tenant-contact.dto";
 
 // Landlord/Caretaker: tenancy directory for properties they have access to.
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,5 +28,15 @@ export class TenantsController {
   @Post(":id/resend-invite")
   resendInvite(@CurrentUser() user: AuthenticatedUser, @Param("id") id: string) {
     return this.tenantsService.resendInvite(user, id);
+  }
+
+  @Patch(":id")
+  updateContact(@CurrentUser() user: AuthenticatedUser, @Param("id") id: string, @Body() dto: UpdateTenantContactDto) {
+    return this.tenantsService.updateContact(user, id, dto);
+  }
+
+  @Delete(":id")
+  cancelPendingRegistration(@CurrentUser() user: AuthenticatedUser, @Param("id") id: string) {
+    return this.tenantsService.cancelPendingRegistration(user, id);
   }
 }

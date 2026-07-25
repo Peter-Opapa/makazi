@@ -45,6 +45,24 @@ export function resendCaretakerInvite(caretakerId: string) {
   return apiFetch<{ resent: boolean; inviteToken?: string }>(`/caretaker-invites/${caretakerId}/resend`, { method: "POST" });
 }
 
+export interface UpdateCaretakerContactInput {
+  email?: string;
+  phone?: string;
+}
+
+/** Fixes a typo'd email/phone — only works before the caretaker claims their invite. */
+export function updateCaretakerContact(caretakerId: string, input: UpdateCaretakerContactInput) {
+  return apiFetch<{ id: string; firstName: string; lastName: string; phone: string | null; email: string | null }>(
+    `/caretaker-invites/${caretakerId}`,
+    { method: "PATCH", body: JSON.stringify(input) },
+  );
+}
+
+/** Removes a caretaker's access to one property — any other properties they're assigned to are untouched. */
+export function revokeCaretaker(propertyId: string, caretakerId: string) {
+  return apiFetch<void>(`/properties/${propertyId}/caretakers/${caretakerId}`, { method: "DELETE" });
+}
+
 export function listMyInvites() {
   return apiFetch<CaretakerInvite[]>("/caretaker/invites");
 }
