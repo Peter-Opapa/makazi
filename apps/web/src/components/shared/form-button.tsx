@@ -28,7 +28,7 @@ export function FormButton({
     <button
       type={type}
       className={cn(
-        "rounded-[10px] px-[14px] py-[14px] text-[15px] font-semibold transition-colors disabled:cursor-default",
+        "rounded-[10px] px-[14px] py-[14px] text-[15px] font-semibold transition-all active:translate-y-px disabled:cursor-default",
         fullWidth && "w-full",
         variantClasses[variant],
         className,
