@@ -40,3 +40,6 @@ Thumbs.db
 
 # testing
 coverage/
+
+# Generated tenant-import templates (account-specific, not source)
+makazi-tenant-import-template*.csv
