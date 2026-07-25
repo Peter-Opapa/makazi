@@ -434,48 +434,57 @@ export function Sidebar({
         {!collapsed && <span className="whitespace-nowrap">Settings</span>}
       </Link>
 
-      <div
-        onClick={() => setProfileMenuOpen((o) => !o)}
-        className="flex items-center gap-[9px] px-2 py-[10px] mt-2 cursor-pointer relative"
-        style={{ borderTop: "1px solid rgba(255,255,255,.1)" }}
-      >
-        <div
-          className="w-7 h-7 rounded-full bg-[var(--green)] flex items-center justify-center text-[11px] font-semibold shrink-0 overflow-hidden bg-cover bg-center"
-          style={user.profilePhotoUrl ? { backgroundImage: `url(${user.profilePhotoUrl})` } : undefined}
+      <div className="relative mt-2" style={{ borderTop: "1px solid rgba(255,255,255,.1)" }}>
+        <button
+          type="button"
+          onClick={() => setProfileMenuOpen((o) => !o)}
+          aria-haspopup="menu"
+          aria-expanded={profileMenuOpen}
+          className="flex items-center gap-[9px] px-2 py-[10px] w-full text-left"
         >
-          {!user.profilePhotoUrl && initials}
-        </div>
-        {!collapsed && (
-          <div className="leading-tight flex-1 min-w-0">
-            <div className="text-xs font-medium truncate">{user.firstName}</div>
-            <div className="text-[10px] text-[#9AA39D]">{roleLabel}</div>
+          <div
+            className="w-7 h-7 rounded-full bg-[var(--green)] flex items-center justify-center text-[11px] font-semibold shrink-0 overflow-hidden bg-cover bg-center"
+            style={user.profilePhotoUrl ? { backgroundImage: `url(${user.profilePhotoUrl})` } : undefined}
+          >
+            {!user.profilePhotoUrl && initials}
           </div>
-        )}
+          {!collapsed && (
+            <div className="leading-tight flex-1 min-w-0">
+              <div className="text-xs font-medium truncate">{user.firstName}</div>
+              <div className="text-[10px] text-[#9AA39D]">{roleLabel}</div>
+            </div>
+          )}
+        </button>
         {profileMenuOpen && (
           <div
+            role="menu"
             className="absolute bottom-12 left-2 right-2 bg-white border border-[var(--line)] rounded-[10px] overflow-hidden w-[200px]"
             style={{ boxShadow: "0 24px 60px -30px rgba(0,0,0,.4)" }}
           >
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setProfileMenuOpen(false);
                 onNavigate?.();
                 router.push(settingsHref);
               }}
-              className="px-[14px] py-[11px] text-[13px] text-[var(--ink)]"
+              className="block w-full text-left px-[14px] py-[11px] text-[13px] text-[var(--ink)] hover:bg-[var(--paper)]"
             >
               Profile &amp; settings
-            </div>
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setProfileMenuOpen(false);
                 onNavigate?.();
                 router.push("/logout");
               }}
-              className="px-[14px] py-[11px] text-[13px] text-[var(--error)] border-t border-[var(--line)]"
+              className="block w-full text-left px-[14px] py-[11px] text-[13px] text-[var(--error)] border-t border-[var(--line)] hover:bg-[var(--paper)]"
             >
               Log out
-            </div>
+            </button>
           </div>
         )}
       </div>
